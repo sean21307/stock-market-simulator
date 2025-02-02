@@ -16,3 +16,5 @@ backend/stock_market_venv/
 # Ignore system-specific files
 .DS_Store
 Thumbs.db
+
+venv
