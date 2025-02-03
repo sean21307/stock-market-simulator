@@ -5,6 +5,13 @@ import { AgCharts } from 'ag-charts-angular';
 import { AgChartOptions } from 'ag-charts-community';
 import { StockPriceService } from '../../services/stock-price.service';
 
+
+
+type stockData = {
+  date: string,
+  closing_price: string
+}
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -14,7 +21,7 @@ import { StockPriceService } from '../../services/stock-price.service';
 })
 export class DashboardComponent implements OnInit {
   chartOptions!: AgChartOptions;
-  stockData: { day: string, price: number }[] = [];
+  stockDataArray: stockData[] = [];
 
   constructor(private stockPriceService: StockPriceService) {
     
@@ -22,19 +29,15 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() {
     // mock data
-    this.stockData = [
-      { day: '2024-02-02', price: 184.94395446777344 },
-      { day: '2024-02-05', price: 188.32736786854025 },
-      { day: '2024-02-06', price: 188.38708201253658 },
-      { day: '2024-02-07', price: 190.11859155018027 },
-      { day: '2024-02-08', price: 188.6159548348253 },
-      { day: '2024-02-09', price: 189.30503301755343 },
-      { day: '2024-02-12', price: 187.98977434952795 },
-    ]
 
-    const transformedData = this.stockData.map(entry => ({
-      day: this.stockPriceService.formatDate(entry.day),
-      price: entry.price
+    this.stockPriceService.getStockPrices('AAPL').subscribe(data => {
+      this.stockDataArray = data;
+      console.log(this.stockDataArray);
+    });
+
+    const transformedData = this.stockDataArray.map(entry => ({
+      day: this.stockPriceService.formatDate(entry.date),
+      price: entry.closing_price
     }));
 
     this.chartOptions = {
