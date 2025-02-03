@@ -52,7 +52,7 @@ export class DashboardComponent implements OnInit {
         }
       ],
       background: {
-        fill: "#d1d5db",
+        fill: "#ffffff",
       }
     };
   }
