@@ -31,32 +31,36 @@ export class DashboardComponent implements OnInit {
     // mock data
 
     this.stockPriceService.getStockPrices('AAPL').subscribe(data => {
-      this.stockDataArray = data;
+      this.stockDataArray = data.slice(0, 30);
       console.log(this.stockDataArray);
+
+      const transformedData = this.stockDataArray.map(entry => ({
+        day: this.stockPriceService.formatDate(entry.date),
+        price: +entry.closing_price 
+      }));
+
+      console.log(transformedData);
+  
+      this.chartOptions = {
+        data: transformedData,
+  
+        series: [
+          { 
+            type: 'line', 
+            xKey: 'day', 
+            yKey: 'price',
+            connectMissingData: true,
+            // interpolation: {
+            //   type: 'smooth',
+            // }
+          }
+        ],
+        background: {
+          fill: "#ffffff",
+        }
+      };
     });
 
-    const transformedData = this.stockDataArray.map(entry => ({
-      day: this.stockPriceService.formatDate(entry.date),
-      price: entry.closing_price
-    }));
-
-    this.chartOptions = {
-      data: transformedData,
-
-      series: [
-        { 
-          type: 'line', 
-          xKey: 'day', 
-          yKey: 'price',
-          connectMissingData: true,
-          // interpolation: {
-          //   type: 'smooth',
-          // }
-        }
-      ],
-      background: {
-        fill: "#ffffff",
-      }
-    };
+    
   }
 }

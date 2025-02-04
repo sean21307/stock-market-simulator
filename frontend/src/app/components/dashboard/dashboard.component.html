@@ -25,10 +25,12 @@
             <hr class="bg-gray-400">
 
             <div class="h-full flex items-center justify-center mt-2">
-                <ag-charts
-                    style="height: 100%; width: 100%;"
-                    [options]="chartOptions">
-                </ag-charts>
+                @if (chartOptions) {
+                    <ag-charts class="w-full h-full"
+                        [options]="chartOptions">
+                    </ag-charts>
+                }
+                
             </div>
             
         </app-card>
