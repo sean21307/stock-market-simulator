@@ -90,10 +90,10 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        "NAME": 'stock-market-sim',
-        "USER": "root",
-        "PASSWORD": "admin123",
-        "HOST": "localhost",
+        "NAME": env('DB_NAME'),
+        "USER": env('DB_USERNAME'),
+        "PASSWORD": env('DB_PASS'),
+        "HOST": env('DB_HOST'),
         "PORT": env('DB_PORT')
     }
 }
