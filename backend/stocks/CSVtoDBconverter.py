@@ -5,7 +5,7 @@ stock_constants = open('stocks/stock_ticker_constants.txt','r')
 count = 0
 for line in stock_constants.readlines():
     stock_symbol = line.rsplit(',')[0]
-    stock_name = line.rsplit(',')[1]
+    stock_name = line.rsplit(',')[1].replace('\n','')
     stock = Stock(symbol=stock_symbol, name=stock_name, description="placeholder")
     stock.save()
     csv = open('stocks/stockdata/' + stock_symbol + '_stockData.csv','r')
