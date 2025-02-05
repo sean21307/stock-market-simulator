@@ -31,7 +31,7 @@ export class DashboardComponent implements OnInit {
     // mock data
 
     this.stockPriceService.getStockPrices('AAPL').subscribe(data => {
-      this.stockDataArray = data.slice(0, 30);
+      this.stockDataArray = data.slice(0, 200);
       console.log(this.stockDataArray);
 
       const transformedData = this.stockDataArray.map(entry => ({
@@ -50,6 +50,9 @@ export class DashboardComponent implements OnInit {
             xKey: 'day', 
             yKey: 'price',
             connectMissingData: true,
+            marker: {
+              enabled: false,
+            }, 
             // interpolation: {
             //   type: 'smooth',
             // }
