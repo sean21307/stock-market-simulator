@@ -38,7 +38,7 @@ def getStocksAndPriceWithChange(request):
 
         current_date = EndOfDay.objects.filter(symbol=symbol).aggregate(Max('date'))['date__max']
         if current_date.weekday == 0:
-            previous_date = previous_date - timedelta(days=3)
+            previous_date = current_date - timedelta(days=3)
         else:
             previous_date = current_date - timedelta(days=1)
 
