@@ -59,7 +59,7 @@ GRAL,Grail Inc
 NVDA,NVIDIA Corp
 NXPI,NXP Semiconductors NV
 ODFL,Old Dominion Freight Line Inc
-ORLY,O’Reilly Automotive Inc
+ORLY,Oï¿½Reilly Automotive Inc
 PCAR,Paccar Inc
 PANW,Palo Alto Networks Inc
 PAYX,Paychex Inc

@@ -1,5 +1,5 @@
 def getStockData(stock_symbol):
-    csv = open("stockMarketDataGatherer/stockdata/" + stock_symbol + "_stockData.csv")
+    csv = open("stocks/stockdata/" + stock_symbol + "_stockData.csv")
     entries = []
     for line in csv.readlines():
         date = line.split(',')[0]

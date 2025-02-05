@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class StockmarketdatagathererConfig(AppConfig):
+class StocksConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'stockMarketDataGatherer'
+    name = 'stocks'
