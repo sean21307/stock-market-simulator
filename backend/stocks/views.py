@@ -18,7 +18,7 @@ def getStockDetails(request,stock_symbol):
 
 def getNewStockBySymbol(request,stock_symbol):
     data = dict()
-    data['stockInfo'] = list(Stock.objects.filter(symbol=stock_symbol).values())
+    data['stockInfo'] = dict(Stock.objects.filter(symbol=stock_symbol).values().first())
     data['prices'] = list(EndOfDay.objects.filter(symbol=stock_symbol).values('date','closing_price'))
     return JsonResponse(data,safe=False)
 
@@ -27,7 +27,9 @@ def getStockBySymbolAndRange(request,stock_symbol,start,end):
     return JsonResponse(data, safe=False)
 
 def getStocksAndPriceWithChange(request):
-    data = list(Stock.objects.all().values("symbol"))
-    for entry in data:
-        entry['current_price'] = EndOfDay.objects.values('date').order_by('date')[0]
+    data = dict()
+
+    stocks = list(Stock.objects.all().values("symbol"))
+    for symbol in stocks:
+        data = ['min_date',EndOfDay.objects.values('date').order_by('date')[0]]
     return JsonResponse(data,safe=False)
