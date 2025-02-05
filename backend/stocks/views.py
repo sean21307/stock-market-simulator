@@ -1,6 +1,8 @@
+from datetime import date, datetime, timedelta
 from gc import get_objects
 
 from django.http import HttpResponse, JsonResponse
+from django.db.models import Max
 from django.shortcuts import render, get_object_or_404
 from . import CsvStockReader as csv
 
@@ -27,9 +29,23 @@ def getStockBySymbolAndRange(request,stock_symbol,start,end):
     return JsonResponse(data, safe=False)
 
 def getStocksAndPriceWithChange(request):
-    data = dict()
+    listOfData = list()
+    stocks = [symbol['symbol'] for symbol in Stock.objects.all().values("symbol")]
 
-    stocks = list(Stock.objects.all().values("symbol"))
     for symbol in stocks:
-        data = ['min_date',EndOfDay.objects.values('date').order_by('date')[0]]
-    return JsonResponse(data,safe=False)
+        data = dict()
+        data['symbol'] = symbol
+
+        current_date = EndOfDay.objects.filter(symbol=symbol).aggregate(Max('date'))['date__max']
+        if current_date.weekday == 0:
+            previous_date = previous_date - timedelta(days=3)
+        else:
+            previous_date = current_date - timedelta(days=1)
+
+        current_price = list(EndOfDay.objects.filter(symbol=symbol).filter(date=current_date).values('closing_price'))[0]['closing_price']
+        previous_price = list(EndOfDay.objects.filter(symbol=symbol).filter(date=previous_date).values('closing_price'))[0]['closing_price']
+
+        data['current_price'] = current_price
+        data['change'] = (current_price / previous_price) - 1
+        listOfData.append(data)
+    return JsonResponse(listOfData, safe=False)
