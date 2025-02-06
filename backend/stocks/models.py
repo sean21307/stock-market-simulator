@@ -18,3 +18,9 @@ class EndOfDay(models.Model):
     max_price = models.FloatField()
     volume = models.IntegerField()
     symbol = models.ForeignKey('Stock', on_delete=models.CASCADE)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["symbol", "-date", "closing_price"], name="idx_symbol_date_price")
+        ]
+        unique_together = ("symbol", "date")

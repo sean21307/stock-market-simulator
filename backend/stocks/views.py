@@ -1,9 +1,5 @@
-from datetime import date, datetime, timedelta
-from gc import get_objects
-
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.db.models import Max
-from django.shortcuts import render, get_object_or_404
 from . import CsvStockReader as csv
 
 
@@ -29,23 +25,42 @@ def getStockBySymbolAndRange(request,stock_symbol,start,end):
     return JsonResponse(data, safe=False)
 
 def getStocksAndPriceWithChange(request):
-    listOfData = list()
-    stocks = [symbol['symbol'] for symbol in Stock.objects.all().values("symbol")]
 
-    for symbol in stocks:
-        data = dict()
-        data['symbol'] = symbol
+    latest_dates = (
+        EndOfDay.objects
+        .values("symbol")
+        .annotate(latest_date=Max("date"))
+    )
 
-        current_date = EndOfDay.objects.filter(symbol=symbol).aggregate(Max('date'))['date__max']
-        if current_date.weekday == 0:
-            previous_date = current_date - timedelta(days=3)
+    stock_data = []
+    for entry in latest_dates:
+        symbol = entry["symbol"]
+        current_date = entry["latest_date"]
+
+        current_price = (
+            EndOfDay.objects
+            .filter(symbol=symbol, date=current_date)
+            .values_list("closing_price", flat=True)
+            .first()
+        )
+
+        previous_price = (
+            EndOfDay.objects
+            .filter(symbol=symbol, date__lt=current_date)
+            .order_by("-date")
+            .values_list("closing_price", flat=True)
+            .first()
+        )
+
+        if current_price is not None and previous_price is not None:
+            change = (current_price / previous_price) - 1
         else:
-            previous_date = current_date - timedelta(days=1)
+            change = None
 
-        current_price = list(EndOfDay.objects.filter(symbol=symbol).filter(date=current_date).values('closing_price'))[0]['closing_price']
-        previous_price = list(EndOfDay.objects.filter(symbol=symbol).filter(date=previous_date).values('closing_price'))[0]['closing_price']
+        stock_data.append({
+            "symbol": symbol,
+            "current_price": current_price,
+            "change": change
+        })
 
-        data['current_price'] = current_price
-        data['change'] = (current_price / previous_price) - 1
-        listOfData.append(data)
-    return JsonResponse(listOfData, safe=False)
+    return JsonResponse(stock_data, safe=False)
