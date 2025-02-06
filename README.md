@@ -2,6 +2,7 @@
 
 Sean is a silly man
 
+
 # stock-market-simulator
 
 Sean is a silly man
@@ -9,6 +10,7 @@ Sean is a silly man
 pip install django
 pip install Yfinance
 pip install django-cors-headers
+pip install django-environ
 
 - Allows server to accept HTTP requests
 - NOTE - CORS_ALLOWED_ORIGINS
@@ -26,3 +28,4 @@ python manage.py migrate
 - Creates SQL tables
 
 '.\stock_market_venv`\Scripts\activate'
+
