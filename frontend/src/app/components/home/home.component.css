@@ -1,0 +1,14 @@
+/* home.component.css */
+.container {
+    margin-top: 20px;
+  }
+  
+  table {
+    width: 100%;
+  }
+  
+  th, td {
+    text-align: center;
+    padding: 10px;
+  }
+  

@@ -1,0 +1,35 @@
+<!-- home.component.html -->
+<div class="container">
+    <h2>Stock Information</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Symbol</th>
+          <th>Current Price</th>
+          <th>Change</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Stock 1 -->
+        <tr>
+          <td>{{ stock1.symbol }}</td>
+          <td>{{ stock1.currentPrice }}</td>
+          <td [class.text-success]="stock1.change >= 0" [class.text-danger]="stock1.change < 0">
+            {{ stock1.change }}
+          </td>
+        </tr>
+  
+        <!-- Stock 2 -->
+        <tr>
+          <td>{{ stock2.symbol }}</td>
+          <td>{{ stock2.currentPrice }}</td>
+          <td [class.text-success]="stock2.change >= 0" [class.text-danger]="stock2.change < 0">
+            {{ stock2.change }}
+          </td>
+        </tr>
+  
+        <!-- Add more stocks here if needed -->
+      </tbody>
+    </table>
+  </div>
+  
