@@ -11,9 +11,14 @@ pip install django
 pip install Yfinance
 pip install django-cors-headers
 pip install django-environ
+pip install mysqlclient
 
 - Allows server to accept HTTP requests
 - NOTE - CORS_ALLOWED_ORIGINS
+
+python manage.py shell
+-exec(open("stocks/CSVtoDBconverter.py").read()) 
+
 
 python manage.py runserver
 
