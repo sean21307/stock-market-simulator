@@ -1,5 +1,5 @@
-export interface Stock {
+export interface AllStock {
     symbol: string;
-    currentPrice: number;
+    current_price: number;
     change: number;
 }

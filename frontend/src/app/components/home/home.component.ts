@@ -1,20 +1,24 @@
-// home.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common'; // ✅ Required for pipes and directives
+import { RouterModule } from '@angular/router'; // Import RouterModule to enable routing
+import { StockPriceService } from '../../services/stock-price.service';
 
 @Component({
   selector: 'app-home',
+  standalone: true, // ✅ This tells Angular it's a standalone component
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  styleUrls: ['./home.component.css'],
+  imports: [CommonModule, RouterModule], // ✅ Include RouterModule here to use routerLink
+  providers: [StockPriceService] // ✅ If needed, provide the service
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent {
+  stocks: any[] = [];
 
-  // Manually defined stock information
-  stock1 = { symbol: 'AAPL', currentPrice: 236.0, change: 4 };
-  stock2 = { symbol: 'GOOG', currentPrice: 1345.55, change: -12.3 };
-  // Add more stock variables as needed
+  constructor(private stockService: StockPriceService) {}
 
-  constructor() {}
-
-  ngOnInit(): void {}
-
+  ngOnInit(): void {
+    this.stockService.getAllStocks().subscribe((data) => {
+      this.stocks = data;
+    });
+  }
 }
