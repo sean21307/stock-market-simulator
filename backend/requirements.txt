@@ -1,0 +1,9 @@
+asgiref @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_47jggogimk/croot/asgiref_1724072471856/work
+Django @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_578q9wrure/croot/django_1731615969522/work
+django-cors-headers==4.6.0
+django-environ==0.12.0
+mysql==0.0.3
+mysqlclient==2.2.7
+setuptools==75.8.0
+sqlparse @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_444946bpsc/croot/sqlparse_1734704466504/work
+wheel==0.45.1
