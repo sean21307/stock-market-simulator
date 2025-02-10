@@ -1,0 +1,39 @@
+<div *ngIf="stocks.length > 0; else loading">
+  <!-- Stock Table Container -->
+  <div class="container-fluid d-flex flex-column vh-100 px-0">
+    <h2 class="text-center mb-4">Stock Market </h2>
+    
+    <!-- Table Styling -->
+    <div class="table-responsive flex-grow-1">
+      <table class="table table-bordered table-hover table-sm w-100">
+        <thead class="thead-dark">
+          <tr>
+            <th>Symbol</th>
+            <th>Current Price</th>
+            <th>Change ($)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let stock of stocks" [ngClass]="{'table-success': stock.change >= 0, 'table-danger': stock.change < 0}"
+              [routerLink]="['/stock', stock.symbol]" class="clickable-row">
+            <td>{{ stock.symbol }}</td>
+            <td>${{ stock.current_price | number:'1.2-2' }}</td>
+            <td [ngClass]="{'text-success': stock.change >= 0, 'text-danger': stock.change < 0}">
+              {{ stock.change | number:'1.2-2' }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Loading State Template -->
+<ng-template #loading>
+  <div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="spinner-border text-primary" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+  <p class="text-center mt-3">Fetching the latest stock data...</p>
+</ng-template>
