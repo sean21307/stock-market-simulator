@@ -1,0 +1,54 @@
+<div class="flex min-h-screen items-center justify-center bg-surface dark:bg-surface-dark">
+    <div class="w-full max-w-md p-8 shadow-lg rounded-lg bg-surface-alt dark:bg-surface-dark-alt">
+      <h2 class="text-2xl font-bold text-center text-primary dark:text-primary-dark">
+        @if (isLogin) { 
+          Login 
+        } @else { 
+          Sign Up 
+        }
+      </h2>
+  
+      <form [formGroup]="authForm" (ngSubmit)="onSubmit()" class="mt-6">
+        <div class="mb-4">
+          <label class="block text-on-surface dark:text-on-surface-dark">Email</label>
+          <input type="email" formControlName="email" class="w-full p-2 mt-1 border rounded outline-none bg-surface dark:bg-surface-dark text-on-surface dark:text-on-surface-dark focus:ring-2 focus:ring-outline dark:focus:ring-outline-dark">
+        </div>
+  
+        <div class="mb-4">
+          <label class="block text-on-surface dark:text-on-surface-dark">Password</label>
+          <input type="password" formControlName="password" class="w-full p-2 mt-1 border rounded outline-none bg-surface dark:bg-surface-dark text-on-surface dark:text-on-surface-dark focus:ring-2 focus:ring-outline dark:focus:ring-outline-dark">
+        </div>
+  
+        @if (!isLogin) {
+          <div class="mb-4">
+            <label class="block text-on-surface dark:text-on-surface-dark">Confirm Password</label>
+            <input type="password" formControlName="confirmPassword" class="w-full p-2 mt-1 border rounded outline-none bg-surface dark:bg-surface-dark text-on-surface dark:text-on-surface-dark focus:ring-2 focus:ring-outline dark:focus:ring-outline-dark">
+          </div>
+        }
+  
+        <button type="submit" class="w-full py-2 text-white rounded bg-primary dark:bg-primary-dark hover:bg-secondary dark:hover:bg-secondary-dark">
+          @if (isLogin) { 
+            Login 
+          } @else { 
+            Sign Up 
+          }
+        </button>
+      </form>
+  
+      <p class="mt-4 text-center text-on-surface dark:text-on-surface-dark">
+        @if (isLogin) { 
+          Don't have an account? 
+        } @else { 
+          Already have an account? 
+        }
+        <button (click)="toggleAuth()" class="text-info dark:text-on-info font-bold underline">
+          @if (isLogin) { 
+            Sign up 
+          } @else { 
+            Login 
+          }
+        </button>
+      </p>
+    </div>
+  </div>
+  

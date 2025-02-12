@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Auth Form Styling */
+input {
+  border-radius: var(--radius-radius);
+  border: 1px solid var(--color-outline);
+}
+
+input:focus {
+  outline: none;
+  box-shadow: 0 0 5px var(--color-outline-strong);
+}
+
+button {
+  transition: all 0.2s ease-in-out;
+}
