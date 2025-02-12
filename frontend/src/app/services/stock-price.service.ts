@@ -26,14 +26,14 @@ export class StockPriceService {
 
   // Fetch detailed stock info for a specific symbol
   public getStockInfo(symbol: string): Observable<Stock> {
-    return this.http.get<Stock>(`${this.baseUrl}new/${symbol}`);
+    return this.http.get<Stock>(`${this.baseUrl}${symbol}`);
   }
 
   // Fetch data for all stocks using the AllStocksModel
   public getAllStocks(): Observable<AllStock[]> {
     return this.http.get<AllStock[]>(`${this.baseUrl}`);
   }
-  
+
 
   public formatDate(dateStr: string): string {
     const date = new Date(dateStr);

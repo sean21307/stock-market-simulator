@@ -4,7 +4,7 @@ from django.db import models
 
 # Stock(symbol, name, description)
 class Stock(models.Model):
-    symbol = models.CharField(max_length=10, unique=True, primary_key=True)
+    symbol_id = models.CharField(max_length=10, unique=True, primary_key=True)
     name = models.CharField(max_length=100)
     description = models.TextField()
 
@@ -17,10 +17,10 @@ class EndOfDay(models.Model):
     min_price = models.FloatField()
     max_price = models.FloatField()
     volume = models.IntegerField()
-    symbol = models.ForeignKey('Stock', on_delete=models.CASCADE)
+    symbol_id = models.ForeignKey('Stock', on_delete=models.CASCADE)
 
     class Meta:
         indexes = [
-            models.Index(fields=["symbol", "-date", "closing_price"], name="idx_symbol_date_price")
+            models.Index(fields=["symbol_id", "-date", "closing_price"], name="idx_symbol_date_price")
         ]
-        unique_together = ("symbol", "date")
+        unique_together = ("symbol_id", "date")
