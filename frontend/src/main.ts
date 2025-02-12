@@ -7,6 +7,8 @@ import { appConfig } from './app/app.config';
 // Import the AppComponent, which is the root component of the Angular application
 import { AppComponent } from './app/app.component'; 
 
+
+
 // Bootstraps the application, starting with the AppComponent and using the appConfig for configuration
 bootstrapApplication(AppComponent, appConfig)
   // If there's an error during bootstrapping, log it to the console

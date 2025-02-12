@@ -1,0 +1,68 @@
+<div class="flex min-h-screen items-center justify-center bg-surface dark:bg-surface-dark">
+    <div class="w-full max-w-md p-8 shadow-lg rounded-lg bg-surface-alt dark:bg-surface-dark-alt">
+      <h2 class="text-2xl font-bold text-center text-primary dark:text-primary-dark">
+        {{ isLogin ? 'Login' : 'Sign Up' }}
+      </h2>
+  
+      <form [formGroup]="authForm" (ngSubmit)="onSubmit()" class="mt-6">
+        <!-- email input -->
+        <div class="mb-4">
+          <label class="flex w-fit items-center gap-1 pl-0.5 text-sm" 
+          [ngClass]="(emailInvalid) ? 'text-danger' : 'text-on-surface dark:text-on-surface-dark'">
+            @if (emailInvalid) {
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor" class="w-4 h-4">
+                <path d="M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z"/>
+              </svg>
+            }
+            Email
+          </label>
+          <input [ngClass]="{'border-danger': emailInvalid}" type="email" formControlName="email" class="w-full p-2 mt-1 border rounded outline-none bg-surface dark:bg-surface-dark text-on-surface dark:text-on-surface-dark focus:ring-2 focus:ring-outline dark:focus:ring-outline-dark">
+          @if (emailInvalid) {
+            <small class="pl-0.5 text-danger">Error: {{ email?.hasError('required') ? 'Email is required' : 'Not a valid email' }}</small>
+          }
+          
+        </div>
+  
+        <!-- password input -->
+        <div class="mb-4">
+          <label class="flex w-fit items-center gap-1 pl-0.5 text-sm" 
+          [ngClass]="passwordInvalid ? 'text-danger' : 'text-on-surface dark:text-on-surface-dark'">
+            @if (passwordInvalid) {
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor" class="w-4 h-4">
+                <path d="M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z"/>
+              </svg>
+            }
+            Password
+          </label>
+          <input [ngClass]="{'border-danger': passwordInvalid}" type="password" formControlName="password" class="w-full p-2 mt-1 border rounded outline-none bg-surface dark:bg-surface-dark text-on-surface dark:text-on-surface-dark focus:ring-2 focus:ring-outline dark:focus:ring-outline-dark">
+          @if (passwordInvalid) {
+            <small class="pl-0.5 text-danger">Error: {{ password?.hasError('required') ? 'Password is required' : 'Password must have at least 6 characters' }}</small>
+          }
+        </div>
+  
+        <!-- confirm password input -->
+        @if (!isLogin) {
+          <div class="mb-4">
+            <label class="block text-on-surface dark:text-on-surface-dark">Confirm Password</label>
+            <input [ngClass]="{'border-danger': confirmPasswordInvalid}" type="password" formControlName="confirmPassword" class="w-full p-2 mt-1 border rounded outline-none bg-surface dark:bg-surface-dark text-on-surface dark:text-on-surface-dark focus:ring-2 focus:ring-outline dark:focus:ring-outline-dark">
+            @if (confirmPasswordInvalid) {
+              <small class="pl-0.5 text-danger">Error: Passwords do not match</small>
+            }
+          </div>
+        }
+  
+        <button type="submit" class="cursor-pointer w-full py-2 text-on-primary dark:text-on-primary-dark rounded bg-primary dark:bg-primary-dark hover:bg-secondary dark:hover:bg-secondary-dark">
+          {{ isLogin ? 'Login' : 'Sign Up' }}
+        </button>
+      </form>
+  
+      <p class="mt-4 text-center text-on-surface dark:text-on-surface-dark">
+        {{ isLogin ? "Don't have an account?" : 'Already have an account?' }}
+
+        <button (click)="toggleAuth()" class="cursor-pointer text-info dark:text-on-info font-bold underline">
+          {{ isLogin ? 'Sign Up' : 'Log In' }}
+        </button>
+      </p>
+    </div>
+  </div>
+  
