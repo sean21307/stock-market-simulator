@@ -1,52 +1,89 @@
-from django.http import JsonResponse
+import json
+
 from django.db.models import Max
-from . import CsvStockReader as csv
+from rest_framework import generics, mixins
+from rest_framework.decorators import api_view
+from rest_framework.generics import ListAPIView, get_object_or_404
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 
 from .models import Stock, EndOfDay
+from .serializers import StockSerializer, EndOfDaySerializer
 
 
 # Create your views here.
+
+class StockView(mixins.RetrieveModelMixin,
+                    mixins.UpdateModelMixin,
+                    mixins.CreateModelMixin,
+                    mixins.DestroyModelMixin,
+                    generics.GenericAPIView):
+    queryset = Stock.objects.all()
+    serializer_class = StockSerializer
+    lookup_field = 'symbol_id'
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+
+
+@api_view(['GET'])
 def getStockBySymbol(request,stock_symbol):
-    return JsonResponse(csv.getStockData(stock_symbol),safe=False)
-
-def getStockDetails(request,stock_symbol):
-    data = list(Stock.objects.filter(symbol=stock_symbol).values())
-    return JsonResponse(data,safe=False)
-
-def getNewStockBySymbol(request,stock_symbol):
     data = dict()
-    data['stockInfo'] = dict(Stock.objects.filter(symbol=stock_symbol).values().first())
-    data['prices'] = list(EndOfDay.objects.filter(symbol=stock_symbol).values('date','closing_price'))
-    return JsonResponse(data,safe=False)
 
-def getStockBySymbolAndRange(request,stock_symbol,start,end):
-    data = list(EndOfDay.objects.filter(symbol_id=stock_symbol, date__range=[start, end]).values('date', 'closing_price'))
-    return JsonResponse(data, safe=False)
+    data['stockInfo'] = StockSerializer(Stock.objects.get(symbol_id=stock_symbol)).data
+    data['prices'] = list(EndOfDay.objects.filter(symbol_id=stock_symbol).values('date','closing_price'))
+    return Response(data)
 
+@api_view(['GET'])
+def getStockBySymbolAndRange(request,stock_symbol):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    if not start_date or not end_date:
+        return Response({"error": "start_date and end_date are required."}, status=400)
+
+    stock_prices = EndOfDay.objects.filter(
+        symbol_id=stock_symbol,
+        date__range=[start_date, end_date]
+    ).values('date', 'closing_price')
+
+    return Response(list(stock_prices), status=200)
+
+@api_view(['GET'])
 def getStocksAndPriceWithChange(request):
 
     latest_dates = (
         EndOfDay.objects
-        .values("symbol")
+        .values("symbol_id")
         .annotate(latest_date=Max("date"))
     )
 
     stock_data = []
     for entry in latest_dates:
-        symbol = entry["symbol"]
+        symbol = entry["symbol_id"]
         current_date = entry["latest_date"]
 
         current_price = (
             EndOfDay.objects
-            .filter(symbol=symbol, date=current_date)
+            .filter(symbol_id=symbol, date=current_date)
             .values_list("closing_price", flat=True)
             .first()
         )
 
         previous_price = (
             EndOfDay.objects
-            .filter(symbol=symbol, date__lt=current_date)
+            .filter(symbol_id=symbol, date__lt=current_date)
             .order_by("-date")
             .values_list("closing_price", flat=True)
             .first()
@@ -63,4 +100,25 @@ def getStocksAndPriceWithChange(request):
             "change": change
         })
 
-    return JsonResponse(stock_data, safe=False)
+    return Response(stock_data)
+
+class StockDetailsWithPrices(APIView):
+    def get(self, request, symbol_id):
+        stock = get_object_or_404(Stock, symbol_id=symbol_id)
+        stock_data = StockSerializer(stock).data
+        prices = EndOfDay.objects.filter(symbol_id=symbol_id).values('date', 'closing_price')
+
+        return Response({
+            "stockInfo": stock_data,
+            "prices": list(prices)
+        })
+
+class EndOfDayList(ListAPIView):
+    serializer_class = EndOfDaySerializer
+    def get_queryset(self):
+        symbol_id = self.kwargs['symbol_id']
+        return EndOfDay.objects.filter(symbol_id=symbol_id)
+
+class StockList(generics.ListAPIView):
+    queryset = Stock.objects.all()
+    serializer_class = StockSerializer

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'stocks.apps.StocksConfig',
     'django.contrib.admin',
     'django.contrib.auth',
+    'rest_framework',
     'corsheaders',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
