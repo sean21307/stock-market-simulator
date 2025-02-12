@@ -19,14 +19,10 @@ export class StockPriceService {
 
   private baseUrl = 'http://127.0.0.1:8000/stocks/';
 
-  // Fetch stock prices for a specific symbol
-  public getStockPrices(symbol: string): Observable<stockData[]> {
-    return this.http.get<stockData[]>(`${this.baseUrl}${symbol}`);
-  }
 
   // Fetch detailed stock info for a specific symbol
   public getStockInfo(symbol: string): Observable<Stock> {
-    return this.http.get<Stock>(`${this.baseUrl}${symbol}`);
+    return this.http.get<Stock>(`${this.baseUrl}${symbol}/`);
   }
 
   // Fetch data for all stocks using the AllStocksModel
