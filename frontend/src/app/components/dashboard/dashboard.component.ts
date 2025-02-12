@@ -32,14 +32,12 @@ export class DashboardComponent implements OnInit {
 
     this.stockPriceService.getStockPrices('AAPL').subscribe(data => {
       this.stockDataArray = data.slice(0, 200);
-      console.log(this.stockDataArray);
 
       const transformedData = this.stockDataArray.map(entry => ({
         day: this.stockPriceService.formatDate(entry.date),
-        price: +entry.closing_price 
+        price: entry.closing_price 
       }));
 
-      console.log(transformedData);
   
       this.chartOptions = {
         data: transformedData,

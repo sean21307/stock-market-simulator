@@ -46,7 +46,7 @@ export class StockDetailsComponent {
   constructor(private stockPriceService: StockPriceService, private themeService: ThemeService) {}
 
   updateChartOptions() {
-    console.log(this.darkMode);
+    if (!this.stock) return;
 
     this.chartOptions = {
       data: this.stock.prices.map(entry => ({
@@ -97,7 +97,8 @@ export class StockDetailsComponent {
 
     const symbol = this.route.snapshot.paramMap.get('symbol');
     if (symbol) {
-      this.stockPriceService.getStockInfo(symbol).subscribe((data: Stock) => {
+      this.stockPriceService.getStockInfo(symbol).subscribe(
+        (data: Stock) => {
         this.stock = data;
         this.currentPrice = Math.round((this.stock.prices[this.stock.prices.length - 1].closing_price + Number.EPSILON) * 100) / 100;
         this.updateChartOptions();
