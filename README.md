@@ -7,6 +7,8 @@ Sean is a silly man
 
 Sean is a silly man
 
+test
+
 pip install django
 pip install Yfinance
 pip install django-cors-headers
