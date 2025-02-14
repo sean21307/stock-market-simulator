@@ -1,4 +1,5 @@
 import json
+from datetime import timedelta
 
 from django.db.models import Max
 from rest_framework import generics, mixins
@@ -74,16 +75,20 @@ def getStocksAndPriceWithChange(request):
         symbol = entry["symbol_id"]
         current_date = entry["latest_date"]
 
-        current_price = (
+        current_price_obj = (
             EndOfDay.objects
             .filter(symbol_id=symbol, date=current_date)
-            .values_list("closing_price", flat=True)
+            .values_list("date","closing_price")
             .first()
         )
+        current_datetime = current_price_obj[0]
+        current_price = current_price_obj[1]
+
+        previous_datetime = current_datetime - timedelta(days=1)
 
         previous_price = (
             EndOfDay.objects
-            .filter(symbol_id=symbol, date__lt=current_date)
+            .filter(symbol_id=symbol, date__lte=previous_datetime)
             .order_by("-date")
             .values_list("closing_price", flat=True)
             .first()
