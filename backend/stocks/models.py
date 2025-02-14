@@ -11,13 +11,13 @@ class Stock(models.Model):
 # EndOfDay(id, symbol, date, endOfDayPrice, minPrice, maxPrice, volume)
 # 	FK symbol -> Stocks
 class EndOfDay(models.Model):
-    date = models.DateField()
+    date = models.DateTimeField()
     closing_price = models.FloatField()
     open_price = models.FloatField()
     min_price = models.FloatField()
     max_price = models.FloatField()
     volume = models.IntegerField()
-    symbol_id = models.ForeignKey('Stock', on_delete=models.CASCADE)
+    symbol = models.ForeignKey('Stock', on_delete=models.CASCADE)
 
     class Meta:
         indexes = [
