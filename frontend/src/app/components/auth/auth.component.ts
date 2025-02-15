@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';  // Import the AuthService
 
 function confirmPasswordValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
@@ -30,7 +31,7 @@ export class AuthComponent {
   isLogin = true; // Toggle between login & signup
   authForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private authService: AuthService) {  // Inject AuthService
     this.authForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
@@ -64,32 +65,59 @@ export class AuthComponent {
 
   toggleAuth() {
     this.isLogin = !this.isLogin;
-
+  
+    // Adjust validation logic for confirmPassword based on login/signup toggle
     if (this.isLogin) {
       this.authForm.get('confirmPassword')?.clearValidators();
-      this.authForm.get('confirmPassword')?.updateValueAndValidity();
     } else {
       this.authForm.get('confirmPassword')?.setValidators([Validators.required]);
-      this.authForm.get('confirmPassword')?.updateValueAndValidity();
     }
-
+  
+    // Only update validity if the control has been changed
+    this.authForm.get('confirmPassword')?.updateValueAndValidity();
+  
+    // Reset the form values but not the validation state
     this.authForm.reset();
   }
-
+  
   onSubmit() {
-    if (this.authForm.invalid) return console.log("invalid");
-
+    if (this.authForm.invalid) {
+      console.log('Form is invalid');
+      return;
+    }
+  
     const { email, password, confirmPassword } = this.authForm.value;
-
+  
     if (!this.isLogin && password !== confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
-
+  
     if (this.isLogin) {
       console.log('Logging in:', { email, password });
+      this.authService.loginUser({ email, password }).subscribe(
+        (response) => {
+          localStorage.setItem('access_token', response.access);  // Store JWT
+          localStorage.setItem('refresh_token', response.refresh);  // Store JWT
+          console.log('Login successful');
+        },
+        (error) => {
+          console.error('Login failed', error);
+        }
+      );
     } else {
       console.log('Signing up:', { email, password });
+      this.authService.registerUser({ email, password }).subscribe(
+        (response) => {
+          console.log('Registration successful', response);
+          alert('Registration successful!');
+          this.toggleAuth();  // Switch to login form after successful registration
+        },
+        (error) => {
+          console.error('Registration failed', error);
+        }
+      );
     }
   }
 }
+  
