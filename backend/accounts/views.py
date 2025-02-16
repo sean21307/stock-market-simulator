@@ -5,8 +5,6 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken  # Import RefreshToken for blacklisting
 
-class CustomTokenObtainPairView(TokenObtainPairView):
-    pass  # You can customize this if needed
 
 @api_view(['POST'])
 def register_user(request):
@@ -17,6 +15,10 @@ def register_user(request):
     # Check if username already exists
     if User.objects.filter(username=username).exists():
         return Response({'error': 'Username already taken'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Check if username already exists
+    if User.objects.filter(email=email).exists():
+        return Response({'error': 'Email already taken'}, status=status.HTTP_400_BAD_REQUEST)
 
     # Create the user if username doesn't exist
     user = User.objects.create_user(username=username, password=password, email=email)

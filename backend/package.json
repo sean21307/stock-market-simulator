@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "localstorage-polyfill": "^1.0.1"
+  }
+}

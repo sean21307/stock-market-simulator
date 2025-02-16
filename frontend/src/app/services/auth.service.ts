@@ -20,6 +20,13 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}token/`, credentials);
   }
 
+  storeUserData(response: any) {
+    
+    localStorage.setItem('access_token', response.access);
+    localStorage.setItem('refresh_token', response.refresh);
+    localStorage.setItem('username', response.username);  
+  }
+
   // Logout User
   logoutUser(): Observable<any> {
     const refreshToken = localStorage.getItem('refresh_token');  // Assuming you're storing it in localStorage
