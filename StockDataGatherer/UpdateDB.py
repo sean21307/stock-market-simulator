@@ -16,7 +16,7 @@ def updateDB():
         result = db.store_result()
         last_datetime_byte_str = result.fetch_row()[0][0].decode('utf8')
         last_datetime = pd.to_datetime(last_datetime_byte_str) + timedelta(minutes=1)
-        current_datetime = datetime.now()
+        current_datetime = last_datetime + timedelta(days=8)
         print("Putting 1 minute data for " + symbol + " from " + str(last_datetime) + " to " + str(current_datetime))
 
         stock_data = yf.download(symbol, interval="1m", start=last_datetime, end=current_datetime)
