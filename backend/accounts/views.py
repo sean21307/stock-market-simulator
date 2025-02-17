@@ -1,6 +1,8 @@
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken  # Import RefreshToken for blacklisting
@@ -43,3 +45,15 @@ def get_all_users(request):
         return Response(user_data, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def test_auth_token(request, format=None):
+    content = {
+        'user' : str(request.user),
+        'token' : str(request.auth)
+    }
+
+    return Response(content, status=status.HTTP_200_OK)
+
+
