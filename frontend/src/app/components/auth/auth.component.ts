@@ -1,85 +1,115 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+  ValidatorFn,
+  AbstractControl,
+  ValidationErrors
+} from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
+
+// Custom Validator for Confirm Password Matching
 function confirmPasswordValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const password = control.get('password')?.value;
     const confirmPassword = control.get('confirmPassword')?.value;
-    
-    if (!confirmPassword) return null;
-
-    if (password !== confirmPassword) {
-      control.get('confirmPassword')?.setErrors({ passwordMismatch: true });
-      return { passwordMismatch: true };
-    } else {
-      control.get('confirmPassword')?.setErrors(null);
+    // Only run password match check if both values exist.
+    if (confirmPassword === null || confirmPassword === undefined || confirmPassword === '') {
       return null;
     }
+    return password !== confirmPassword ? { passwordMismatch: true } : null;
   };
 }
 
 @Component({
   selector: 'app-auth',
-  standalone: true, // ✅ Standalone component
+  standalone: true,
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.css'],
-  imports: [CommonModule, ReactiveFormsModule] // ✅ Import ReactiveFormsModule
+  imports: [CommonModule, ReactiveFormsModule]
 })
 export class AuthComponent {
-  isLogin = true; // Toggle between login & signup
-  authForm: FormGroup;
+  isLogin = true;
+  authForm!: FormGroup; // non-null assertion
 
-  constructor(private fb: FormBuilder) {
-    this.authForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['']
-    }, {validators: confirmPasswordValidator()});
+  constructor(private fb: FormBuilder, private authService: AuthService) {
+    this.createForm();
   }
 
+  private createForm() {
+    this.authForm = this.fb.group(
+      {
+        username: ['', [Validators.required]],
+        email: [''], 
+        password: ['', [Validators.required, Validators.minLength(3)]],
+        confirmPassword: [''] 
+      },
+      { validators: confirmPasswordValidator() }
+    );
+  }
+
+  get username() {
+    return this.authForm.get('username');
+  }
   get email() {
     return this.authForm.get('email');
   }
-
-  get emailInvalid() {
-    return this.email?.invalid && (this.email?.dirty || this.email?.touched)
-  }
-
   get password() {
     return this.authForm.get('password');
   }
-
-  get passwordInvalid() {
-    return this.password?.invalid && (this.password?.dirty || this.password?.touched)
-  }
-
   get confirmPassword() {
     return this.authForm.get('confirmPassword');
   }
 
+  get usernameInvalid() {
+    const control = this.authForm.get('username');
+    return control && control.invalid && (control.dirty || control.touched);
+  }
+  get emailInvalid() {
+    const control = this.authForm.get('email');
+    return control && control.invalid && (control.dirty || control.touched);
+  }
+  get passwordInvalid() {
+    const control = this.authForm.get('password');
+    return control && control.invalid && (control.dirty || control.touched);
+  }
   get confirmPasswordInvalid() {
-    return this.confirmPassword?.invalid && (this.confirmPassword?.dirty || this.confirmPassword?.touched)
+    const control = this.authForm.get('confirmPassword');
+    return control && control.invalid && (control.dirty || control.touched);
   }
 
   toggleAuth() {
     this.isLogin = !this.isLogin;
 
     if (this.isLogin) {
-      this.authForm.get('confirmPassword')?.clearValidators();
-      this.authForm.get('confirmPassword')?.updateValueAndValidity();
+      // In login mode, email and confirmPassword are not required
+      this.email?.clearValidators();
+      this.confirmPassword?.clearValidators();
     } else {
-      this.authForm.get('confirmPassword')?.setValidators([Validators.required]);
-      this.authForm.get('confirmPassword')?.updateValueAndValidity();
+      // In signup mode, email and confirmPassword become required
+      this.email?.setValidators([Validators.required, Validators.email]);
+      this.confirmPassword?.setValidators([Validators.required]);
     }
 
+    this.email?.updateValueAndValidity();
+    this.confirmPassword?.updateValueAndValidity();
     this.authForm.reset();
   }
 
   onSubmit() {
-    if (this.authForm.invalid) return console.log("invalid");
+    if (this.authForm.invalid) {
+      console.log('Form is invalid');
+      // (Optional) log current errors for debugging:
+      console.log(this.authForm.errors, this.authForm.value);
+      return;
+    }
 
-    const { email, password, confirmPassword } = this.authForm.value;
+    const { username, email, password, confirmPassword } = this.authForm.value;
 
     if (!this.isLogin && password !== confirmPassword) {
       alert("Passwords do not match!");
@@ -87,9 +117,34 @@ export class AuthComponent {
     }
 
     if (this.isLogin) {
-      console.log('Logging in:', { email, password });
+      console.log('Logging in:', { username, password });
+      this.authService.loginUser({ username, password }).subscribe(
+        (response) => {
+          
+          localStorage.setItem('access_token', response.access);
+          localStorage.setItem('refresh_token', response.refresh);
+          localStorage.setItem('username', username); 
+
+          console.log('Login successful');
+          // this.router.navigate(['/profile']); // Redirect to profile after login
+
+        },
+        (error) => {
+          console.error('Login failed', error);
+        }
+      );
     } else {
-      console.log('Signing up:', { email, password });
+      console.log('Signing up:', { username, email, password });
+      this.authService.registerUser({ username, email, password }).subscribe(
+        (response) => {
+          console.log('Registration successful', response);
+          alert('Registration successful!');
+          this.toggleAuth();
+        },
+        (error) => {
+          console.error('Registration failed', error);
+        }
+      );
     }
   }
 }
