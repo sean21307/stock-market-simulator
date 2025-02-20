@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from stocks.models import Stock, EndOfDay
+from stocks.models import Stock
 
 
 class StockSerializer(serializers.ModelSerializer):
@@ -8,7 +8,3 @@ class StockSerializer(serializers.ModelSerializer):
         model = Stock
         fields = ['symbol_id','name','description']
 
-class EndOfDaySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EndOfDay
-        fields = '__all__'

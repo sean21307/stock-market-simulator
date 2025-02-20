@@ -52,13 +52,13 @@ export class StockDetailsComponent implements OnInit {
     this.chartOptions = {
       data: this.stock.prices.map(entry => ({
         day: this.stockPriceService.formatDate(entry.date),
-        price: entry.closing_price 
+        price: entry.closing_price
       })),
 
       series: [
-        { 
-          type: 'line', 
-          xKey: 'day', 
+        {
+          type: 'line',
+          xKey: 'day',
           yKey: 'price',
           connectMissingData: true,
           marker: {
