@@ -47,7 +47,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'rest_framework_simplejwt.token_blacklist',
     'django.contrib.staticfiles',
-    'accounts'
+    'accounts',
+    'watchlist'
+
 ]
 
 MIDDLEWARE = [
