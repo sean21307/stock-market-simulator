@@ -3,7 +3,7 @@ from datetime import timedelta, date
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .models import Stock
+from .constants import symbols_list
 
 import os
 from dotenv import load_dotenv
@@ -43,5 +43,6 @@ def get_EOD_prices_by_range(request, symbol):
 
 @api_view(['GET'])
 def get_all_supported_symbols(request):
-    stocks = list(Stock.objects.all().values_list('symbol_id', flat=True))
-    return Response(fmpsdk.quote(apikey=apikey, symbol=stocks))
+    # stocks = list(Stock.objects.filter(exchange="NASDAQ").values_list('symbol_id', flat=True))[:102]
+    print(symbols_list)
+    return Response(fmpsdk.quote(apikey=apikey, symbol=symbols_list))
