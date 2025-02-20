@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, switchMap } from 'rxjs';
@@ -9,6 +9,7 @@ import { ThemeService } from '../../services/theme.service';
 
 import { AgCharts } from 'ag-charts-angular';
 import { AgCartesianSeriesTooltipRendererParams, AgChartOptions, AgLineSeriesTooltipRendererParams } from 'ag-charts-types';
+import { isPlatformBrowser } from '@angular/common';
 
 
 function renderer({
@@ -34,7 +35,7 @@ function renderer({
   templateUrl: './stock-details.component.html',
   styleUrl: './stock-details.component.css',
 })
-export class StockDetailsComponent {
+export class StockDetailsComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
 
   darkMode = false;
@@ -43,21 +44,21 @@ export class StockDetailsComponent {
   stock!: Stock;
 
 
-  constructor(private stockPriceService: StockPriceService, private themeService: ThemeService) {}
+  constructor(private stockPriceService: StockPriceService, private themeService: ThemeService, @Inject(PLATFORM_ID) private platformId: any) {}
 
   updateChartOptions() {
-    console.log(this.darkMode);
+    if (!this.stock || !isPlatformBrowser(this.platformId)) return;
 
     this.chartOptions = {
       data: this.stock.prices.map(entry => ({
         day: this.stockPriceService.formatDate(entry.date),
-        price: entry.closing_price 
+        price: entry.closing_price
       })),
 
       series: [
-        { 
-          type: 'line', 
-          xKey: 'day', 
+        {
+          type: 'line',
+          xKey: 'day',
           yKey: 'price',
           connectMissingData: true,
           marker: {
@@ -97,12 +98,16 @@ export class StockDetailsComponent {
 
     const symbol = this.route.snapshot.paramMap.get('symbol');
     if (symbol) {
-      this.stockPriceService.getStockInfo(symbol).subscribe((data: Stock) => {
-        this.stock = data;
-        this.currentPrice = Math.round((this.stock.prices[this.stock.prices.length - 1].closing_price + Number.EPSILON) * 100) / 100;
-        this.updateChartOptions();
-        
+      this.stockPriceService.getStockInfo(symbol).subscribe({
+        next: (data: Stock) => {
+          this.stock = data;
+          this.currentPrice = Math.round((this.stock.prices[this.stock.prices.length - 1].closing_price + Number.EPSILON) * 100) / 100;
+          this.updateChartOptions();
+        }, error: (err: Error) => {
+          console.log(err);
+        }
       });
+
     }
   }
 }
