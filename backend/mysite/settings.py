@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'django.contrib.staticfiles',
-    'accounts'
+    'accounts',
+    'wallets.apps.WalletsConfig',
 ]
 
 MIDDLEWARE = [

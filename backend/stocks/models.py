@@ -4,23 +4,7 @@ from django.db import models
 
 # Stock(symbol, name, description)
 class Stock(models.Model):
-    symbol_id = models.CharField(max_length=10, unique=True, primary_key=True)
-    name = models.CharField(max_length=100)
-    description = models.TextField()
+    symbol_id = models.CharField(max_length=50, unique=True, primary_key=True)
+    name = models.CharField(max_length=500)
+    exchange = models.CharField(max_length=50, null=True)
 
-# EndOfDay(id, symbol, date, endOfDayPrice, minPrice, maxPrice, volume)
-# 	FK symbol -> Stocks
-class EndOfDay(models.Model):
-    date = models.DateField()
-    closing_price = models.FloatField()
-    open_price = models.FloatField()
-    min_price = models.FloatField()
-    max_price = models.FloatField()
-    volume = models.IntegerField()
-    symbol_id = models.ForeignKey('Stock', on_delete=models.CASCADE)
-
-    class Meta:
-        indexes = [
-            models.Index(fields=["symbol_id", "-date", "closing_price"], name="idx_symbol_date_price")
-        ]
-        unique_together = ("symbol_id", "date")
