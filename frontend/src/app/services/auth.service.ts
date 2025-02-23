@@ -20,6 +20,10 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}token/`, credentials);
   }
 
+  getToken(): string | null {
+    return localStorage.getItem('access_token');
+  }
+
   storeUserData(response: any) {
     
     localStorage.setItem('access_token', response.access);
@@ -27,9 +31,19 @@ export class AuthService {
     localStorage.setItem('username', response.username);  
   }
 
-  // Logout User
-  logoutUser(): Observable<any> {
-    const refreshToken = localStorage.getItem('refresh_token');  // Assuming you're storing it in localStorage
-    return this.http.post(`${this.apiUrl}logout/`, { refresh: refreshToken });
+  // Logout user and blacklist refresh token
+  logoutUser() {
+    const refreshToken = localStorage.getItem('refresh_token');
+    
+    this.http.post(`${this.apiUrl}logout/`, { refresh: refreshToken }).subscribe({
+      next: () => {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        window.location.reload();
+      }, error: (err: Error) => {
+        alert("Failed to logout");
+        console.log(err);
+      }
+    });
   }
 }
