@@ -3,6 +3,7 @@ import json
 
 import fmpsdk
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import permission_classes, api_view
@@ -10,6 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from accounts.models import Profile
 from wallets.models import Wallet
 
 import os
@@ -133,4 +135,32 @@ def get_shares(request, wallet_name):
         "wallet" : WalletSerializer(wallet).data,
         'shares': shares_list
     }, status=status.HTTP_200_OK)
+
+@permission_classes([IsAuthenticated])
+@api_view(['POST'])
+def update_or_make_selected_wallet(request, wallet_name):
+    username = request.user
+    user = User.objects.get(username=username)
+    wallet = user.wallet_set.get(name=wallet_name)
+
+    try:
+        profile = Profile.objects.get(user=user)
+        profile.selected_wallet = wallet
+        profile.save()
+        return Response({'wallet_id': wallet.id}, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        Profile.objects.create(user=user, selected_wallet=wallet)
+        return Response({'wallet_id': wallet.id}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@permission_classes([IsAuthenticated])
+@api_view(['GET'])
+def get_selected_wallet(request):
+    username = request.user
+    user = User.objects.get(username=username)
+    wallet = Profile.objects.get(user=user).selected_wallet
+
+    return Response({"selected_wallet_name" : wallet.name}, status=status.HTTP_200_OK)
+
 
