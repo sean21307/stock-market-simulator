@@ -4,6 +4,10 @@ import { RouterOutlet } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ThemeService } from '../../services/theme.service';
 import { DropdownComponent } from "../dropdown/dropdown.component";
+import { WalletService } from '../../services/wallet.service';
+import { Wallet } from '../../models/wallet.model';
+import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-sidebar',
@@ -15,21 +19,55 @@ import { DropdownComponent } from "../dropdown/dropdown.component";
 export class SidebarComponent {
   showSidebar = true;
   darkMode = false;
-  selectedWallet = 'Wallet 1';
+  selectedWallet = '';
   walletDropdownOpen = false;
-  wallets = ['Wallet 1', 'Wallet 2'];
+  wallets: Wallet[] = [];
+  walletNames: string[] = [];
+  loggedIn = false;
 
-  constructor(private themeService: ThemeService) {}
+  constructor(
+    private themeService: ThemeService, 
+    private walletService: WalletService, 
+    private authService: AuthService, 
+    private router: Router,
+  ) {}
   
   ngOnInit() {
     this.themeService.darkMode$.subscribe(isDark => {
       this.darkMode = isDark;
     });
+
+    
+    if (this.authService.getToken() != null) {
+      this.loggedIn = true;
+      this.getWallets(); // only need to request wallets if you're logged in
+    }
+  }
+
+  getWallets() {
+    this.walletService.getWallets().subscribe({
+      next: (data: Wallet[]) => {
+        this.wallets = data;
+        this.walletNames = this.wallets.map(wallet => wallet.name);
+        this.walletNames.push("New");
+      }, error: (err: Error) => {
+        console.log(err);
+      }
+    });
+  }
+
+  logout() {
+    this.authService.logoutUser();
   }
 
   changeWallet(wallet: string) {
-    this.selectedWallet = wallet;
-    // window.location.reload();
+    if (wallet == 'New') {
+      this.router.navigate(['/wallet/new'])
+      console.log('Make new wallet');
+    } else {
+      this.selectedWallet = wallet;
+      window.location.reload();
+    }
   }
 
   toggleSidebar() {

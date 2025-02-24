@@ -127,9 +127,11 @@ export class AuthComponent {
 
           console.log('Login successful');
           this.router.navigate(['/profile']);
+          window.location.reload();
 
         },
         (error) => {
+          // TODO: display incorrect credentials notification
           console.error('Login failed', error);
         }
       );
