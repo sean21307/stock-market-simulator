@@ -16,9 +16,9 @@
           <tr *ngFor="let stock of stocks"
               [routerLink]="['/stock', stock.symbol]" class="cursor-pointer hover:bg-surface-alt hover:dark:bg-surface-dark-alt bg-surface dark:bg-surface-dark text-on-surface dark:text-on-surface-dark">
             <td class="p-4">{{ stock.symbol }}</td>
-            <td class="p-4">${{ stock.current_price | number:'1.2-2' }}</td>
-            <td class="p-4" [ngClass]="{'text-success': stock.change >= 0, 'text-danger': stock.change < 0}">
-              {{ stock.change | number:'1.2-2' }}%
+            <td class="p-4">${{ stock.price | number:'1.2-2' }}</td>
+            <td class="p-4" [ngClass]="{'text-success': stock.changesPercentage >= 0, 'text-danger': stock.changesPercentage < 0}">
+              {{ stock.changesPercentage | number:'1.2-2' }}%
             </td>
           </tr>
         </tbody>
