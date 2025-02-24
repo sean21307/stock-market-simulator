@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Stock } from '../models/stock.model';
+import { AllStock } from '../models/allStocks.model';
+
 
 
 type stockData = {
@@ -15,14 +17,19 @@ type stockData = {
 export class StockPriceService {
   constructor(private http: HttpClient) { }
 
-  public getStockPrices(symbol: string): Observable<stockData[]> {
-    return this.http.get<stockData[]>(`http://127.0.0.1:8000/stocks/${symbol}`);
+  private baseUrl = 'http://127.0.0.1:8000/stocks/';
+
+
+  // Fetch detailed stock info for a specific symbol
+  public getStockInfo(symbol: string): Observable<Stock> {
+    return this.http.get<Stock>(`${this.baseUrl}${symbol}/`);
   }
 
-  public getStockInfo(symbol: string): Observable<Stock> {
-    return this.http.get<Stock>(`http://127.0.0.1:8000/stocks/new/${symbol}`);
+  // Fetch data for all stocks using the AllStocksModel
+  public getAllStocks(): Observable<AllStock[]> {
+    return this.http.get<AllStock[]>(`${this.baseUrl}`);
   }
-  
+
 
   public formatDate(dateStr: string): string {
     const date = new Date(dateStr);

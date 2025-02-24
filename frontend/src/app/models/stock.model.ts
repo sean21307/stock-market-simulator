@@ -5,7 +5,7 @@ interface Price {
 
 interface StockInfo {
     symbol: string,
-    name: string,
+    companyName: string,
     description: string,
 }
 
