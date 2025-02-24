@@ -22,7 +22,7 @@ function renderer({
     data: [
       {
         label: datum[xKey],
-        value: datum[yKey].toFixed(2),
+        value: '$' + datum[yKey].toFixed(2),
       },
     ],
   };
@@ -68,20 +68,31 @@ export class StockDetailsComponent implements OnInit {
           //stroke: this.darkMode && "#208a09" || "#2196f3"
         }
       ],
+      
       axes: [
         {
           type: 'category',
           position: 'bottom',
           label: {
-            color: this.darkMode ? '#ffffff' : '#000000', // Dynamic x-axis label color
+            color: this.darkMode ? '#B8BBC1' : '#000000',
+          },
+          line: {
+            stroke: this.darkMode ? '#3B3D3F' : '#E0EAF1',
           }
         },
         {
           type: 'number',
           position: 'left',
           label: {
-            color: this.darkMode ? '#ffffff' : '#000000', // Dynamic y-axis label color
-          }
+            color: this.darkMode ? '#B8BBC1' : '#000000',
+          },
+          gridLine: {
+            style: [
+              {
+                  stroke: this.darkMode ? '#3B3D3F' : '#C3C3C3',
+              },
+              ],
+          },
         }
       ],
       background: {
