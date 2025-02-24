@@ -1,7 +1,59 @@
 <div class="bg-surface dark:bg-surface-dark h-screen grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 grid-rows-8 md:grid-rows-7 xl:grid-rows-5 auto-rows-fr gap-6 p-8">
-    <div class="col-span-full">
+    <div class="md:col-span-2 row-span-3">
         <app-card>
-            <p>Wallets</p>
+            <p class="text-xl text-on-surface-strong dark:text-on-surface-dark-strong">Profile Information</p>
+        </app-card>
+    </div>
+    
+    <div class="md:col-span-1 row-span-3">
+        <app-card>
+            <p class="text-xl text-on-surface-strong dark:text-on-surface-dark-strong">Your Wallets</p>
+            
+            @for (wallet of wallets.slice((walletPage - 1) * WALLET_PAGE_SIZE, walletPage * WALLET_PAGE_SIZE); track wallet.name; let isLast = $last) {
+                <div [ngClass]="wallets.length > WALLET_PAGE_SIZE ? 'py-2.5' : 'py-3'">
+                    <p> {{ wallet.name | titlecase }} </p>
+                    <p class="text-on-surface/60 dark:text-on-surface-dark/60">{{ wallet.description }}</p>
+                </div>
+
+                @if (!isLast) {
+                    <hr class="border-gray-300 dark:border-neutral-700 border-1 w-full mx-auto">
+                }
+            }
+            
+            @if (wallets.length > WALLET_PAGE_SIZE) {
+                <nav aria-label="pagination" class="flex justify-center">
+                    <ul class="flex shrink-0 items-center gap-2 text-sm font-medium">
+                        <li>
+                            <button (click)="decrementWalletPage()" class="cursor-pointer flex items-center rounded-radius p-1 text-on-surface hover:text-primary dark:text-on-surface-dark dark:hover:text-primary-dark" aria-label="previous page">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="size-6">
+                                    <path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+                                </svg>
+                                Previous
+                            </button>
+                        </li>
+
+                        @for (num of walletPages; track num) {
+                            <li><button (click)="setWalletPage(num)" [disabled]="walletPage == 1" 
+                                class="cursor-pointer flex size-6 items-center justify-center rounded-radius p-1" 
+                                [ngClass]="num == walletPage ? 
+                                    'bg-primary p-1 font-bold text-on-primary dark:bg-primary-dark dark:text-on-primary-dark' : 
+                                    'p-1 text-on-surface hover:text-primary dark:text-on-surface-dark dark:hover:text-primary-dark'"
+                                aria-label="page 1">{{ num }}
+                                
+                            </button></li>
+                        }
+
+                        <li>
+                            <button (click)="incrementWalletPage()" [disabled]="walletPage >= totalPages" class="cursor-pointer flex items-center rounded-radius p-1 text-on-surface hover:text-primary dark:text-on-surface-dark dark:hover:text-primary-dark" aria-label="next page">
+                                Next
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="size-6">
+                                    <path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>                    
+            }
         </app-card>
     </div>
 </div>
