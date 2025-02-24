@@ -30,7 +30,7 @@ def get_wallets(request):
     wallet_list = []
     for wallet in wallets:
         wallet_list.append(WalletSerializer(wallet).data)
-    return Response({"wallets": wallet_list}, status=status.HTTP_200_OK)
+    return Response(wallet_list, status=status.HTTP_200_OK)
 
 @permission_classes([IsAuthenticated])
 @api_view(['POST'])
@@ -73,13 +73,17 @@ def delete_wallet(request, wallet_name):
 @permission_classes([IsAuthenticated])
 @api_view(['POST'])
 def add_shares(request, wallet_name):
+    if not request.user.is_authenticated:
+        return Response({'error': 'User is not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+
     try:
         symbol = request.data.get('symbol')
-        quantity = request.data.get('quantity')
+        quantity = int(float(request.data.get('quantity'))) # ensure only int quantities
 
         price = fmpsdk.quote_short(apikey=apikey,symbol=symbol)[0]['price']
         total_price = decimal.Decimal(price * quantity)
         wallet_owner_username = request.user
+
         user = User.objects.get(username=wallet_owner_username)
         wallet = user.wallet_set.get(name=wallet_name)
         wallet.balance = wallet.balance - total_price
