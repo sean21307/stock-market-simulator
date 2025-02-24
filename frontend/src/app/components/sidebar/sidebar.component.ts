@@ -41,6 +41,10 @@ export class SidebarComponent {
     if (this.authService.getToken() != null) {
       this.loggedIn = true;
       this.getWallets(); // only need to request wallets if you're logged in
+
+      this.walletService.getSelectedWalletName().subscribe(walletName => {
+        this.selectedWallet = walletName;
+      });
     }
   }
 
@@ -60,13 +64,19 @@ export class SidebarComponent {
     this.authService.logoutUser();
   }
 
-  changeWallet(wallet: string) {
-    if (wallet == 'New') {
+  changeWallet(walletName: string) {
+    if (walletName == 'New') {
       this.router.navigate(['/wallet/new'])
       console.log('Make new wallet');
     } else {
-      this.selectedWallet = wallet;
-      window.location.reload();
+      this.walletService.setSelectedWallet(walletName).subscribe({
+        next: (data: { wallet_id: number }) => {
+          window.location.reload();
+        }, error: (err: Error) => {
+          alert('Failed to select wallet. See console for error.');
+          console.log(err);
+        }
+      })
     }
   }
 

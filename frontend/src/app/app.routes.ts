@@ -4,6 +4,7 @@ import { HomeComponent } from './components/home/home.component';
 import { AuthComponent } from './components/auth/auth.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { WalletFormComponent } from './components/wallet-form/wallet-form.component';
+import { WalletDetailsComponent } from './components/wallet-details/wallet-details.component';
 
 
 
@@ -13,4 +14,5 @@ export const routes: Routes = [
     { path: 'auth', component: AuthComponent },
     { path: 'profile', component: ProfileComponent },
     { path: 'wallet/new', component: WalletFormComponent },
+    { path: 'wallet/:name', component: WalletDetailsComponent },
 ];
