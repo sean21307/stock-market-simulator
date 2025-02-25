@@ -80,7 +80,7 @@ def add_shares(request, wallet_name):
 
     try:
         symbol = request.data.get('symbol')
-        quantity = int(float(request.data.get('quantity'))) # ensure only int quantities
+        quantity = int(request.data.get('quantity')) # ensure only int quantities
 
         price = fmpsdk.quote_short(apikey=apikey,symbol=symbol)[0]['price']
         total_price = decimal.Decimal(price * quantity)

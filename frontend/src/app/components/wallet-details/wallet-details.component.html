@@ -1,52 +1,110 @@
-<div class="bg-surface dark:bg-surface-dark h-screen grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 grid-rows-8 md:grid-rows-7 xl:grid-rows-5 auto-rows-fr gap-6 p-8">
+<div class="bg-surface dark:bg-surface-dark h-screen p-8">
     @if (walletDetails) {
-        <div class="md:col-span-full row-span-4">
-            <app-card>
-                <div class="grid grid-cols-1 grid-rows-8 w-full h-full">
-                    <div class="row-span-1 col-span-1 flex justify-between mb-2">
-                        <div>
-                            <h2 class="text-2xl">{{ walletDetails.wallet.name }}</h2>
-                        </div>
-    
-                        <div class="text-right">
-                            <h2 class="text-2xl">Balance: ${{ walletDetails.wallet.balance | number:'1.2-2' }}</h2>
-                        </div>
-                    </div>
-    
-                    <div class="row-span-7 col-span-1 mt-2 flex flex-col items-center justify-center w-full h-full">
-                        <p>chart go here</p>
-                        <!-- <hr class="border-gray-300 dark:border-neutral-700 border-1 w-full mx-auto mb-5"> -->
-    
-    
-                        <!-- @if (chartOptions) {
-                            <ag-charts class="w-full h-full"
-                                [options]="chartOptions">
-                            </ag-charts>
-                        } -->
-                    </div>
+        <div class="mb-5 w-full md:min-h-0 rounded-lg relative p-8 border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark flex flex-col">
+            <div class="row-span-1 col-span-1 flex justify-between mb-1">
+                <div>
+                    <h2 class="text-2xl">{{ walletDetails.wallet.name }}</h2>
                 </div>
-            </app-card>
+
+                <div class="text-right">
+                    <h2 class="text-2xl">Balance: ${{ walletDetails.wallet.balance | number:'1.2-2' }}</h2>
+                </div>
+            </div>
+
+            <p class="text-2x1 text-on-surface-dark/70"> {{ walletDetails.wallet.description }}</p>
         </div>
 
-        <div class="md:col-span-full">
-            <app-card class="h-full">
-                <h2 class="text-2xl">Your Stocks</h2>
-                <hr class="border-gray-300 dark:border-neutral-700 border-1 w-full mx-auto mb-5">
+        <div class="mb-5 w-full md:min-h-0 rounded-lg relative p-8 border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark flex flex-col">
+            <div class="grid grid-cols-1 grid-rows-8 w-full h-full">
+                <div class="row-span-7 col-span-1 mt-2 flex flex-col items-center justify-center w-full h-full">
+                    <p>chart go here</p>
+                    <!-- <hr class="border-gray-300 dark:border-neutral-700 border-1 w-full mx-auto mb-5"> -->
 
-                <div class="mt-2 flex flex-col items-center justify-center ">
-                    <p>chart go here</p>
-                    <p>chart go here</p>                     
-                    <p>chart go here</p>
-                    <p>chart go here</p>
-                    <p>chart go here</p>
-                    <p>chart go here</p>
-                    <p>chart go here</p>
-                    <p>chart go here</p>
-                    <p>chart go here</p>
-                    <p>chart go here</p>
 
+                    <!-- @if (chartOptions) {
+                        <ag-charts class="w-full h-full"
+                            [options]="chartOptions">
+                        </ag-charts>
+                    } -->
                 </div>
-            </app-card>
+            </div>
+        </div>
+
+        <div class="mb-5 w-full md:min-h-0 rounded-lg relative border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark flex flex-col">
+            <div class="p-8 pb-6 flex justify-between mb-1">
+                <div>
+                    <h2 class="text-2xl">Your Stocks</h2>
+                </div>
+
+                <div class="text-right">
+                    <h2 class="text-2xl">Portfolio Value: $25,000</h2>
+                </div>
+            </div>
+
+            <!-- <hr class="border-gray-300 dark:border-neutral-700 border-1 w-full mx-auto"> -->
+
+            <div>
+                @if (sharesDict) {
+
+                    <div class="container-fluid d-flex flex-column px-0">
+    
+                        <div class="overflow-hidden w-full overflow-x-auto border-t border-outline dark:border-outline-dark rounded-b-lg">
+                            <table class="w-full text-left text-sm text-on-surface dark:text-on-surface-dark">
+                                <thead class="border-b border-outline bg-transparent text-sm text-on-surface-strong dark:border-outline-dark dark:text-on-surface-dark-strong">
+                                    <tr>
+                                    <th scope="col" class="p-4 pl-8">Name</th>
+                                    <th scope="col" class="p-4">Total</th>
+                                    <th scope="col" class="p-4">Price</th>
+                                    <th scope="col" class="p-4">Allocation</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-outline dark:divide-outline-dark bg-transparent">
+                                    @for (symbol of keys(sharesDict); track symbol; let isLast = $last) {
+                                        @if (stockDict[symbol]) {
+                                            <tr [routerLink]="['/stock', symbol]" 
+                                                class="cursor-pointer transition duration-150 bg-surface-alt dark:bg-surface-dark-alt hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-600 text-on-surface dark:text-on-surface-dark"
+                                                [ngClass]="isLast ? 'rounded-b-full' : ''" 
+                                            >
+                                                
+                                                <td class="p-4 pl-8">
+                                                    <p>{{ stockDict[symbol].stockInfo.companyName }}</p>
+                                                    <p class="text-xs">{{ symbol }}</p>
+                                                </td>
+                                    
+                                                <td class="p-4">
+                                                    <p>${{ stockDict[symbol].stockInfo.price * sharesDict[symbol] | number:'1.2-2' }}</p>
+                                                    <p class="text-xs">{{ sharesDict[symbol] + ' ' + symbol}}</p>
+                                                </td>
+                                                
+                                                <td class="p-4">
+                                                    <p>${{ stockDict[symbol].stockInfo.price | number:'1.2-2' }}</p>
+                                                    <p class="text-xs" [ngClass]="{'text-success': stockDict[symbol].stockInfo.changes >= 0, 'text-danger': stockDict[symbol].stockInfo.changes < 0}">
+                                                        {{ (stockDict[symbol].stockInfo.changes > 0 ? '+' : '') }}{{ stockDict[symbol].stockInfo.changes | number:'1.2-2' }}%
+                                                    </p>
+                                                </td>
+                                    
+                                                <td class="p-4">
+                                                    {{ (sharesDict[symbol] / walletDetails.shares.length * 100) | number:'1.2-2' }}%
+                                                </td>
+                                    
+                                            </tr>
+                                        } @else {
+                                            <tr class="cursor-pointer transition duration-150 bg-surface-alt dark:bg-surface-dark-alt hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-600 text-on-surface dark:text-on-surface-dark">
+                                                <td class="p-4 pl-8">
+                                                    <p>Loading {{ symbol }}</p>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                } @else {
+                    <p>Loading</p>
+                }
+            </div>
         </div>
     } @else {
         <div class="md:col-span-full row-span-4">
