@@ -92,7 +92,14 @@
                                 <small class="pl-0.5 text-danger">Error: Quantity must be an integer</small>
                             } @else {
                                 @if (!buyTab && buyForm.controls['quantity'].hasError('exceedsShares')) {
-                                    <small class="pl-0.5 text-danger">Error: You cannot sell more than {{ stock ? sharesDict[stock.stockInfo.symbol] : '?' }} shares.</small>
+                                    
+                                    <small class="pl-0.5 text-danger">
+                                        {{ sharesDict[stock.stockInfo.symbol] ? 
+                                            ('Error: You cannot sell more than ' + (stock ? sharesDict[stock.stockInfo.symbol] : '?') + ' shares.') : 
+                                            'You don\'t have any shares to sell' 
+                                        }}
+                                    </small>
+                                    
                                 } @else {
                                     <small class="pl-0.5 text-danger">Error: Quantity is required</small>
                                 }
