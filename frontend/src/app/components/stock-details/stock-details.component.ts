@@ -18,12 +18,23 @@ import { WalletDetails } from '../../models/walletDetails.model';
 
 function integerValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
-    console.log(control.value);
     if (control.value && !Number.isInteger(Number(control.value))) {
       return { 'notInteger': true };
     }
     return null;
   }
+}
+
+function maxSharesValidator(getSharesDict: () => Record<string, number>, stockSymbol: string, isBuying: boolean): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (isBuying) return null;
+
+    const availableShares = getSharesDict()[stockSymbol] || 0;
+    if (control.value > availableShares) {
+      return { 'exceedsShares': { available: availableShares } };
+    }
+    return null;
+  };
 }
 
 function renderer({
@@ -52,20 +63,28 @@ function renderer({
 export class StockDetailsComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
 
+  buyTab = true;
   darkMode = false;
   currentPrice: number = 0;
   chartOptions!: AgChartOptions;
   stock!: Stock;
+  sharesDict!: Record<string, number>;
   buyForm = new FormGroup({
-    quantity: new FormControl(1, [Validators.required, integerValidator]),
+    quantity: new FormControl(1, [Validators.required, integerValidator(), maxSharesValidator(() => this.sharesDict || [], this.stock?.stockInfo.symbol || '', this.buyTab)]),
   })
   wallet!: WalletDetails;
 
+  constructor(
+    private walletService: WalletService,
+    private stockPriceService: StockPriceService, 
+    private themeService: ThemeService,
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: any
+  ) {}
 
 
   get quantityInvalid() {
     const control = this.buyForm.get('quantity');
-    console.log(control?.errors)
     return control && control.invalid && (control.dirty || control.touched);
   }
 
@@ -78,33 +97,51 @@ export class StockDetailsComponent implements OnInit {
     return this.buyForm.get('quantity')?.value;
   }
 
+  setBuying(state: boolean) {
+    this.buyTab = state;
+    
+    this.buyForm.controls['quantity'].setValidators([
+      Validators.required,
+      integerValidator(),
+      maxSharesValidator(() => this.sharesDict, this.stock?.stockInfo.symbol || '', this.buyTab)
+    ]);
+    this.buyForm.controls['quantity'].updateValueAndValidity();
+  }
+
   onSubmit() {
     if (this.buyForm.invalid) {
       return;
     }
 
-    this.walletService.purchaseShares(
-      { 
-        symbol: this.stock.stockInfo.symbol,
-        quantity: Number(this.buyForm.value.quantity) ?? 0, 
-      }).subscribe({
-        next: () => {
-          alert('Successfully purchased!')
-          this.router.navigate(['/wallet/', this.wallet.wallet.name]);
-        }, error: (err: Error) => {
-          console.log(err);
-        }
-      });
+    if (this.buyTab == true) {
+      this.walletService.purchaseShares(
+        { 
+          symbol: this.stock.stockInfo.symbol,
+          quantity: Number(this.buyForm.value.quantity) ?? 0, 
+        }).subscribe({
+          next: () => {
+            alert('Successfully purchased!')
+            this.router.navigate(['/wallet/', this.wallet.wallet.name]);
+          }, error: (err: Error) => {
+            console.log(err);
+          }
+        });
+    } else {
+      this.walletService.sellShares(
+        { 
+          symbol: this.stock.stockInfo.symbol,
+          quantity: Number(this.buyForm.value.quantity) ?? 0, 
+        }).subscribe({
+          next: () => {
+            alert('Successfully sold!')
+            this.router.navigate(['/wallet/', this.wallet.wallet.name]);
+          }, error: (err: Error) => {
+            console.log(err);
+          }
+        });
+    }
+    
   }
-
-
-  constructor(
-    private walletService: WalletService,
-    private stockPriceService: StockPriceService, 
-    private themeService: ThemeService,
-    private router: Router,
-    @Inject(PLATFORM_ID) private platformId: any
-  ) {}
 
   updateChartOptions() {
     if (!this.stock || !isPlatformBrowser(this.platformId)) return;
@@ -184,7 +221,14 @@ export class StockDetailsComponent implements OnInit {
     this.walletService.getSelectedWallet().subscribe({
       next: (wallet: WalletDetails) => {
         this.wallet = wallet;
-        console.log(wallet);
+        this.sharesDict = this.walletService.getSharesCountDictionary(this.wallet.shares)
+        
+        this.buyForm.controls['quantity'].setValidators([
+          Validators.required,
+          integerValidator(),
+          maxSharesValidator(() => this.sharesDict, this.stock?.stockInfo.symbol || '', this.buyTab)
+        ]);
+        this.buyForm.controls['quantity'].updateValueAndValidity();
       }
     })
   }

@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { map, Observable, of, switchMap, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
 import { Wallet } from '../models/wallet.model';
-import { WalletDetails } from '../models/walletDetails.model';
+import { Share, WalletDetails } from '../models/walletDetails.model';
 
 @Injectable({
   providedIn: 'root'
@@ -52,6 +52,14 @@ export class WalletService {
       })
     );
   }
+
+  getSharesCountDictionary(shares: Share[]): Record<string, number> {
+    return shares.reduce((acc, share) => {
+        acc[share.symbol] = (acc[share.symbol] || 0) + 1;
+        return acc;
+    }, {} as Record<string, number>);
+  }
+
   
   purchaseShares(body: { symbol: string, quantity: number }): Observable<any> {
     return this.getSelectedWalletName().pipe(
@@ -62,6 +70,19 @@ export class WalletService {
   
         const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
         return this.http.post<any>(`${this.apiUrl}${walletName}/add-shares`, body, { headers });
+      })
+    );
+  }
+
+  sellShares(body: { symbol: string, quantity: number }): Observable<any> {
+    return this.getSelectedWalletName().pipe(
+      switchMap((walletName: string | null) => {
+        if (!walletName) {
+          return throwError(() => new Error('No wallet selected.'));
+        }
+  
+        const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
+        return this.http.post<any>(`${this.apiUrl}${walletName}/sell-shares`, body, { headers });
       })
     );
   }

@@ -1,9 +1,8 @@
 import { Wallet } from "./wallet.model";
 
-interface Share {
+export interface Share {
     symbol: string,
     buying_price: number,
-    
 }
 
 export interface WalletDetails {
