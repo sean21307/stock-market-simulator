@@ -43,6 +43,11 @@ def get_EOD_prices_by_range(request, symbol):
 
 @api_view(['GET'])
 def get_all_supported_symbols(request):
-    # stocks = list(Stock.objects.filter(exchange="NASDAQ").values_list('symbol_id', flat=True))[:102]
     print(symbols_list)
     return Response(fmpsdk.quote(apikey=apikey, symbol=symbols_list))
+
+@api_view(['POST'])
+def get_quotes_by_symbols(request):
+    list_of_symbols = request.data.get('symbols')
+    print(list_of_symbols)
+    return Response(fmpsdk.quote(apikey=apikey, symbol=list_of_symbols))
