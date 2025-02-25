@@ -51,7 +51,7 @@ def get_quotes_by_symbols(request):
     list_of_symbols = request.data.get('symbols')
     stocks = fmpsdk.quote(apikey=apikey, symbol=list_of_symbols)
 
-    stock_quotes = list()
+    stock_quotes = dict()
     for stock in stocks:
         name = stock.get("name")
         changesPercentage = stock.get("changesPercentage")
@@ -60,12 +60,12 @@ def get_quotes_by_symbols(request):
         stock_profile = fmpsdk.company_profile(apikey=apikey, symbol=stock.get("symbol"))[0]
         image = stock_profile.get("image")
 
-        stock_quotes.append({
+        stock_quotes[stock.get("symbol")] = {
             "name": name,
             "changesPercentage": changesPercentage,
             "price": price,
             "image": image,
-        })
+        }
 
     return Response(stock_quotes)
 
