@@ -2,13 +2,15 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common'; // ✅ Required for pipes and directives
 import { RouterModule } from '@angular/router'; // Import RouterModule to enable routing
 import { StockPriceService } from '../../services/stock-price.service';
+import {CardComponent} from "../card/card.component";
+import {DropdownComponent} from "../dropdown/dropdown.component";
 
 @Component({
   selector: 'app-home',
   standalone: true, // ✅ This tells Angular it's a standalone component
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
-  imports: [CommonModule, RouterModule], // ✅ Include RouterModule here to use routerLink
+  imports: [CommonModule, RouterModule, CardComponent, DropdownComponent], // ✅ Include RouterModule here to use routerLink
   providers: [StockPriceService] // ✅ If needed, provide the service
 })
 export class HomeComponent {
