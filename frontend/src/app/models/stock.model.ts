@@ -7,6 +7,9 @@ interface StockInfo {
     symbol: string,
     companyName: string,
     description: string,
+    price: number,
+    changes: number,
+    image: string,
 }
 
 export interface Stock {
