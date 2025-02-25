@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, switchMap } from 'rxjs';
 import { Stock } from '../../models/stock.model';
 import { StockPriceService } from '../../services/stock-price.service';
@@ -9,8 +9,22 @@ import { ThemeService } from '../../services/theme.service';
 
 import { AgCharts } from 'ag-charts-angular';
 import { AgCartesianSeriesTooltipRendererParams, AgChartOptions, AgLineSeriesTooltipRendererParams } from 'ag-charts-types';
-import { isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { WalletService } from '../../services/wallet.service';
+import { Wallet } from '../../models/wallet.model';
+import { WalletDetails } from '../../models/walletDetails.model';
 
+
+function integerValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    console.log(control.value);
+    if (control.value && !Number.isInteger(Number(control.value))) {
+      return { 'notInteger': true };
+    }
+    return null;
+  }
+}
 
 function renderer({
   datum,
@@ -31,7 +45,7 @@ function renderer({
 @Component({
   selector: 'app-stock-details',
   standalone: true,
-  imports: [CardComponent, AgCharts],
+  imports: [CardComponent, AgCharts, ReactiveFormsModule, CommonModule],
   templateUrl: './stock-details.component.html',
   styleUrl: './stock-details.component.css',
 })
@@ -42,9 +56,55 @@ export class StockDetailsComponent implements OnInit {
   currentPrice: number = 0;
   chartOptions!: AgChartOptions;
   stock!: Stock;
+  buyForm = new FormGroup({
+    quantity: new FormControl(1, [Validators.required, integerValidator]),
+  })
+  wallet!: WalletDetails;
 
 
-  constructor(private stockPriceService: StockPriceService, private themeService: ThemeService, @Inject(PLATFORM_ID) private platformId: any) {}
+
+  get quantityInvalid() {
+    const control = this.buyForm.get('quantity');
+    console.log(control?.errors)
+    return control && control.invalid && (control.dirty || control.touched);
+  }
+
+  get quantityNonInt() {
+    const control = this.buyForm.get('quantity');
+    return control && control.invalid && control.hasError('pattern')
+  }
+
+  get quantity() {
+    return this.buyForm.get('quantity')?.value;
+  }
+
+  onSubmit() {
+    if (this.buyForm.invalid) {
+      return;
+    }
+
+    this.walletService.purchaseShares(
+      { 
+        symbol: this.stock.stockInfo.symbol,
+        quantity: Number(this.buyForm.value.quantity) ?? 0, 
+      }).subscribe({
+        next: () => {
+          alert('Successfully purchased!')
+          this.router.navigate(['/wallet/', this.wallet.wallet.name]);
+        }, error: (err: Error) => {
+          console.log(err);
+        }
+      });
+  }
+
+
+  constructor(
+    private walletService: WalletService,
+    private stockPriceService: StockPriceService, 
+    private themeService: ThemeService,
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: any
+  ) {}
 
   updateChartOptions() {
     if (!this.stock || !isPlatformBrowser(this.platformId)) return;
@@ -53,7 +113,7 @@ export class StockDetailsComponent implements OnInit {
       data: this.stock.prices.map(entry => ({
         day: this.stockPriceService.formatDate(entry.date),
         price: entry.closing_price
-      })),
+      })).reverse(),
 
       series: [
         {
@@ -120,5 +180,12 @@ export class StockDetailsComponent implements OnInit {
       });
 
     }
+
+    this.walletService.getSelectedWallet().subscribe({
+      next: (wallet: WalletDetails) => {
+        this.wallet = wallet;
+        console.log(wallet);
+      }
+    })
   }
 }

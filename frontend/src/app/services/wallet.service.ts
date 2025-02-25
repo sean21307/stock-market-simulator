@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { map, Observable, of, switchMap, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
 import { Wallet } from '../models/wallet.model';
+import { WalletDetails } from '../models/walletDetails.model';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +16,11 @@ export class WalletService {
   getWallets(): Observable<Wallet[]> {
     const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
     return this.http.get<Wallet[]>(`${this.apiUrl}`, { headers });
+  }
+
+  getWalletDetails(walletName: string): Observable<WalletDetails> {
+    const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
+    return this.http.get<WalletDetails>(`${this.apiUrl}${walletName}`, { headers });
   }
 
   createWallet(body: {name: string, description: string}): Observable<Wallet> {
@@ -34,4 +40,30 @@ export class WalletService {
       map(response => response.selected_wallet_name)
     );
   }
+
+  getSelectedWallet(): Observable<WalletDetails> {
+    return this.getSelectedWalletName().pipe(
+      switchMap((walletName: string) => {
+        if (!walletName) {
+          return throwError(() => new Error('No wallet selected.'));
+        }
+        console.log(walletName);
+        return this.getWalletDetails(walletName);
+      })
+    );
+  }
+  
+  purchaseShares(body: { symbol: string, quantity: number }): Observable<any> {
+    return this.getSelectedWalletName().pipe(
+      switchMap((walletName: string | null) => {
+        if (!walletName) {
+          return throwError(() => new Error('No wallet selected.'));
+        }
+  
+        const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
+        return this.http.post<any>(`${this.apiUrl}${walletName}/add-shares`, body, { headers });
+      })
+    );
+  }
+  
 }
