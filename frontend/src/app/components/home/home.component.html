@@ -1,7 +1,9 @@
 <div *ngIf="stocks.length > 0; else loading">
+  <div class="grid-cols-4 grid">
+
   <!-- Stock Table Container -->
-  <div class="container-fluid d-flex flex-column vh-100 p-8">
-    
+  <div class="container-fluid d-flex flex-column vh-100 p-8 col-span-3">
+
     <!-- Table Styling -->
     <div class="overflow-hidden w-full overflow-x-auto rounded-radius border border-outline dark:border-outline-dark">
       <table class="w-full text-left text-sm text-on-surface dark:text-on-surface-dark">
@@ -25,7 +27,14 @@
       </table>
     </div>
   </div>
+    <div class="col-1">
+      <app-card>
+        <h3>Hello World</h3>
+      </app-card>
+    </div>
+    </div>
 </div>
+
 
 <!-- Loading State Template -->
 <ng-template #loading>
