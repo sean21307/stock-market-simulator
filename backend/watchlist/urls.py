@@ -1,9 +1,13 @@
 from django.urls import path
-from .views import WatchlistViewSet
+from . import views
 
 urlpatterns = [
-    path('', WatchlistViewSet.as_view({'get': 'list'})),  # Get current user's watchlist
-    path('<str:username>/', WatchlistViewSet.as_view({'get': 'get_by_username'})),  # Get a specific user's watchlist
-    path('add/', WatchlistViewSet.as_view({'post': 'add_stock'})),  # Add stock
-    path('remove/', WatchlistViewSet.as_view({'post': 'remove_stock'})),  # Remove stock
+    # List all watchlists of the authenticated user
+    path('', views.get_watchlists, name='list_watchlists'),
+    path('create/', views.create_watchlist, name='create_watchlist'),
+    path('<int:watchlist_id>/add-stock/', views.add_stock_to_watchlist, name='add_stock_to_watchlist'),
+    path('<int:watchlist_id>/remove-stock/<str:symbol>/', views.remove_stock_from_watchlist, name='remove_stock_from_watchlist'),
+    path('<int:watchlist_id>/stocks/', views.view_watchlist_stocks, name='view_watchlist_stocks')
+
+    
 ]
