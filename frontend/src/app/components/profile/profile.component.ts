@@ -14,6 +14,7 @@ import { CommonModule, TitleCasePipe } from '@angular/common';
   styleUrl: './profile.component.css'
 })
 export class ProfileComponent implements OnInit {
+  selectedWallet!: string;
   wallets!: Wallet[];
   walletPage = 1;
   WALLET_PAGE_SIZE = 6;
@@ -46,6 +47,16 @@ export class ProfileComponent implements OnInit {
     console.log(this.walletPage);
   }
 
+  routeToWalletPage(name: string) {
+    this.router.navigate(['/wallet/', name]);
+  }
+
+  sortWallets() {
+    if (this.wallets) {
+      this.wallets.sort((a, b) => (a.name === this.selectedWallet ? -1 : b.name === this.selectedWallet ? 1 : 0));
+    }
+  }
+
   ngOnInit() {
     if (this.authService.getToken() == null) {
       this.router.navigate(['/auth']);
@@ -55,9 +66,15 @@ export class ProfileComponent implements OnInit {
     this.walletService.getWallets().subscribe({
       next: (data: Wallet[]) => {
         this.wallets = data;
+        this.sortWallets();
       }, error: (err: Error) => {
         console.log(err);
       }
     })
+
+    this.walletService.getSelectedWalletName().subscribe(walletName => {
+      this.selectedWallet = walletName;
+      this.sortWallets();
+    });
   }
 }
