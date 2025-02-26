@@ -144,6 +144,7 @@ export class AuthComponent {
           this.toggleAuth();
         },
         (error) => {
+          alert('Registration failed. Check console for errors.');
           console.error('Registration failed', error);
         }
       );

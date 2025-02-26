@@ -1,26 +1,37 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common'; // ✅ Required for pipes and directives
-import { RouterModule } from '@angular/router'; // Import RouterModule to enable routing
-import { StockPriceService } from '../../services/stock-price.service';
-import {CardComponent} from "../card/card.component";
-import {DropdownComponent} from "../dropdown/dropdown.component";
+import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { WalletService } from '../../services/wallet.service';
 
 @Component({
   selector: 'app-home',
-  standalone: true, // ✅ This tells Angular it's a standalone component
+  standalone: true,
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
-  imports: [CommonModule, RouterModule, CardComponent, DropdownComponent], // ✅ Include RouterModule here to use routerLink
-  providers: [StockPriceService] // ✅ If needed, provide the service
+  imports: [CommonModule, RouterModule],
+  providers: []
 })
 export class HomeComponent {
-  stocks: any[] = [];
 
-  constructor(private stockService: StockPriceService) {}
+  constructor(
+    private authService: AuthService,
+    private walletService: WalletService,
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
-    this.stockService.getAllStocks().subscribe((data) => {
-      this.stocks = data;
-    });
+    if (this.authService.getToken() == null) {
+      this.router.navigate(['/stocks']);
+    } else {
+      this.walletService.getSelectedWalletName().subscribe({
+        next: (name: string) => {
+          this.router.navigate(['/wallet/', name]);
+        }, error: (err: Error) => {
+          this.router.navigate(['/profile']);
+        }
+      })
+      
+    }
   }
 }

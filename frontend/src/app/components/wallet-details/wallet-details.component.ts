@@ -108,9 +108,12 @@ export class WalletDetailsComponent implements OnInit {
               }
 
               this.prices = this.walletDetails.wallet_values_overtime.map(entry => ({
-                date : new Date(entry.date),
-                closing_price : entry.value
-              }))
+                date: new Date(entry.date),
+                closing_price: entry.value
+              })).filter((entry, index, array) => 
+                index === 0 || entry.closing_price !== array[index - 1].closing_price
+              );
+
               this.updateChartOptions()
             }
           })

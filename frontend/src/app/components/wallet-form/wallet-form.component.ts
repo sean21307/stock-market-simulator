@@ -41,7 +41,6 @@ export class WalletFormComponent {
         description: this.walletForm.get("description")?.value ?? '' 
     }).subscribe({
       next: (data: Wallet) => {
-        alert('Successfully created wallet!')
         this.router.navigate([`/wallet/${data.name}`]);
       }, error: (err: Error) => {
         alert('Wallet already exists with that name.');
