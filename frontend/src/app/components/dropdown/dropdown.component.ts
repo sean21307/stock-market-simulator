@@ -12,8 +12,9 @@ export class DropdownComponent {
   @Output() itemClicked = new EventEmitter<string>();
   @Input() selectedItem!: string;
   @Input() items!: string[];
+  @Input() dropdownText = '';
   dropdownOpen = false;
-
+  
   private wasInside = false;
 
   @HostListener('click')
