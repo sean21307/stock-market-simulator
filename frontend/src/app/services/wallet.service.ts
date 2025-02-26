@@ -60,14 +60,14 @@ export class WalletService {
     }, {} as Record<string, number>);
   }
 
-  
+
   purchaseShares(body: { symbol: string, quantity: number }): Observable<any> {
     return this.getSelectedWalletName().pipe(
       switchMap((walletName: string | null) => {
         if (!walletName) {
           return throwError(() => new Error('No wallet selected.'));
         }
-  
+
         const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
         return this.http.post<any>(`${this.apiUrl}${walletName}/add-shares`, body, { headers });
       })
@@ -80,11 +80,11 @@ export class WalletService {
         if (!walletName) {
           return throwError(() => new Error('No wallet selected.'));
         }
-  
+
         const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
         return this.http.post<any>(`${this.apiUrl}${walletName}/sell-shares`, body, { headers });
       })
     );
   }
-  
+
 }
