@@ -1,42 +1,58 @@
 <div class="bg-surface dark:bg-surface-dark p-8">
     @if (walletDetails) {
-        <div class="mb-5 w-full md:min-h-0 rounded-lg relative p-8 border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark flex flex-col">
-            <div class="row-span-1 col-span-1 flex justify-between mb-1">
-                <div>
-                    <h2 class="text-2xl">{{ walletDetails.wallet.name }}</h2>
-                </div>
+        <div class="grid grid-cols-1 md:grid-cols-8 grid-rows-[auto_1fr] auto-rows-fr gap-8 mb-8">
 
-                <div class="text-right">
-                    <h2 class="text-2xl">Balance: ${{ walletDetails.wallet.balance | number:'1.2-2' }}</h2>
-                </div>
-            </div>
-
-            <p class="text-2x1 text-on-surface-dark/70"> {{ walletDetails.wallet.description }}</p>
-        </div>
-
-        <div class="mb-5 w-full md:min-h-0 rounded-lg relative p-8 border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark flex flex-col">
-            <div class="grid grid-cols-1 grid-rows-8 w-full h-full">
-                <div class="row-span-1 col-span-1 flex justify-between mb-2">
+        
+            <!-- name, desc, and balance -->
+            <div class="md:col-span-6 rounded-lg relative p-8 border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark flex flex-col">
+                <div class="row-span-1 col-span-1 flex justify-between mb-1">
                     <div>
-                        <h2 class="text-2xl">Value Over Time</h2>
+                        <h2 class="text-2xl">{{ walletDetails.wallet.name }}</h2>
                     </div>
 
                     <div class="text-right">
-                        <h2 class="text-2xl">${{ portfolioValue | number:'1.2-2' }}</h2>
+                        <h2 class="text-2xl">Balance: ${{ walletDetails.wallet.balance | number:'1.2-2' }}</h2>
                     </div>
                 </div>
 
-                <div class="row-span-7 col-span-1 mt-2 flex flex-col items-center justify-center w-full h-full">
+                <p class="text-2x1 text-on-surface-dark/70"> {{ walletDetails.wallet.description }}</p>
+            </div>
 
-                    @if (chartOptions) {
-                        <ag-charts class="w-full h-full"
-                            [options]="chartOptions">
-                        </ag-charts>
-                    }
+             <!-- watchlist -->
+             <div class="md:col-span-2 row-span-3 h-full rounded-lg relative p-8 border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark">
+                <p>hi</p>
+            </div>
+
+            <!-- graph -->
+            <div class="md:col-span-6 row-span-2 rounded-lg relative p-8 border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark flex flex-col">
+                <div class="grid grid-cols-1 grid-rows-8 w-full h-full">
+                    <div class="row-span-1 col-span-1 flex justify-between mb-2">
+                        <div>
+                            <h2 class="text-2xl">Value Over Time</h2>
+                        </div>
+
+                        <div class="text-right">
+                            <h2 class="text-2xl">${{ portfolioValue | number:'1.2-2' }}</h2>
+                        </div>
+                    </div>
+
+                    <div class="row-span-7 col-span-1 mt-2 flex flex-col items-center justify-center w-full h-full">
+
+                        @if (chartOptions) {
+                            <ag-charts class="w-full h-full"
+                                [options]="chartOptions">
+                            </ag-charts>
+                        }
+                    </div>
                 </div>
             </div>
+
+           
+
+            
         </div>
 
+        <!-- stocks table -->
         <div class="w-full md:min-h-0 rounded-lg relative border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark flex flex-col">
             <div class="p-8 pb-6 flex justify-between mb-1">
                 <div>
