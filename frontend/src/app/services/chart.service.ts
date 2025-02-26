@@ -40,7 +40,7 @@ export class ChartService {
           //stroke: this.darkMode && "#208a09" || "#2196f3"
         }
       ],
-      
+
       axes: [
         {
           type: 'category',

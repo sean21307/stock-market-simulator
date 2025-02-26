@@ -11,7 +11,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.models import Profile
-from wallets.models import Wallet
+from wallets.models import Wallet, WalletValue
+
 
 import os
 from dotenv import load_dotenv
@@ -31,6 +32,7 @@ def get_wallets(request):
     wallet_list = []
     for wallet in wallets:
         wallet_list.append(WalletSerializer(wallet).data)
+        update_wallet_value(wallet)
     return Response(wallet_list, status=status.HTTP_200_OK)
 
 @permission_classes([IsAuthenticated])
@@ -95,6 +97,7 @@ def add_shares(request, wallet_name):
         while quantity > 0:
             wallet.share_set.create(symbol=symbol, buying_price=price)
             quantity -= 1
+        update_wallet_value(wallet)
         return Response({'wallet': WalletSerializer(wallet).data}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -116,6 +119,7 @@ def sell_shares(request, wallet_name):
             share.delete()
             quantity -= 1
         wallet.save()
+        update_wallet_value(wallet)
         return Response({'wallet': WalletSerializer(wallet).data}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -128,11 +132,13 @@ def get_shares(request, wallet_name):
     wallet = user.wallet_set.get(name=wallet_name)
     shares = wallet.share_set.all()
     shares_list = []
+    values_list = wallet.walletvalue_set.values("date","value")
     for share in shares:
         shares_list.append(ShareSerializer(share).data)
     return Response({
         "wallet" : WalletSerializer(wallet).data,
-        'shares': shares_list
+        'shares' : shares_list,
+        'wallet_values_overtime' : values_list
     }, status=status.HTTP_200_OK)
 
 @permission_classes([IsAuthenticated])
@@ -162,4 +168,13 @@ def get_selected_wallet(request):
 
     return Response({"selected_wallet_name" : wallet.name}, status=status.HTTP_200_OK)
 
+
+def update_wallet_value(wallet):
+    symbols = list(wallet.share_set.values_list('symbol', flat=True).distinct())
+    quotes = fmpsdk.quote(apikey=apikey,symbol=symbols)
+    balance = 0
+    for quote in quotes:
+        quantity = wallet.share_set.filter(symbol=quote['symbol']).count()
+        balance += quantity * quote['price']
+    wallet.walletvalue_set.create(value=balance)
 

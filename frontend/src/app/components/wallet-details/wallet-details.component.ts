@@ -27,7 +27,7 @@ export class WalletDetailsComponent implements OnInit {
   sharesDict!: Record<string, number>;
   stockDict: Record<string, PartialStock> = {};
   portfolioValue = 0;
-  prices!: { date: string, closing_price: number }[];
+  prices!: { date: Date, closing_price: number }[];
   chartOptions!: AgChartOptions;
   darkMode = false;
   watchlistModalOpen = false;
@@ -36,7 +36,7 @@ export class WalletDetailsComponent implements OnInit {
   expandedLists: Record<string, boolean> = {};
 
   constructor(
-    private walletService: WalletService, 
+    private walletService: WalletService,
     private watchlistService: WatchlistService,
     private stockService: StockPriceService,
     private chartService: ChartService,
@@ -52,12 +52,12 @@ export class WalletDetailsComponent implements OnInit {
     const data = [];
     let currentDate = new Date();
     let currentValue = finalValue;
-    
+
     for (let i = 0; i < numDays; i++) {
         let change = (Math.random() - 0.45) * (currentValue * 0.04);
         change += currentValue * 0.0005;
-        currentValue -= change; 
-        
+        currentValue -= change;
+
         const formattedDate = currentDate.toISOString().split('T')[0];
 
         data.push({
@@ -71,16 +71,16 @@ export class WalletDetailsComponent implements OnInit {
     return data;
   }
 
-  
+
   updateChartOptions() {
     //if (!isPlatformBrowser(this.platformId)) return;
     if (!this.prices) return;
 
     this.chartOptions = this.chartService.getChartOptions(
       this.prices.map(entry => ({
-        day: this.stockPriceService.formatDate(entry.date),
+        day: entry.date.toISOString(),
         price: entry.closing_price
-      })).reverse(),
+      })),
       this.darkMode,
     )
   }
@@ -97,7 +97,7 @@ export class WalletDetailsComponent implements OnInit {
         next: (wallet: WalletDetails) => {
           this.walletDetails = wallet;
           this.sharesDict = this.walletService.getSharesCountDictionary(this.walletDetails.shares)
-          
+
           let symbolList = Object.keys(this.sharesDict);
           this.stockService.getStockInfoFromSymbolList(symbolList).subscribe({
             next: (info: Record<string, PartialStock>) => {
@@ -107,15 +107,17 @@ export class WalletDetailsComponent implements OnInit {
                 this.portfolioValue += this.stockDict[symbol].price * this.sharesDict[symbol]
               }
 
-              this.prices = this.generateMockStockData(this.portfolioValue, 90)
-              console.log(this.prices);
-              this.updateChartOptions();
+              this.prices = this.walletDetails.wallet_values_overtime.map(entry => ({
+                date : new Date(entry.date),
+                closing_price : entry.value
+              }))
+              this.updateChartOptions()
             }
           })
         }
       })
     }
-    
+
     // get watchlists first then get stock details
     this.watchlistService.getWatchlists().subscribe({
       next: (data: Record<string, string[]>) => {
