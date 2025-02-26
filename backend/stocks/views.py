@@ -43,6 +43,30 @@ def get_EOD_prices_by_range(request, symbol):
 
 @api_view(['GET'])
 def get_all_supported_symbols(request):
-    # stocks = list(Stock.objects.filter(exchange="NASDAQ").values_list('symbol_id', flat=True))[:102]
     print(symbols_list)
     return Response(fmpsdk.quote(apikey=apikey, symbol=symbols_list))
+
+@api_view(['POST'])
+def get_quotes_by_symbols(request):
+    list_of_symbols = request.data.get('symbols')
+    stocks = fmpsdk.quote(apikey=apikey, symbol=list_of_symbols)
+
+    stock_quotes = dict()
+    for stock in stocks:
+        name = stock.get("name")
+        changesPercentage = stock.get("changesPercentage")
+        price = stock.get("price")
+
+
+        stock_quotes[stock.get("symbol")] = {
+            "name": name,
+            "changesPercentage": changesPercentage,
+            "price": price,
+        }
+
+    return Response(stock_quotes)
+
+
+
+
+    return Response("Hello Sean Nolan")

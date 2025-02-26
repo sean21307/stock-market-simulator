@@ -32,6 +32,8 @@ python manage.py createsuperuser
 - For MYSQL - Build tables
 
 python manage.py migrate
+python manage.py makemigrations
+
 
 - Creates SQL tables
 
