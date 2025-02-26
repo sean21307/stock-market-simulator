@@ -1,7 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Stock } from '../models/stock.model';
+import { PartialStock, Stock } from '../models/stock.model';
 import { AllStock } from '../models/allStocks.model';
 
 
@@ -30,6 +30,10 @@ export class StockPriceService {
     return this.http.get<AllStock[]>(`${this.baseUrl}`);
   }
 
+  public getStockInfoFromSymbolList(symbolList: string[]): Observable<Record<string, PartialStock>> {
+    console.log(symbolList);
+    return this.http.post<Record<string, PartialStock>>(`${this.baseUrl}quotes/`, {symbols: symbolList});
+  }
 
   public formatDate(dateStr: string): string {
     const date = new Date(dateStr);

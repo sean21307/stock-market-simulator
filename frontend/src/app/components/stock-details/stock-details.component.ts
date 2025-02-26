@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, switchMap } from 'rxjs';
 import { Stock } from '../../models/stock.model';
 import { StockPriceService } from '../../services/stock-price.service';
@@ -9,85 +9,143 @@ import { ThemeService } from '../../services/theme.service';
 
 import { AgCharts } from 'ag-charts-angular';
 import { AgCartesianSeriesTooltipRendererParams, AgChartOptions, AgLineSeriesTooltipRendererParams } from 'ag-charts-types';
-import { isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { WalletService } from '../../services/wallet.service';
+import { Wallet } from '../../models/wallet.model';
+import { WalletDetails } from '../../models/walletDetails.model';
+import { ChartService } from '../../services/chart.service';
+import { WatchlistModalComponent } from '../watchlist-modal/watchlist-modal.component';
 
 
-function renderer({
-  datum,
-  xKey,
-  yKey,
-  yName,
-}: AgLineSeriesTooltipRendererParams) {
-  return {
-    data: [
-      {
-        label: datum[xKey],
-        value: datum[yKey].toFixed(2),
-      },
-    ],
+function integerValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (control.value && !Number.isInteger(Number(control.value))) {
+      return { 'notInteger': true };
+    }
+    return null;
+  }
+}
+
+function maxSharesValidator(getSharesDict: () => Record<string, number>, stockSymbol: string, isBuying: boolean): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (isBuying) return null;
+
+    const availableShares = getSharesDict()[stockSymbol] || 0;
+    if (control.value > availableShares) {
+      return { 'exceedsShares': { available: availableShares } };
+    }
+    return null;
   };
 }
+
+
 
 @Component({
   selector: 'app-stock-details',
   standalone: true,
-  imports: [CardComponent, AgCharts],
+  imports: [CardComponent, AgCharts, ReactiveFormsModule, CommonModule, WatchlistModalComponent],
   templateUrl: './stock-details.component.html',
   styleUrl: './stock-details.component.css',
 })
 export class StockDetailsComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
 
+  watchlistModalOpen = false;
+  buyTab = true;
   darkMode = false;
   currentPrice: number = 0;
   chartOptions!: AgChartOptions;
   stock!: Stock;
+  sharesDict!: Record<string, number>;
+  buyForm = new FormGroup({
+    quantity: new FormControl(1, [Validators.required, integerValidator(), maxSharesValidator(() => this.sharesDict || [], this.stock?.stockInfo.symbol || '', this.buyTab)]),
+  })
+  wallet!: WalletDetails;
+  transactionComplete = false;
+
+  constructor(
+    private walletService: WalletService,
+    private stockPriceService: StockPriceService, 
+    private themeService: ThemeService,
+    private chartService: ChartService,
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: any
+  ) {}
 
 
-  constructor(private stockPriceService: StockPriceService, private themeService: ThemeService, @Inject(PLATFORM_ID) private platformId: any) {}
+  get quantityInvalid() {
+    const control = this.buyForm.get('quantity');
+    return control && control.invalid && (control.dirty || control.touched);
+  }
+
+  get quantityNonInt() {
+    const control = this.buyForm.get('quantity');
+    return control && control.invalid && control.hasError('pattern')
+  }
+
+  get quantity() {
+    return this.buyForm.get('quantity')?.value;
+  }
+
+  setBuying(state: boolean) {
+    this.buyTab = state;
+    
+    this.buyForm.controls['quantity'].setValidators([
+      Validators.required,
+      integerValidator(),
+      maxSharesValidator(() => this.sharesDict, this.stock?.stockInfo.symbol || '', this.buyTab)
+    ]);
+    this.buyForm.controls['quantity'].updateValueAndValidity();
+  }
+
+  reload() {
+    window.location.reload();
+  }
+
+  onSubmit() {
+    if (this.buyForm.invalid) {
+      return;
+    }
+
+    if (this.buyTab == true) {
+      this.walletService.purchaseShares(
+        { 
+          symbol: this.stock.stockInfo.symbol,
+          quantity: Number(this.buyForm.value.quantity) ?? 0, 
+        }).subscribe({
+          next: () => {
+            this.transactionComplete = true;
+          }, error: (err: Error) => {
+            console.log(err);
+          }
+        });
+    } else {
+      this.walletService.sellShares(
+        { 
+          symbol: this.stock.stockInfo.symbol,
+          quantity: Number(this.buyForm.value.quantity) ?? 0, 
+        }).subscribe({
+          next: () => {
+            this.transactionComplete = true;
+          }, error: (err: Error) => {
+            console.log(err);
+          }
+        });
+    }
+    
+  }
 
   updateChartOptions() {
     if (!this.stock || !isPlatformBrowser(this.platformId)) return;
 
-    this.chartOptions = {
-      data: this.stock.prices.map(entry => ({
+    this.chartOptions = this.chartService.getChartOptions(
+      this.stock.prices.map(entry => ({
         day: this.stockPriceService.formatDate(entry.date),
         price: entry.closing_price
-      })),
-
-      series: [
-        {
-          type: 'line',
-          xKey: 'day',
-          yKey: 'price',
-          connectMissingData: true,
-          marker: {
-            enabled: false,
-          },
-          tooltip: { renderer: renderer },
-          //stroke: this.darkMode && "#208a09" || "#2196f3"
-        }
-      ],
-      axes: [
-        {
-          type: 'category',
-          position: 'bottom',
-          label: {
-            color: this.darkMode ? '#ffffff' : '#000000', // Dynamic x-axis label color
-          }
-        },
-        {
-          type: 'number',
-          position: 'left',
-          label: {
-            color: this.darkMode ? '#ffffff' : '#000000', // Dynamic y-axis label color
-          }
-        }
-      ],
-      background: {
-        fill: "transparent",
-      },
-    };
+      })).reverse(),
+      this.darkMode,
+    )
   }
 
   ngOnInit() {
@@ -109,5 +167,19 @@ export class StockDetailsComponent implements OnInit {
       });
 
     }
+
+    this.walletService.getSelectedWallet().subscribe({
+      next: (wallet: WalletDetails) => {
+        this.wallet = wallet;
+        this.sharesDict = this.walletService.getSharesCountDictionary(this.wallet.shares)
+        
+        this.buyForm.controls['quantity'].setValidators([
+          Validators.required,
+          integerValidator(),
+          maxSharesValidator(() => this.sharesDict, this.stock?.stockInfo.symbol || '', this.buyTab)
+        ]);
+        this.buyForm.controls['quantity'].updateValueAndValidity();
+      }
+    })
   }
 }

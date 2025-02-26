@@ -37,7 +37,7 @@ export class AuthComponent {
   isLogin = true;
   authForm!: FormGroup; // non-null assertion
 
-  constructor(private fb: FormBuilder, private authService: AuthService) {
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
     this.createForm();
   }
 
@@ -126,10 +126,12 @@ export class AuthComponent {
           localStorage.setItem('username', username); 
 
           console.log('Login successful');
-          // this.router.navigate(['/profile']); // Redirect to profile after login
+          this.router.navigate(['/profile']);
+          window.location.reload();
 
         },
         (error) => {
+          // TODO: display incorrect credentials notification
           console.error('Login failed', error);
         }
       );

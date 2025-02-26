@@ -7,6 +7,14 @@ interface StockInfo {
     symbol: string,
     companyName: string,
     description: string,
+    price: number,
+    changesPercentage: number,
+}
+
+export interface PartialStock {
+    name: string,
+    price: number,
+    changesPercentage: number,
 }
 
 export interface Stock {

@@ -2,6 +2,7 @@ import decimal
 import json
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import permission_classes, api_view
@@ -9,7 +10,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from accounts.models import Profile
 from wallets.models import Wallet, WalletValue
+
 
 import os
 from dotenv import load_dotenv
@@ -29,7 +32,8 @@ def get_wallets(request):
     wallet_list = []
     for wallet in wallets:
         wallet_list.append(WalletSerializer(wallet).data)
-    return Response({"wallets": wallet_list}, status=status.HTTP_200_OK)
+        update_wallet_value(wallet)
+    return Response(wallet_list, status=status.HTTP_200_OK)
 
 @permission_classes([IsAuthenticated])
 @api_view(['POST'])
@@ -72,13 +76,17 @@ def delete_wallet(request, wallet_name):
 @permission_classes([IsAuthenticated])
 @api_view(['POST'])
 def add_shares(request, wallet_name):
+    if not request.user.is_authenticated:
+        return Response({'error': 'User is not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+
     try:
         symbol = request.data.get('symbol')
-        quantity = request.data.get('quantity')
+        quantity = int(request.data.get('quantity')) # ensure only int quantities
 
         price = fmpsdk.quote_short(apikey=apikey,symbol=symbol)[0]['price']
         total_price = decimal.Decimal(price * quantity)
         wallet_owner_username = request.user
+
         user = User.objects.get(username=wallet_owner_username)
         wallet = user.wallet_set.get(name=wallet_name)
         wallet.balance = wallet.balance - total_price
@@ -133,6 +141,34 @@ def get_shares(request, wallet_name):
         'wallet_values_overtime' : values_list
     }, status=status.HTTP_200_OK)
 
+@permission_classes([IsAuthenticated])
+@api_view(['POST'])
+def update_or_make_selected_wallet(request, wallet_name):
+    username = request.user
+    user = User.objects.get(username=username)
+    wallet = user.wallet_set.get(name=wallet_name)
+
+    try:
+        profile = Profile.objects.get(user=user)
+        profile.selected_wallet = wallet
+        profile.save()
+        return Response({'wallet_id': wallet.id}, status=status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        Profile.objects.create(user=user, selected_wallet=wallet)
+        return Response({'wallet_id': wallet.id}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@permission_classes([IsAuthenticated])
+@api_view(['GET'])
+def get_selected_wallet(request):
+    username = request.user
+    user = User.objects.get(username=username)
+    wallet = Profile.objects.get(user=user).selected_wallet
+
+    return Response({"selected_wallet_name" : wallet.name}, status=status.HTTP_200_OK)
+
+
 def update_wallet_value(wallet):
     symbols = list(wallet.share_set.values_list('symbol', flat=True).distinct())
     quotes = fmpsdk.quote(apikey=apikey,symbol=symbols)
@@ -141,3 +177,4 @@ def update_wallet_value(wallet):
         quantity = wallet.share_set.filter(symbol=quote['symbol']).count()
         balance += quantity * quote['price']
     wallet.walletvalue_set.create(value=balance)
+

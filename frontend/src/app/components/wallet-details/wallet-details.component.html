@@ -1,0 +1,221 @@
+@if (watchlistModalOpen) {
+    <app-watchlist-modal (close)="watchlistModalOpen = false"></app-watchlist-modal>
+}
+
+
+<div class="bg-surface dark:bg-surface-dark p-8">
+    @if (walletDetails) {
+        <div class="grid grid-cols-1 md:grid-cols-8 grid-rows-[auto_1fr] gap-8 mb-8 h-full min-h-0">
+
+        
+            <!-- name, desc, and balance -->
+            <div class="md:col-span-6 rounded-lg relative p-8 border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark flex flex-col">
+                <div class="row-span-1 col-span-1 flex justify-between mb-1">
+                    <div>
+                        <h2 class="text-2xl">{{ walletDetails.wallet.name }}</h2>
+                    </div>
+
+                    <div class="text-right">
+                        <h2 class="text-2xl">Balance: ${{ walletDetails.wallet.balance | number:'1.2-2' }}</h2>
+                    </div>
+                </div>
+
+                <p class="text-2x1 text-on-surface-dark/70"> {{ walletDetails.wallet.description }}</p>
+            </div>
+
+             <!-- watchlist -->
+             <div class="md:col-span-2 row-span-3 h-full rounded-lg relative p-8 border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark">
+                <div class="flex justify-between items-center pb-3">
+                    <p class="text-xl text-on-surface-strong dark:text-on-surface-dark-strong">
+                        Watchlists
+                    </p>
+                    <svg (click)="watchlistModalOpen = true" class="size-6 cursor-pointer hover:text-gray-400 dark:hover:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>                               
+                </div>
+
+                @if ( watchlists ) {
+                    <div class="h-full overflow-y-auto scrollbar scrollbar-thumb-on-surface-dark scrollbar-track-outline-dark">
+                        <div class="w-[100%]">
+                            @for (listName of keys(watchlists); track listName; let isLast = $last; let isFirst = $first) {
+                                <div (click)="expandedLists[listName] = expandedLists[listName] ? !expandedLists[listName] : true" class="p-1 cursor-pointer hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-600" 
+                                    [ngClass]="{
+                                        'pb-3': isFirst,
+                                        'pt-3': isLast,
+                                        'py-3': !isFirst && !isLast
+                                    }"
+                                >
+
+                                    <div class="justify-between flex items-center">
+                                        <p class="text-on-surface dark:text-on-surface-dark">{{ listName }}</p>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                          </svg>
+                                    </div>
+                                </div>
+
+                                @if (expandedLists[listName]) {
+                                    @for (symbol of watchlists[listName]; track symbol) {
+                                        
+
+                                        <div [routerLink]="['/stock', symbol]" class="cursor-pointer hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-600 flex justify-between items-center p-2">
+                                            <div>
+                                                <div class="flex items-center space-x-3">
+                                                    <img src="https://images.financialmodelingprep.com/symbol/{{ symbol }}.png"
+                                                        class="w-5 h-5 object-contain rounded-md" />
+                                            
+    
+                                                    <div>
+                                                        <p class="font-medium text-base/5">{{ watchlistStockDict[symbol].name }}</p>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ symbol }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+    
+                                            <div class="text-right">
+                                                <p>${{ watchlistStockDict[symbol].price | number:'1.2-2' }}</p>
+                                                <p class="text-xs" [ngClass]="{'text-success': watchlistStockDict[symbol].changesPercentage >= 0, 'text-danger': watchlistStockDict[symbol].changesPercentage < 0}">
+                                                    {{ (watchlistStockDict[symbol].changesPercentage > 0 ? '+' : '') }}{{ watchlistStockDict[symbol].changesPercentage | number:'1.2-2' }}%
+                                                </p>
+                                            </div>
+    
+                                        </div>
+                                        
+                                    }
+                                }
+        
+                                @if (!isLast) {
+                                    <hr class="px-2 border-gray-300 dark:border-neutral-700 border-1 w-full mx-auto">
+                                }
+                            }
+                        </div>
+                        
+                    </div>
+                    
+                } @else {
+                    <p>Loading Wallets...</p>
+                }
+            </div>
+
+            <!-- graph -->
+            <div class="md:col-span-6 row-span-2 rounded-lg relative p-8 border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark flex flex-col">
+                <div class="grid grid-cols-1 grid-rows-8 w-full h-full">
+                    <div class="row-span-1 col-span-1 flex justify-between mb-2">
+                        <div>
+                            <h2 class="text-2xl">Value Over Time</h2>
+                        </div>
+
+                        <div class="text-right">
+                            <h2 class="text-2xl">${{ portfolioValue | number:'1.2-2' }}</h2>
+                        </div>
+                    </div>
+
+                    <div class="row-span-7 col-span-1 mt-2 flex flex-col items-center justify-center w-full h-full">
+
+                        @if (chartOptions) {
+                            <ag-charts class="w-full h-full"
+                                [options]="chartOptions">
+                            </ag-charts>
+                        }
+                    </div>
+                </div>
+            </div>
+
+           
+
+            
+        </div>
+
+        <!-- stocks table -->
+        <div class="w-full md:min-h-0 rounded-lg relative border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark flex flex-col">
+            <div class="p-8 pb-6 flex justify-between mb-1">
+                <div>
+                    <h2 class="text-2xl">Your Stocks</h2>
+                </div>
+
+                <div class="text-right">
+                    <h2 class="text-2xl">Portfolio Value: ${{ portfolioValue | number:'1.2-2' }}</h2>
+                </div>
+            </div>
+
+            <div>
+                @if (sharesDict) {
+
+                    <div class="container-fluid d-flex flex-column px-0">
+    
+                        <div class="overflow-hidden w-full overflow-x-auto border-t border-outline dark:border-outline-dark rounded-b-lg">
+                            <table class="w-full text-left text-sm text-on-surface dark:text-on-surface-dark">
+                                <thead class="border-b border-outline bg-transparent text-sm text-on-surface-strong dark:border-outline-dark dark:text-on-surface-dark-strong">
+                                    <tr>
+                                    <th scope="col" class="p-4 pl-8">Name</th>
+                                    <th scope="col" class="p-4">Total</th>
+                                    <th scope="col" class="p-4">Price</th>
+                                    <th scope="col" class="p-4">Allocation</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-outline dark:divide-outline-dark bg-transparent">
+                                    @for (symbol of keys(sharesDict); track symbol; let isLast = $last) {
+                                        @if (stockDict[symbol]) {
+                                            <tr [routerLink]="['/stock', symbol]" 
+                                                class="cursor-pointer bg-surface-alt dark:bg-surface-dark-alt hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-600 text-on-surface dark:text-on-surface-dark"
+                                                [ngClass]="isLast ? 'rounded-b-full' : ''" 
+                                            >
+                                                
+                                                <td class="p-4 pl-7">
+                                                    <div class="flex items-center space-x-3">
+                                                        <img src="https://images.financialmodelingprep.com/symbol/{{ symbol }}.png" alt="{{ stockDict[symbol].name }}" 
+                                                            class="w-10 h-10 object-contain rounded-md" />
+                                                
+
+                                                        <div>
+                                                            <p class="font-medium">{{ stockDict[symbol].name }}</p>
+                                                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ symbol }}</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            
+                                    
+                                                <td class="p-4">
+                                                    <p>${{ stockDict[symbol].price * sharesDict[symbol] | number:'1.2-2' }}</p>
+                                                    <p class="text-xs">{{ sharesDict[symbol] + ' ' + symbol}}</p>
+                                                </td>
+                                                
+                                                <td class="p-4">
+                                                    <p>${{ stockDict[symbol].price | number:'1.2-2' }}</p>
+                                                    <p class="text-xs" [ngClass]="{'text-success': stockDict[symbol].changesPercentage >= 0, 'text-danger': stockDict[symbol].changesPercentage < 0}">
+                                                        {{ (stockDict[symbol].changesPercentage > 0 ? '+' : '') }}{{ stockDict[symbol].changesPercentage | number:'1.2-2' }}%
+                                                    </p>
+                                                </td>
+                                    
+                                                <td class="p-4">
+                                                    {{ (stockDict[symbol].price * sharesDict[symbol] / portfolioValue * 100) | number:'1.2-2' }}%
+                                                </td>
+                                    
+                                            </tr>
+                                        } @else {
+                                            <tr class="bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark">
+                                                <td class="p-4 pl-8">
+                                                    <p>Loading {{ symbol }}</p>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                } @else {
+                    <p>Loading</p>
+                }
+            </div>
+        </div>
+    } @else {
+        <div class="md:col-span-full row-span-4">
+            <app-card>
+                <p>Loading</p>
+            </app-card>
+        </div>
+    }
+</div>
+
