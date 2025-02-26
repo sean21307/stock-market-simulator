@@ -15,6 +15,7 @@ import { WalletService } from '../../services/wallet.service';
 import { Wallet } from '../../models/wallet.model';
 import { WalletDetails } from '../../models/walletDetails.model';
 import { ChartService } from '../../services/chart.service';
+import { WatchlistModalComponent } from '../watchlist-modal/watchlist-modal.component';
 
 
 function integerValidator(): ValidatorFn {
@@ -43,13 +44,14 @@ function maxSharesValidator(getSharesDict: () => Record<string, number>, stockSy
 @Component({
   selector: 'app-stock-details',
   standalone: true,
-  imports: [CardComponent, AgCharts, ReactiveFormsModule, CommonModule],
+  imports: [CardComponent, AgCharts, ReactiveFormsModule, CommonModule, WatchlistModalComponent],
   templateUrl: './stock-details.component.html',
   styleUrl: './stock-details.component.css',
 })
 export class StockDetailsComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
 
+  watchlistModalOpen = false;
   buyTab = true;
   darkMode = false;
   currentPrice: number = 0;

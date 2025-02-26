@@ -1,4 +1,7 @@
-<app-watchlist-modal [isOpen]="watchlistModalOpen" ></app-watchlist-modal>
+@if (watchlistModalOpen) {
+    <app-watchlist-modal (close)="watchlistModalOpen = false"></app-watchlist-modal>
+}
+
 
 <div class="bg-surface dark:bg-surface-dark p-8">
     @if (walletDetails) {

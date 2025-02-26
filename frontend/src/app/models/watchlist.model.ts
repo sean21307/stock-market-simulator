@@ -1,3 +1,3 @@
-export interface WatchlistModel{
-
+export interface Watchlist {
+    name: string,
 }

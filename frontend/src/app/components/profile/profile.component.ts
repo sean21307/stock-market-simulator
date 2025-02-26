@@ -58,9 +58,10 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit() {
+    console.log(this.authService.getToken());
     if (this.authService.getToken() == null) {
-      this.router.navigate(['/auth']);
-      return;
+      //this.router.navigate(['/auth']);
+      //return;
     }
 
     this.walletService.getWallets().subscribe({

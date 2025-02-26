@@ -11,6 +11,8 @@ import { AgChartOptions } from 'ag-charts-types';
 import { ChartService } from '../../services/chart.service';
 import { ThemeService } from '../../services/theme.service';
 import { WatchlistModalComponent } from '../watchlist-modal/watchlist-modal.component';
+import { WatchlistService } from '../../services/watchlist.service';
+import { Watchlist } from '../../models/watchlist.model';
 
 @Component({
   selector: 'app-wallet-details',
@@ -30,14 +32,12 @@ export class WalletDetailsComponent implements OnInit {
   darkMode = false;
   watchlistModalOpen = false;
   watchlistStockDict: Record<string, PartialStock> = {};
-  watchlists: Record<string, string[]> = {
-    "Sean's List": ["TSLA", "NVDA", "AAPL"],
-    // "FAANG": ["TSLA", "NVDA", "AAPL", "TSLA", "TSLA", "TSLA", "TSLA", "TSLA", "TSLA", "TSLA", "TSLA", "TSLA"],
-  }
+  watchlists: Record<string, string[]> = {};
   expandedLists: Record<string, boolean> = {};
 
   constructor(
     private walletService: WalletService, 
+    private watchlistService: WatchlistService,
     private stockService: StockPriceService,
     private chartService: ChartService,
     private stockPriceService: StockPriceService,
@@ -117,14 +117,23 @@ export class WalletDetailsComponent implements OnInit {
     }
     
     // get watchlists first then get stock details
-    let symbolList = Array.from(
-      new Set(Object.values(this.watchlists).flat())
-    );
-    
-    this.stockService.getStockInfoFromSymbolList(symbolList).subscribe({
-      next: (info: Record<string, PartialStock>) => {
-        this.watchlistStockDict = info;
+    this.watchlistService.getWatchlists().subscribe({
+      next: (data: Record<string, string[]>) => {
+        this.watchlists = data;
+
+        let symbolList = Array.from(
+          new Set(Object.values(this.watchlists).flat())
+        );
+
+        this.stockService.getStockInfoFromSymbolList(symbolList).subscribe({
+          next: (info: Record<string, PartialStock>) => {
+            this.watchlistStockDict = info;
+          }
+        })
       }
     })
+    
+    
+    
   }
 }

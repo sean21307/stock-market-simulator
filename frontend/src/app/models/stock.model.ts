@@ -9,14 +9,12 @@ interface StockInfo {
     description: string,
     price: number,
     changesPercentage: number,
-    image: string,
 }
 
 export interface PartialStock {
     name: string,
     price: number,
     changesPercentage: number,
-    image: string,
 }
 
 export interface Stock {

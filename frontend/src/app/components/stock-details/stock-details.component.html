@@ -1,4 +1,9 @@
-<div class="bg-surface dark:bg-surface-dark h-screen grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 grid-rows-8 md:grid-rows-7 xl:grid-rows-5 auto-rows-fr gap-6 p-8">
+@if (stock && watchlistModalOpen) {
+    <app-watchlist-modal [symbol]="stock.stockInfo.symbol" (close)="watchlistModalOpen = false"></app-watchlist-modal>
+}
+
+<div class="bg-surface dark:bg-surface-dark h-screen grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 grid-rows-[auto_1fr] gap-6 p-8"> 
+    <!-- grid-rows-8 md:grid-rows-7 xl:grid-rows-5  -->
     <div class="md:col-span-2 row-span-4">
         <app-card>
 
@@ -40,6 +45,13 @@
             }
 
         </app-card>
+    </div>
+
+    <div class="row-span-1 md:col-span-2 xl:col-span-1">
+        <div (click)="watchlistModalOpen = true" class="rounded-lg relative p-3 border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt hover:bg-surface-alt/10 dark:hover:bg-surface-alt*20 cursor-pointer text-on-surface dark:text-on-surface-dark flex flex-col">
+            <p class="text-center">Add to Watchlists</p>
+        </div>
+        
     </div>
 
     <div class="row-span-4 md:col-span-2 xl:col-span-1">
