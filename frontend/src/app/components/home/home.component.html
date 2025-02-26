@@ -8,7 +8,7 @@
         <thead
           class="border-b border-outline bg-surface-alt text-sm text-on-surface-strong dark:border-outline-dark dark:bg-surface-dark-alt dark:text-on-surface-dark-strong">
           <tr>
-            <th scope="col" class="p-4">Symbol</th>
+            <th scope="col" class="p-4">Name</th>
             <th scope="col" class="p-4">Current Price</th>
             <th scope="col" class="p-4">Change</th>
           </tr>
@@ -16,7 +16,14 @@
         <tbody class="divide-y divide-outline dark:divide-outline-dark">
           <tr *ngFor="let stock of stocks" [routerLink]="['/stock', stock.symbol]"
             class="cursor-pointer bg-surface-alt dark:bg-surface-dark-alt hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-600 text-on-surface dark:text-on-surface-dark">
-            <td class="p-4">{{ stock.symbol }}</td>
+            <td class="p-4 flex items-center space-x-3">
+              <img src="https://images.financialmodelingprep.com/symbol/{{ stock.symbol }}.png" class="w-10 h-10 object-contain rounded-md" />
+                
+                <div>
+                    <p class="font-medium">{{ stock.name }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ stock.symbol }}</p>
+                </div>
+            </td>
             <td class="p-4">${{ stock.price | number:'1.2-2' }}</td>
             <td class="p-4"
               [ngClass]="{'text-success': stock.changesPercentage >= 0, 'text-danger': stock.changesPercentage < 0}">

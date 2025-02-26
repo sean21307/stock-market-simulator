@@ -10,11 +10,12 @@ import { AgCharts } from 'ag-charts-angular';
 import { AgChartOptions } from 'ag-charts-types';
 import { ChartService } from '../../services/chart.service';
 import { ThemeService } from '../../services/theme.service';
+import { WatchlistModalComponent } from '../watchlist-modal/watchlist-modal.component';
 
 @Component({
   selector: 'app-wallet-details',
   standalone: true,
-  imports: [CardComponent, CommonModule, RouterModule, AgCharts],
+  imports: [CardComponent, CommonModule, RouterModule, AgCharts, WatchlistModalComponent],
   templateUrl: './wallet-details.component.html',
   styleUrl: './wallet-details.component.css'
 })
@@ -27,6 +28,13 @@ export class WalletDetailsComponent implements OnInit {
   prices!: { date: string, closing_price: number }[];
   chartOptions!: AgChartOptions;
   darkMode = false;
+  watchlistModalOpen = false;
+  watchlistStockDict: Record<string, PartialStock> = {};
+  watchlists: Record<string, string[]> = {
+    "Sean's List": ["TSLA", "NVDA", "AAPL"],
+    // "FAANG": ["TSLA", "NVDA", "AAPL", "TSLA", "TSLA", "TSLA", "TSLA", "TSLA", "TSLA", "TSLA", "TSLA", "TSLA"],
+  }
+  expandedLists: Record<string, boolean> = {};
 
   constructor(
     private walletService: WalletService, 
@@ -107,5 +115,16 @@ export class WalletDetailsComponent implements OnInit {
         }
       })
     }
+    
+    // get watchlists first then get stock details
+    let symbolList = Array.from(
+      new Set(Object.values(this.watchlists).flat())
+    );
+    
+    this.stockService.getStockInfoFromSymbolList(symbolList).subscribe({
+      next: (info: Record<string, PartialStock>) => {
+        this.watchlistStockDict = info;
+      }
+    })
   }
 }
