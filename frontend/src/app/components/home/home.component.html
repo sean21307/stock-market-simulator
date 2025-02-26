@@ -16,7 +16,7 @@
         </thead>
         <tbody class="divide-y divide-outline dark:divide-outline-dark">
           <tr *ngFor="let stock of stocks"
-              [routerLink]="['/stock', stock.symbol]" class="cursor-pointer hover:bg-surface-alt hover:dark:bg-surface-dark-alt bg-surface dark:bg-surface-dark text-on-surface dark:text-on-surface-dark">
+              [routerLink]="['/stock', stock.symbol]" class="cursor-pointer bg-surface-alt dark:bg-surface-dark-alt hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-600 text-on-surface dark:text-on-surface-dark">
             <td class="p-4">{{ stock.symbol }}</td>
             <td class="p-4">${{ stock.price | number:'1.2-2' }}</td>
             <td class="p-4" [ngClass]="{'text-success': stock.changesPercentage >= 0, 'text-danger': stock.changesPercentage < 0}">

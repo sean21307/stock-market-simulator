@@ -22,7 +22,7 @@
                 <div class="h-[90%] overflow-y-auto scrollbar scrollbar-thumb-on-surface-dark scrollbar-track-outline-dark">
                     <div class="w-[95%]">
                         @for (wallet of wallets; track wallet.name; let isLast = $last; let isFirst = $first) {
-                            <div (click)="routeToWalletPage(wallet.name)" class="p-1 cursor-pointer transition duration-150 hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-600" 
+                            <div (click)="routeToWalletPage(wallet.name)" class="p-1 cursor-pointer hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-600" 
                                 [ngClass]="{
                                     'pb-3': isFirst,
                                     'pt-3': isLast,

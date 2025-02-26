@@ -6,7 +6,7 @@
                 <div class="grid grid-cols-1 grid-rows-8 w-full h-full">
                     <div class="row-span-1 col-span-1 flex justify-between mb-2">
                         <div>
-                            <h2 class="text-2xl">{{ stock && stock.stockInfo.name }}</h2>
+                            <h2 class="text-2xl">{{ stock && stock.stockInfo.companyName }}</h2>
                             <p class="text-on-surface/50 dark:text-on-surface-dark/50">{{ stock && stock.stockInfo.symbol }}</p>
                         </div>
 
@@ -38,116 +38,127 @@
     </div>
 
     <div class="row-span-4 md:col-span-2 xl:col-span-1">
-        <app-card>
+        <div class="rounded-lg relative p-8 border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark flex flex-col">
+
+        
             @if ( wallet ) {
                 
-                <div class="mb-3 flex gap-2 overflow-x-auto border-b border-outline dark:border-outline-dark" role="tablist" aria-label="tab options">
-                    <button 
-                        (click)="setBuying(true)" 
-                        [attr.aria-selected]="buyTab === true" 
-                        [attr.tabindex]="buyTab === true ? '0' : '-1'" 
-                        [ngClass]="{
-                            'font-bold text-primary border-b-2 border-primary dark:border-primary-dark dark:text-primary-dark': buyTab === true,
-                            'text-on-surface font-medium dark:text-on-surface-dark dark:hover:border-b-outline-dark-strong dark:hover:text-on-surface-dark-strong hover:border-b-2 hover:border-b-outline-strong hover:text-on-surface-strong': buyTab === false,
-                        }"
-                        class="cursor-pointer h-min px-4 py-2 text-sm"
-                        type="button"
-                        role="tab"
-                        aria-controls="tabpanelBuy">
-                        Buy
+                @if (transactionComplete) {
+                    @if (buyTab) {
+                        <p class="text-xl">Successfully bought {{ quantity | number:'1.0' }} shares of {{ stock.stockInfo.symbol }}.</p>
+                    } @else {
+                        <p class="text-xl">Successfully sold {{ quantity | number:'1.0' }} shares of {{ stock.stockInfo.symbol }}.</p>
+                    }
+
+                    <button (click)="reload()" type="submit" class="mt-2 cursor-pointer w-full py-2 text-on-primary dark:text-on-primary-dark rounded bg-primary dark:bg-primary-dark hover:bg-secondary dark:hover:bg-secondary-dark">
+                        OK
                     </button>
-                    
-                    <button 
-                        (click)="setBuying(false)" 
-                        [attr.aria-selected]="buyTab === false" 
-                        [attr.tabindex]="buyTab === false ? '0' : '-1'" 
-                        [ngClass]="{
-                            'font-bold text-primary border-b-2 border-primary dark:border-primary-dark dark:text-primary-dark': buyTab === false,
-                            'text-on-surface font-medium dark:text-on-surface-dark dark:hover:border-b-outline-dark-strong dark:hover:text-on-surface-dark-strong hover:border-b-2 hover:border-b-outline-strong hover:text-on-surface-strong': buyTab === true,
-                        }"
-                        class="cursor-pointer h-min px-4 py-2 text-sm"
-                        type="button"
-                        role="tab"
-                        aria-controls="tabpanelSell">
-                        Sell
-                    </button>
-                </div>
-                <p class="text-xl mb-3">You have {{ (sharesDict[stock.stockInfo.symbol] || 0) | number:'1.0' }} shares.</p>
-                <form [formGroup]="buyForm" (ngSubmit)="onSubmit()" class="mt-4">
-                    
-                    <div class="mb-4">
-                    <label class="flex w-fit items-center gap-1 pl-0.5 text-sm"
-                        [ngClass]="quantityInvalid ? 'text-danger' : 'text-on-surface dark:text-on-surface-dark'">
-                        <ng-container *ngIf="quantityInvalid">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor" class="w-4 h-4">
-                                <path d="M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z"/>
-                            </svg>
-                        </ng-container>
-                        Quantity
-                    </label>
-                    <input ngModel pattern="[0-9]*" [ngClass]="{'border-danger': quantityInvalid}" type="number" formControlName="quantity" 
-                        class="w-full p-2 mt-1 border rounded outline-none bg-surface dark:bg-surface-dark text-on-surface dark:text-on-surface-dark focus:ring-2 focus:ring-outline dark:focus:ring-outline-dark">
-                        @if (quantityInvalid) {
-                            @if (quantityNonInt) {
-                                <small class="pl-0.5 text-danger">Error: Quantity must be an integer</small>
-                            } @else {
-                                @if (!buyTab && buyForm.controls['quantity'].hasError('exceedsShares')) {
-                                    
-                                    <small class="pl-0.5 text-danger">
-                                        {{ sharesDict[stock.stockInfo.symbol] ? 
-                                            ('Error: You cannot sell more than ' + (stock ? sharesDict[stock.stockInfo.symbol] : '?') + ' shares.') : 
-                                            'You don\'t have any shares to sell' 
-                                        }}
-                                    </small>
-                                    
+                } @else {
+                    <div class="mb-3 flex gap-2 overflow-x-auto border-b border-outline dark:border-outline-dark" role="tablist" aria-label="tab options">
+                        <button 
+                            (click)="setBuying(true)" 
+                            [attr.aria-selected]="buyTab === true" 
+                            [attr.tabindex]="buyTab === true ? '0' : '-1'" 
+                            [ngClass]="{
+                                'font-bold text-primary border-b-2 border-primary dark:border-primary-dark dark:text-primary-dark': buyTab === true,
+                                'text-on-surface font-medium dark:text-on-surface-dark dark:hover:border-b-outline-dark-strong dark:hover:text-on-surface-dark-strong hover:border-b-2 hover:border-b-outline-strong hover:text-on-surface-strong': buyTab === false,
+                            }"
+                            class="cursor-pointer h-min px-4 py-2 text-sm"
+                            type="button"
+                            role="tab"
+                            aria-controls="tabpanelBuy">
+                            Buy
+                        </button>
+                        
+                        <button 
+                            (click)="setBuying(false)" 
+                            [attr.aria-selected]="buyTab === false" 
+                            [attr.tabindex]="buyTab === false ? '0' : '-1'" 
+                            [ngClass]="{
+                                'font-bold text-primary border-b-2 border-primary dark:border-primary-dark dark:text-primary-dark': buyTab === false,
+                                'text-on-surface font-medium dark:text-on-surface-dark dark:hover:border-b-outline-dark-strong dark:hover:text-on-surface-dark-strong hover:border-b-2 hover:border-b-outline-strong hover:text-on-surface-strong': buyTab === true,
+                            }"
+                            class="cursor-pointer h-min px-4 py-2 text-sm"
+                            type="button"
+                            role="tab"
+                            aria-controls="tabpanelSell">
+                            Sell
+                        </button>
+                    </div>
+                    <p class="text-xl mb-3">You have {{ (sharesDict[stock.stockInfo.symbol] || 0) | number:'1.0' }} shares.</p>
+                    <form [formGroup]="buyForm" (ngSubmit)="onSubmit()" class="mt-4">
+                        
+                        <div class="mb-4">
+                        <label class="flex w-fit items-center gap-1 pl-0.5 text-sm"
+                            [ngClass]="quantityInvalid ? 'text-danger' : 'text-on-surface dark:text-on-surface-dark'">
+                            <ng-container *ngIf="quantityInvalid">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor" class="w-4 h-4">
+                                    <path d="M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z"/>
+                                </svg>
+                            </ng-container>
+                            Quantity
+                        </label>
+                        <input ngModel pattern="[0-9]*" [ngClass]="{'border-danger': quantityInvalid}" type="string" formControlName="quantity" 
+                            class="w-full p-2 mt-1 border rounded outline-none bg-surface dark:bg-surface-dark text-on-surface dark:text-on-surface-dark focus:ring-2 focus:ring-outline dark:focus:ring-outline-dark">
+                            @if (quantityInvalid) {
+                                @if (quantityNonInt) {
+                                    <small class="pl-0.5 text-danger">Error: Quantity must be an integer</small>
                                 } @else {
-                                    <small class="pl-0.5 text-danger">Error: Quantity is required</small>
+                                    @if (!buyTab && buyForm.controls['quantity'].hasError('exceedsShares')) {
+                                        
+                                        <small class="pl-0.5 text-danger">
+                                            {{ sharesDict[stock.stockInfo.symbol] ? 
+                                                ('Error: You cannot sell more than ' + (stock ? sharesDict[stock.stockInfo.symbol] : '?') + ' shares.') : 
+                                                'You don\'t have any shares to sell' 
+                                            }}
+                                        </small>
+                                        
+                                    } @else {
+                                        <small class="pl-0.5 text-danger">Error: Quantity is required</small>
+                                    }
                                 }
                             }
-                        }
-                    </div>
+                        </div>
 
-                    <div class="my-3">
-                        @if (quantity && !quantityInvalid) {
-                            <div class="flex justify-between my-1">
-                                <p class="text-md">Current balance:</p>
-                                <p class="text-md text-right font-medium">${{ wallet.wallet.balance | number:'1.2-2' }}</p>
-                            </div>
+                        <div class="my-3">
+                            @if (quantity && !quantityInvalid) {
+                                <div class="flex justify-between my-1">
+                                    <p class="text-md">Current balance:</p>
+                                    <p class="text-md text-right font-medium">${{ wallet.wallet.balance | number:'1.2-2' }}</p>
+                                </div>
 
-                            @if (buyTab) {
-                                <div class="flex justify-between my-1">
-                                    <p class="text-md">Cost for {{ quantity | number:'1.0' }} shares:</p>
-                                    <p class="text-md text-right font-medium">${{ (currentPrice * quantity) | number:'1.2-2' }}</p>
-                                </div>
-                                <div class="flex justify-between my-1">
-                                    <p class="text-md">New balance:</p>
-                                    <p class="text-md text-right">${{ (+wallet.wallet.balance - currentPrice * quantity) | number:'1.2-2' }}</p>
-                                </div>
-                            } @else {
-                                <div class="flex justify-between my-1">
-                                    <p class="text-md">Value of {{ quantity | number:'1.0' }} shares:</p>
-                                    <p class="text-md text-right font-medium">${{ (currentPrice * quantity) | number:'1.2-2' }}</p>
-                                </div>
-                                <div class="flex justify-between my-1">
-                                    <p class="text-md">New balance:</p>
-                                    <p class="text-md text-right">${{ (+wallet.wallet.balance + currentPrice * quantity) | number:'1.2-2' }}</p>
-                                </div>
+                                @if (buyTab) {
+                                    <div class="flex justify-between my-1">
+                                        <p class="text-md">Cost for {{ quantity | number:'1.0' }} shares:</p>
+                                        <p class="text-md text-right font-medium">${{ (currentPrice * quantity) | number:'1.2-2' }}</p>
+                                    </div>
+                                    <div class="flex justify-between my-1">
+                                        <p class="text-md">New balance:</p>
+                                        <p class="text-md text-right">${{ (+wallet.wallet.balance - currentPrice * quantity) | number:'1.2-2' }}</p>
+                                    </div>
+                                } @else {
+                                    <div class="flex justify-between my-1">
+                                        <p class="text-md">Value of {{ quantity | number:'1.0' }} shares:</p>
+                                        <p class="text-md text-right font-medium">${{ (currentPrice * quantity) | number:'1.2-2' }}</p>
+                                    </div>
+                                    <div class="flex justify-between my-1">
+                                        <p class="text-md">New balance:</p>
+                                        <p class="text-md text-right">${{ (+wallet.wallet.balance + currentPrice * quantity) | number:'1.2-2' }}</p>
+                                    </div>
+                                }
                             }
                             
-                        }
+                        </div>
                         
-                    </div>
-                    
-                    
+                        
 
-                    <button type="submit" class="cursor-pointer w-full py-2 text-on-primary dark:text-on-primary-dark rounded bg-primary dark:bg-primary-dark hover:bg-secondary dark:hover:bg-secondary-dark">
-                        {{ buyTab ? 'Buy' : 'Sell' }}
-                    </button>
-                </form>
-                
-
+                        <button type="submit" class="cursor-pointer w-full py-2 text-on-primary dark:text-on-primary-dark rounded bg-primary dark:bg-primary-dark hover:bg-secondary dark:hover:bg-secondary-dark">
+                            {{ (buyTab ? 'Buy' : 'Sell') }}
+                        </button>
+                    </form>
+                }
             }
-        </app-card>
+        </div>
     </div>
 </div>
 

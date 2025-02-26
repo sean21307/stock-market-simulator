@@ -1,4 +1,4 @@
-<div class="bg-surface dark:bg-surface-dark h-screen p-8">
+<div class="bg-surface dark:bg-surface-dark p-8">
     @if (walletDetails) {
         <div class="mb-5 w-full md:min-h-0 rounded-lg relative p-8 border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark flex flex-col">
             <div class="row-span-1 col-span-1 flex justify-between mb-1">
@@ -30,7 +30,7 @@
             </div>
         </div>
 
-        <div class="mb-5 w-full md:min-h-0 rounded-lg relative border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark flex flex-col">
+        <div class="w-full md:min-h-0 rounded-lg relative border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark flex flex-col">
             <div class="p-8 pb-6 flex justify-between mb-1">
                 <div>
                     <h2 class="text-2xl">Your Stocks</h2>
@@ -40,8 +40,6 @@
                     <h2 class="text-2xl">Portfolio Value: ${{ portfolioValue | number:'1.2-2' }}</h2>
                 </div>
             </div>
-
-            <!-- <hr class="border-gray-300 dark:border-neutral-700 border-1 w-full mx-auto"> -->
 
             <div>
                 @if (sharesDict) {
@@ -62,14 +60,23 @@
                                     @for (symbol of keys(sharesDict); track symbol; let isLast = $last) {
                                         @if (stockDict[symbol]) {
                                             <tr [routerLink]="['/stock', symbol]" 
-                                                class="cursor-pointer transition duration-150 bg-surface-alt dark:bg-surface-dark-alt hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-600 text-on-surface dark:text-on-surface-dark"
+                                                class="cursor-pointer bg-surface-alt dark:bg-surface-dark-alt hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-600 text-on-surface dark:text-on-surface-dark"
                                                 [ngClass]="isLast ? 'rounded-b-full' : ''" 
                                             >
                                                 
-                                                <td class="p-4 pl-8">
-                                                    <p>{{ stockDict[symbol].name }}</p>
-                                                    <p class="text-xs">{{ symbol }}</p>
-                                                </td>
+                                            <td class="p-4 pl-7">
+                                                <div class="flex items-center space-x-3">
+                                                    <img [src]="stockDict[symbol].image" alt="{{ stockDict[symbol].name }}" 
+                                                        class="w-10 h-10 object-contain rounded-md" />
+                                            
+
+                                                    <div>
+                                                        <p class="font-medium">{{ stockDict[symbol].name }}</p>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ symbol }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            
                                     
                                                 <td class="p-4">
                                                     <p>${{ stockDict[symbol].price * sharesDict[symbol] | number:'1.2-2' }}</p>
@@ -89,7 +96,7 @@
                                     
                                             </tr>
                                         } @else {
-                                            <tr class="cursor-pointer transition duration-150 bg-surface-alt dark:bg-surface-dark-alt hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-600 text-on-surface dark:text-on-surface-dark">
+                                            <tr class="bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark">
                                                 <td class="p-4 pl-8">
                                                     <p>Loading {{ symbol }}</p>
                                                 </td>

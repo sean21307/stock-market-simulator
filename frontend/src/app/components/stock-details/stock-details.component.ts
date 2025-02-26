@@ -73,6 +73,7 @@ export class StockDetailsComponent implements OnInit {
     quantity: new FormControl(1, [Validators.required, integerValidator(), maxSharesValidator(() => this.sharesDict || [], this.stock?.stockInfo.symbol || '', this.buyTab)]),
   })
   wallet!: WalletDetails;
+  transactionComplete = false;
 
   constructor(
     private walletService: WalletService,
@@ -108,6 +109,10 @@ export class StockDetailsComponent implements OnInit {
     this.buyForm.controls['quantity'].updateValueAndValidity();
   }
 
+  reload() {
+    window.location.reload();
+  }
+
   onSubmit() {
     if (this.buyForm.invalid) {
       return;
@@ -120,8 +125,7 @@ export class StockDetailsComponent implements OnInit {
           quantity: Number(this.buyForm.value.quantity) ?? 0, 
         }).subscribe({
           next: () => {
-            alert('Successfully purchased!')
-            this.router.navigate(['/wallet/', this.wallet.wallet.name]);
+            this.transactionComplete = true;
           }, error: (err: Error) => {
             console.log(err);
           }
@@ -133,8 +137,7 @@ export class StockDetailsComponent implements OnInit {
           quantity: Number(this.buyForm.value.quantity) ?? 0, 
         }).subscribe({
           next: () => {
-            alert('Successfully sold!')
-            this.router.navigate(['/wallet/', this.wallet.wallet.name]);
+            this.transactionComplete = true;
           }, error: (err: Error) => {
             console.log(err);
           }
