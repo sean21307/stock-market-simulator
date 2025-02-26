@@ -4,7 +4,7 @@ import { WalletDetails } from '../../models/walletDetails.model';
 import { WalletService } from '../../services/wallet.service';
 import { CardComponent } from "../card/card.component";
 import { CommonModule } from '@angular/common';
-import { Stock } from '../../models/stock.model';
+import { PartialStock, Stock } from '../../models/stock.model';
 import { StockPriceService } from '../../services/stock-price.service';
 
 @Component({
@@ -18,7 +18,8 @@ export class WalletDetailsComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   walletDetails!: WalletDetails;
   sharesDict!: Record<string, number>;
-  stockDict: Record<string, Stock> = {};
+  stockDict: Record<string, PartialStock> = {};
+  portfolioValue = 0;
 
   constructor(private walletService: WalletService, private stockService: StockPriceService) {}
 
@@ -34,17 +35,16 @@ export class WalletDetailsComponent implements OnInit {
           this.walletDetails = wallet;
           this.sharesDict = this.walletService.getSharesCountDictionary(this.walletDetails.shares)
           
-          for (let symbol of Object.keys(this.sharesDict)) {
-            if (this.stockDict[symbol] != null) return;
+          let symbolList = Object.keys(this.sharesDict);
+          this.stockService.getStockInfoFromSymbolList(symbolList).subscribe({
+            next: (info: Record<string, PartialStock>) => {
+              this.stockDict = info;
 
-            this.stockService.getStockInfo(symbol).subscribe({
-              next: (info: Stock) => {
-                this.stockDict[symbol] = info;
+              for (let symbol of Object.keys(this.stockDict)) {
+                this.portfolioValue += this.stockDict[symbol].price * this.sharesDict[symbol]
               }
-            })
-
-            console.log(this.stockDict)
-          }
+            }
+          })
         }
       })
     }
