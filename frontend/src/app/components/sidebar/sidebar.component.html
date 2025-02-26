@@ -54,7 +54,7 @@
             <!-- wallet dropdown -->
             <div class="mt-auto">
                 @if (loggedIn) {
-                    <app-dropdown [dropdownText]="selectedWallet" [items]="walletNames" [selectedItem]="selectedWallet" (itemClicked)="changeWallet($event)"></app-dropdown>
+                    <app-dropdown [dropdownText]="selectedWalletText" [items]="walletNames" [selectedItem]="selectedWallet" (itemClicked)="changeWallet($event)"></app-dropdown>
                 }
                 
 

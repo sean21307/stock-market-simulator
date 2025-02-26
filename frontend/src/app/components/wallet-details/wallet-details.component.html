@@ -38,7 +38,7 @@
                     <div class="h-full overflow-y-auto scrollbar scrollbar-thumb-on-surface-dark scrollbar-track-outline-dark">
                         <div class="w-[100%]">
                             @for (listName of keys(watchlists); track listName; let isLast = $last; let isFirst = $first) {
-                                <div (click)="expandedLists[listName] = expandedLists[listName] ? !expandedLists[listName] : true" class="p-1 cursor-pointer hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-600" 
+                                <div (click)="expandedLists[listName] = expandedLists[listName] ? !expandedLists[listName] : true" class="p-1 cursor-pointer group hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-600" 
                                     [ngClass]="{
                                         'pb-3': isFirst,
                                         'pt-3': isLast,
@@ -50,7 +50,7 @@
                                         <p class="text-on-surface dark:text-on-surface-dark">{{ listName }}</p>
                                         <div class="flex flex-row gap-3">
                                             
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="rounded-sm opacity-0 size-5 group-hover:opacity-100 hover:bg-surface-alt hover:dark:bg-surface-dark-alt">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                                             </svg>
                                               
@@ -69,14 +69,11 @@
                                         <div [routerLink]="['/stocks']" class="cursor-pointer hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-600 flex justify-between items-center p-2">
                                             <div>
                                                 <div class="flex items-center space-x-3">
-                                                    <!-- <img src="https://images.financialmodelingprep.com/symbol/{{ symbol }}.png"
-                                                        class="w-5 h-5 object-contain rounded-md" /> -->
-
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-red-500/80">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
                                                     </svg>
                                             
-                                                    <p class="font-medium text-base/5">Find Stocks</p>
+                                                    <p class="font-medium text-red-500/80">Find Stocks</p>
                                                 </div>
                                             </div>
                                         </div>

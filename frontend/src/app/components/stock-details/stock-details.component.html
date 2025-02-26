@@ -47,13 +47,14 @@
         </app-card>
     </div>
 
-    <div class="row-span-1 md:col-span-2 xl:col-span-1">
-        <div (click)="watchlistModalOpen = true" class="rounded-lg relative p-3 border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt hover:bg-surface-alt/10 dark:hover:bg-surface-alt*20 cursor-pointer text-on-surface dark:text-on-surface-dark flex flex-col">
-            <p class="text-center">Add to Watchlists</p>
+    @if (wallet) {
+        <div class="row-span-1 md:col-span-2 xl:col-span-1">
+            <div (click)="watchlistModalOpen = true" class="rounded-lg relative p-3 border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt hover:bg-surface-alt/10 dark:hover:bg-surface-alt*20 cursor-pointer text-on-surface dark:text-on-surface-dark flex flex-col">
+                <p class="text-center">Add to Watchlists</p>
+            </div>
+            
         </div>
-        
-    </div>
-
+    }
     <div class="row-span-4 md:col-span-2 xl:col-span-1">
         <div class="rounded-lg relative p-8 border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark flex flex-col">
 
@@ -174,6 +175,8 @@
                         </button>
                     </form>
                 }
+            } @else {
+                <p class="text-xl">No Wallet Selected</p>
             }
         </div>
     </div>
