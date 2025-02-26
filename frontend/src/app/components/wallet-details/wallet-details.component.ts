@@ -78,7 +78,7 @@ export class WalletDetailsComponent implements OnInit {
 
     this.chartOptions = this.chartService.getChartOptions(
       this.prices.map(entry => ({
-        day: entry.date.toISOString(),
+        day: new Date(entry.date.toISOString()).toLocaleString(),
         price: entry.closing_price
       })),
       this.darkMode,
