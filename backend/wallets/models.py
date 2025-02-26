@@ -1,5 +1,8 @@
+from datetime import datetime
+
 from django.contrib.auth.models import User
 from django.db import models
+from pytz import timezone
 
 
 # ID, name, description, balance,  user_id
@@ -12,6 +15,11 @@ class Wallet(models.Model):
 
     class Meta:
         unique_together = ("name", "user")
+
+class WalletValue(models.Model):
+    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    value = models.DecimalField(max_digits=15, decimal_places=2)
+    date = models.DateTimeField(auto_now_add=True)
 
 # ID, symbol, wallet_id, buying_price
 #   FK wallet_id - > Wallet
