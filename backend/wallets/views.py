@@ -1,7 +1,6 @@
 import decimal
 import json
 
-import fmpsdk
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
