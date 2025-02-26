@@ -10,8 +10,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-
-from wallets.models import Wallet, WalletValue, Profile
+from accounts.models import Profile
+from wallets.models import Wallet, WalletValue
 
 
 import os
