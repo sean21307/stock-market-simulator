@@ -14,6 +14,7 @@ import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validatio
 import { WalletService } from '../../services/wallet.service';
 import { Wallet } from '../../models/wallet.model';
 import { WalletDetails } from '../../models/walletDetails.model';
+import { ChartService } from '../../services/chart.service';
 
 
 function integerValidator(): ValidatorFn {
@@ -37,21 +38,7 @@ function maxSharesValidator(getSharesDict: () => Record<string, number>, stockSy
   };
 }
 
-function renderer({
-  datum,
-  xKey,
-  yKey,
-  yName,
-}: AgLineSeriesTooltipRendererParams) {
-  return {
-    data: [
-      {
-        label: datum[xKey],
-        value: '$' + datum[yKey].toFixed(2),
-      },
-    ],
-  };
-}
+
 
 @Component({
   selector: 'app-stock-details',
@@ -79,6 +66,7 @@ export class StockDetailsComponent implements OnInit {
     private walletService: WalletService,
     private stockPriceService: StockPriceService, 
     private themeService: ThemeService,
+    private chartService: ChartService,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: any
   ) {}
@@ -149,56 +137,13 @@ export class StockDetailsComponent implements OnInit {
   updateChartOptions() {
     if (!this.stock || !isPlatformBrowser(this.platformId)) return;
 
-    this.chartOptions = {
-      data: this.stock.prices.map(entry => ({
+    this.chartOptions = this.chartService.getChartOptions(
+      this.stock.prices.map(entry => ({
         day: this.stockPriceService.formatDate(entry.date),
         price: entry.closing_price
       })).reverse(),
-
-      series: [
-        {
-          type: 'line',
-          xKey: 'day',
-          yKey: 'price',
-          connectMissingData: true,
-          marker: {
-            enabled: false,
-          },
-          tooltip: { renderer: renderer },
-          //stroke: this.darkMode && "#208a09" || "#2196f3"
-        }
-      ],
-      
-      axes: [
-        {
-          type: 'category',
-          position: 'bottom',
-          label: {
-            color: this.darkMode ? '#B8BBC1' : '#000000',
-          },
-          line: {
-            stroke: this.darkMode ? '#3B3D3F' : '#E0EAF1',
-          }
-        },
-        {
-          type: 'number',
-          position: 'left',
-          label: {
-            color: this.darkMode ? '#B8BBC1' : '#000000',
-          },
-          gridLine: {
-            style: [
-              {
-                  stroke: this.darkMode ? '#3B3D3F' : '#C3C3C3',
-              },
-              ],
-          },
-        }
-      ],
-      background: {
-        fill: "transparent",
-      },
-    };
+      this.darkMode,
+    )
   }
 
   ngOnInit() {
