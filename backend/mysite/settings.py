@@ -14,6 +14,10 @@ from datetime import timedelta
 from pathlib import Path
 import environ
 
+import pymysql
+pymysql.install_as_MySQLdb()
+
+
 env = environ.Env()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
