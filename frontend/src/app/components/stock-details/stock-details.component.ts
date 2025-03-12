@@ -63,6 +63,7 @@ export class StockDetailsComponent implements OnInit {
   })
   wallet!: WalletDetails;
   transactionComplete = false;
+  transactionLoading = false;
 
   constructor(
     private walletService: WalletService,
@@ -108,6 +109,7 @@ export class StockDetailsComponent implements OnInit {
       return;
     }
 
+    this.transactionLoading = true;
     if (this.buyTab == true) {
       this.walletService.purchaseShares(
         { 
@@ -115,26 +117,27 @@ export class StockDetailsComponent implements OnInit {
           quantity: Number(this.buyForm.value.quantity) ?? 0, 
         }).subscribe({
           next: () => {
+            this.transactionLoading = false;
             this.transactionComplete = true;
           }, error: (err: Error) => {
             console.log(err);
           }
         });
-    } else {
-      this.walletService.sellShares(
-        { 
-          symbol: this.stock.stockInfo.symbol,
-          quantity: Number(this.buyForm.value.quantity) ?? 0, 
-        }).subscribe({
-          next: () => {
-            this.transactionComplete = true;
-          }, error: (err: Error) => {
-            console.log(err);
-          }
-        });
+      } else {
+        this.walletService.sellShares(
+          { 
+            symbol: this.stock.stockInfo.symbol,
+            quantity: Number(this.buyForm.value.quantity) ?? 0, 
+          }).subscribe({
+            next: () => {
+              this.transactionLoading = false;
+              this.transactionComplete = true;
+            }, error: (err: Error) => {
+              console.log(err);
+            }
+          });
+      }
     }
-    
-  }
 
   updateChartOptions() {
     if (!this.stock || !isPlatformBrowser(this.platformId)) return;
@@ -159,7 +162,7 @@ export class StockDetailsComponent implements OnInit {
       this.stockPriceService.getStockInfo(symbol).subscribe({
         next: (data: Stock) => {
           this.stock = data;
-          this.currentPrice = Math.round((this.stock.prices[this.stock.prices.length - 1].closing_price + Number.EPSILON) * 100) / 100;
+          this.currentPrice = data.stockInfo.price;
           this.updateChartOptions();
         }, error: (err: Error) => {
           console.log(err);
