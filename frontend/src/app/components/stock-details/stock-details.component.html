@@ -47,29 +47,35 @@
         </app-card>
     </div>
 
-    <div class="row-span-1 md:col-span-2 xl:col-span-1">
-        <div (click)="watchlistModalOpen = true" class="rounded-lg relative p-3 border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt hover:bg-surface-alt/10 dark:hover:bg-surface-alt*20 cursor-pointer text-on-surface dark:text-on-surface-dark flex flex-col">
-            <p class="text-center">Add to Watchlists</p>
+    @if (wallet) {
+        <div class="row-span-1 md:col-span-2 xl:col-span-1">
+            <div (click)="watchlistModalOpen = true" class="rounded-lg relative p-3 border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt hover:bg-surface-alt/10 dark:hover:bg-surface-alt*20 cursor-pointer text-on-surface dark:text-on-surface-dark flex flex-col">
+                <p class="text-center">Add to Watchlists</p>
+            </div>
+            
         </div>
-        
-    </div>
-
+    }
     <div class="row-span-4 md:col-span-2 xl:col-span-1">
         <div class="rounded-lg relative p-8 border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark flex flex-col">
 
         
             @if ( wallet ) {
                 
-                @if (transactionComplete) {
-                    @if (buyTab) {
-                        <p class="text-xl">Successfully bought {{ quantity | number:'1.0' }} shares of {{ stock.stockInfo.symbol }}.</p>
+                @if (transactionComplete || transactionLoading) {
+                    @if (transactionLoading) {
+                        <p class="text-xl">Processing Transaction...</p>
                     } @else {
-                        <p class="text-xl">Successfully sold {{ quantity | number:'1.0' }} shares of {{ stock.stockInfo.symbol }}.</p>
+                        @if (buyTab) {
+                            <p class="text-xl">Successfully bought {{ quantity | number:'1.0' }} shares of {{ stock.stockInfo.symbol }}.</p>
+                        } @else {
+                            <p class="text-xl">Successfully sold {{ quantity | number:'1.0' }} shares of {{ stock.stockInfo.symbol }}.</p>
+                        }
+    
+                        <button (click)="reload()" type="submit" class="mt-2 cursor-pointer w-full py-2 text-on-primary dark:text-on-primary-dark rounded bg-primary dark:bg-primary-dark hover:bg-secondary dark:hover:bg-secondary-dark">
+                            OK
+                        </button>
                     }
-
-                    <button (click)="reload()" type="submit" class="mt-2 cursor-pointer w-full py-2 text-on-primary dark:text-on-primary-dark rounded bg-primary dark:bg-primary-dark hover:bg-secondary dark:hover:bg-secondary-dark">
-                        OK
-                    </button>
+                    
                 } @else {
                     <div class="mb-3 flex gap-2 overflow-x-auto border-b border-outline dark:border-outline-dark" role="tablist" aria-label="tab options">
                         <button 
@@ -174,6 +180,8 @@
                         </button>
                     </form>
                 }
+            } @else {
+                <p class="text-xl">No Wallet Selected</p>
             }
         </div>
     </div>

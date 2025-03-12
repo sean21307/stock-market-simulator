@@ -36,6 +36,7 @@ export class SidebarComponent {
     this.themeService.darkMode$.subscribe(isDark => {
       this.darkMode = isDark;
     });
+    
 
     
     if (this.authService.getToken() != null) {
@@ -46,6 +47,10 @@ export class SidebarComponent {
         this.selectedWallet = walletName;
       });
     }
+  }
+
+  get selectedWalletText(): string {
+    return this.selectedWallet.length == 0 ? 'Wallets' : this.selectedWallet
   }
 
   getWallets() {
