@@ -99,6 +99,12 @@ def add_shares(request, wallet_name):
         ]
 
         wallet.share_set.bulk_create(shares)
+        wallet.purchase_set.create(
+            quantity_purchased=quantity,
+            quantity_available=quantity,
+            price_per_share=price,
+            total_price= price * quantity,
+        )
         update_wallet_value(wallet)
 
         return Response({'wallet': WalletSerializer(wallet).data}, status=status.HTTP_200_OK)
@@ -122,6 +128,30 @@ def sell_shares(request, wallet_name):
             wallet.share_set.filter(symbol=symbol)
             .order_by('id')[:quantity]
             .values_list('id', flat=True)  
+        )
+
+        wallet_purchases = wallet.purchase_set.filter(symbol=symbol, quantity_available__gt=0).order_by('date')
+        index = 0
+        total_purchase_price = 0
+        while(quantity > 0):
+            current = wallet_purchases[index]
+
+            if current.quantity_available > quantity:
+                current.quantity_available -= quantity
+                total_purchase_price += current.price_per_share * quantity
+                quantity = 0
+            else:
+                total_purchase_price += current.price_per_share * current.quantity_available
+                quantity -= current.quantity_available
+                current.quantity_available = 0
+            index += 1
+            current.save()
+        profit = total_purchase_price - total_price
+        wallet.sale_set.create(
+            quantity_sold=quantity,
+            price_per_share=price,
+            total_price= total_price,
+            profit=profit,
         )
 
         wallet.share_set.filter(id__in=ids_to_delete).delete()
