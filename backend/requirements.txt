@@ -1,4 +1,4 @@
-asgiref @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_47jggogimk/croot/asgiref_1724072471856/work
+asgiref==3.8.1
 beautifulsoup4==4.13.3
 certifi==2025.1.31
 charset-normalizer==3.4.1
