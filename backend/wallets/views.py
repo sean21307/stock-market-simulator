@@ -32,7 +32,6 @@ def get_wallets(request):
     wallet_list = []
     for wallet in wallets:
         wallet_list.append(WalletSerializer(wallet).data)
-        update_wallet_value(wallet)
     return Response(wallet_list, status=status.HTTP_200_OK)
 
 @permission_classes([IsAuthenticated])
