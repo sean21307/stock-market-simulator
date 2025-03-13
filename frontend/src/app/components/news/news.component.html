@@ -1,0 +1,20 @@
+<div class="container">
+    <h2>General News</h2>
+    <ul>
+      <li *ngFor="let news of generalNews">
+        <h4>{{ news.title }}</h4>
+        <p>{{ news.description }}</p>
+        <a [href]="news.url" target="_blank">Read more</a>
+      </li>
+    </ul>
+  
+    <h2>Stock News for {{ selectedStock }}</h2>
+    <ul>
+      <li *ngFor="let news of stockNews">
+        <h4>{{ news.title }}</h4>
+        <p>{{ news.description }}</p>
+        <a [href]="news.url" target="_blank">Read more</a>
+      </li>
+    </ul>
+  </div>
+  
