@@ -100,6 +100,7 @@ def add_shares(request, wallet_name):
 
         wallet.share_set.bulk_create(shares)
         wallet.purchase_set.create(
+            symbol=symbol,
             quantity_purchased=quantity,
             quantity_available=quantity,
             price_per_share=price,
@@ -130,12 +131,12 @@ def sell_shares(request, wallet_name):
             .values_list('id', flat=True)  
         )
 
-        wallet_purchases = wallet.purchase_set.filter(symbol=symbol, quantity_available__gt=0).order_by('date')
+        wallet_purchases = list(wallet.purchase_set.filter(symbol=symbol, quantity_available__gt=0).order_by('date'))
         index = 0
         total_purchase_price = 0
-        while(quantity > 0):
+        number_of_shares = quantity
+        while quantity > 0:
             current = wallet_purchases[index]
-
             if current.quantity_available > quantity:
                 current.quantity_available -= quantity
                 total_purchase_price += current.price_per_share * quantity
@@ -144,11 +145,12 @@ def sell_shares(request, wallet_name):
                 total_purchase_price += current.price_per_share * current.quantity_available
                 quantity -= current.quantity_available
                 current.quantity_available = 0
-            index += 1
             current.save()
+            index += 1
+
         profit = total_purchase_price - total_price
         wallet.sale_set.create(
-            quantity_sold=quantity,
+            quantity_sold=number_of_shares,
             price_per_share=price,
             total_price= total_price,
             profit=profit,

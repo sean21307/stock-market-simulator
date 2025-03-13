@@ -35,8 +35,10 @@ class Purchase(models.Model):
     quantity_available = models.PositiveIntegerField()
     price_per_share = models.DecimalField(max_digits=10, decimal_places=2)
     total_price = models.DecimalField(max_digits=15, decimal_places=2)
-    date = models.DateField(auto_now=True)
+    date = models.DateTimeField(auto_now_add=True)
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    def __dir__(self):
+        return ["symbol", "quantity_sold", "price_per_share", "total_price"]
 
 
 class Sale(models.Model):
@@ -44,6 +46,8 @@ class Sale(models.Model):
     quantity_sold = models.PositiveIntegerField()
     price_per_share = models.DecimalField(max_digits=10, decimal_places=2)
     total_price = models.DecimalField(max_digits=15, decimal_places=2)
-    date = models.DateField(auto_now=True)
+    date = models.DateTimeField(auto_now_add=True)
     profit = models.DecimalField(max_digits=15, decimal_places=2)
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    def __dir__(self):
+        return ["symbol", "quantity_sold", "price_per_share", "total_price"]
