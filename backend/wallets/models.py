@@ -27,3 +27,23 @@ class Share(models.Model):
     symbol = models.CharField(max_length=50)
     buying_price = models.DecimalField(max_digits=7, decimal_places=2)
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+
+
+class Purchase(models.Model):
+    symbol = models.CharField(max_length=50)
+    quantity_purchased = models.PositiveIntegerField()
+    quantity_available = models.PositiveIntegerField()
+    price_per_share = models.DecimalField(max_digits=10, decimal_places=2)
+    total_price = models.DecimalField(max_digits=15, decimal_places=2)
+    date = models.DateTimeField(auto_now_add=True)
+    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+
+
+class Sale(models.Model):
+    symbol = models.CharField(max_length=50)
+    quantity_sold = models.PositiveIntegerField()
+    price_per_share = models.DecimalField(max_digits=10, decimal_places=2)
+    total_price = models.DecimalField(max_digits=15, decimal_places=2)
+    date = models.DateTimeField(auto_now_add=True)
+    profit = models.DecimalField(max_digits=15, decimal_places=2)
+    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)

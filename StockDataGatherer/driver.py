@@ -31,5 +31,9 @@ while True:
             hours_until_open = abs(9 - current_hour)
             time.sleep(60 * 60 * hours_until_open)
         else:
-            update_wallets.update_wallets()
-            time.sleep(60 * 15)
+            try:
+                update_wallets.update_wallets()
+            except Exception as ex:
+                print(ex)
+            finally:
+                time.sleep(60 * 15)
