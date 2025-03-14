@@ -69,6 +69,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# need this for now because the vercel links have different urls based on the branch
+CORS_ALLOW_ALL_ORIGINS = True
+
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:4200',
 ]
