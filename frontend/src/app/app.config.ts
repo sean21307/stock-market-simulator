@@ -2,7 +2,6 @@
 import { ApplicationConfig, provideZoneChangeDetection, importProvidersFrom } from '@angular/core'; 
 import { provideRouter } from '@angular/router';  // Provides routing services for the app
 import { provideHttpClient } from '@angular/common/http'; // Provides the HTTP client for making API requests
-import { provideClientHydration } from '@angular/platform-browser'; // Helps with server-side rendering (SSR) hydration
 import { CommonModule } from '@angular/common'; // ✅ Import this to enable commonly used Angular features like pipes and directives
 
 // Import the application's routes
@@ -16,9 +15,6 @@ export const appConfig: ApplicationConfig = {
     
     // Set up routing for the app using the imported routes configuration
     provideRouter(routes), 
-    
-    // Enable client-side hydration for SSR apps to improve performance on the client after server rendering
-    provideClientHydration(), 
     
     // Provide the HttpClient module to handle HTTP requests across the app
     provideHttpClient(),
