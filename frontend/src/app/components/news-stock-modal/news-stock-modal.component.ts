@@ -25,6 +25,7 @@ export class NewsStockModalComponent implements OnInit {
     }
   }
 
+  
   fetchStockNews(): void {
     this.isLoading = true;
     this.errorMessage = '';
@@ -40,4 +41,7 @@ export class NewsStockModalComponent implements OnInit {
       }
     );
   }
+
+  
+  
 }
