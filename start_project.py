@@ -31,7 +31,7 @@ print(f"Executing: {django_cmd}")
 subprocess.Popen(django_cmd, shell=True)
 
 print("\nStarting Angular frontend...")
-angular_cmd = f'cmd /k "cd /d {frontend_path} && npx ng serve --port 4300 --open"'
+angular_cmd = f'cmd /k "cd /d {frontend_path} && npx ng serve --port 4200 --open"'
 print(f"Executing: {angular_cmd}")
 subprocess.Popen(angular_cmd, shell=True)
 

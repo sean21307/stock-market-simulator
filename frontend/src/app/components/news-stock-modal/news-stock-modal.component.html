@@ -1,0 +1,58 @@
+<div class="modal-content bg-surface dark:bg-surface-dark rounded-lg shadow-lg overflow-hidden max-w-xl">
+    <div class="modal-header bg-surface-alt dark:bg-surface-dark-alt p-3 flex justify-between items-center">
+        <h5 class="modal-title text-base font-semibold text-on-surface dark:text-on-surface-dark">Stock News for {{ stockSymbol }}</h5>
+        <button type="button" class="btn-close text-on-surface dark:text-on-surface-dark hover:text-on-surface-strong dark:hover:text-on-surface-dark-strong" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <div class="modal-body p-3 max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600">
+        <ng-container *ngIf="isLoading; else newsContent">
+            <div class="flex justify-center py-4">
+                <span class="text-on-surface dark:text-on-surface-dark">Loading...</span>
+            </div>
+        </ng-container>
+
+        <ng-template #newsContent>
+            <ng-container *ngIf="errorMessage; else noNews">
+                <div class="alert alert-danger bg-danger text-on-danger dark:bg-danger dark:text-on-danger p-4 rounded-md mb-4">
+                    <span>{{ errorMessage }}</span>
+                </div>
+            </ng-container>
+
+            <ng-template #noNews>
+                <ng-container *ngIf="stockNews.length === 0; else displayNews">
+                    <div class="alert alert-info bg-info text-on-info dark:bg-info dark:text-on-info p-4 rounded-md mb-4">
+                        No news available.
+                    </div>
+                </ng-container>
+
+                <ng-template #displayNews>
+                    <div class="space-y-4">
+                        <div *ngFor="let news of stockNews">
+                            <div class="bg-surface dark:bg-surface-dark-alt p-3 rounded-md shadow-md hover:shadow-lg transition-shadow duration-300">
+                                <div class="flex items-center space-x-4">
+                                    <img *ngIf="news.image" [src]="news.image" alt="news image" class="w-12 h-12 rounded-md object-cover">
+
+                                    <div class="flex-1">
+                                        <h5 class="text-lg font-semibold text-on-surface dark:text-on-surface-dark">
+                                            <a [href]="news.url" target="_blank" class="text-info dark:text-info hover:underline">
+                                                {{ news.title }}
+                                            </a>
+                                        </h5>
+                                        <p class="text-on-surface dark:text-on-surface-dark mt-2 truncate">
+                                            {{ news.description }}
+                                        </p>
+                                        <p class="text-sm text-on-surface-strong dark:text-on-surface-dark-strong mt-2">
+                                            <i>{{ news.publishedDate | date: 'medium' }}</i>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </ng-template>
+        </ng-template>
+    </div>
+</div>

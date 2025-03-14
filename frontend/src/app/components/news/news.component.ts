@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NewsService } from '../../services/news.service';
-import { ThemeService } from '../../services/theme.service'; // Assuming ThemeService is injected to manage dark mode
+import { ThemeService } from '../../services/theme.service'; 
 
 @Component({
   selector: 'app-news',
