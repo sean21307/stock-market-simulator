@@ -3,7 +3,15 @@
 @import "tailwindcss";
 @plugin 'tailwind-scrollbar';
 
-
+/* fixes this class for builds */
+@layer utilities {
+    :where(.space-x-3 > :not(:last-child)) {
+      --tw-space-x-reverse: 0;
+      margin-inline-start: calc(calc(var(--spacing) * 3) * var(--tw-space-x-reverse));
+      margin-inline-end: calc(calc(var(--spacing) * 3) * calc(1 - var(--tw-space-x-reverse)));
+    }
+  }
+  
 
 @custom-variant dark (&:where(.dark, .dark *));
 
