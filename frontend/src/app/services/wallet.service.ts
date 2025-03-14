@@ -28,6 +28,11 @@ export class WalletService {
     return this.http.post<Wallet>(`${this.apiUrl}new`, body, { headers });
   }
 
+  deleteWallet(name: string): Observable<void> {
+    const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
+    return this.http.delete<void>(`${this.apiUrl}${name}/delete`, { headers });
+  }
+
   setSelectedWallet(walletName: string): Observable<{ wallet_id: number }> {
     const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
     return this.http.post<{ wallet_id: number }>(`${this.apiUrl}${walletName}/select`, {}, { headers });

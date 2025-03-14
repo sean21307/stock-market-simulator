@@ -64,6 +64,7 @@ export class StockDetailsComponent implements OnInit {
   wallet!: WalletDetails;
   transactionComplete = false;
   transactionLoading = false;
+  descriptionExpanded = false;
 
   constructor(
     private walletService: WalletService,
@@ -151,6 +152,18 @@ export class StockDetailsComponent implements OnInit {
     )
   }
 
+  formatMarketCap(value: number): string {
+    return new Intl.NumberFormat('en-US', { 
+        style: 'currency', 
+        currency: 'USD', 
+        notation: 'compact', 
+        compactDisplay: 'short',
+        minimumFractionDigits: 2, 
+        maximumFractionDigits: 2 
+    }).format(value);
+  }
+
+
   ngOnInit() {
     this.themeService.darkMode$.subscribe(isDark => {
       this.darkMode = isDark;
@@ -161,6 +174,7 @@ export class StockDetailsComponent implements OnInit {
     if (symbol) {
       this.stockPriceService.getStockInfo(symbol).subscribe({
         next: (data: Stock) => {
+          console.log("her", data)
           this.stock = data;
           this.currentPrice = data.stockInfo.price;
           this.updateChartOptions();

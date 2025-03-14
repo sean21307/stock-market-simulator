@@ -7,6 +7,9 @@ interface StockInfo {
     symbol: string,
     companyName: string,
     description: string,
+    industry: string,
+    fullTimeEmployees: number,
+    mktCap: number,
     price: number,
     changesPercentage: number,
 }

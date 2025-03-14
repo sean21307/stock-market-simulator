@@ -17,6 +17,11 @@ export class WatchlistService {
     return this.http.post<Watchlist>(`${this.apiUrl}new/`, body, { headers });
   }
 
+  deleteWatchlist(name: string): Observable<void> {
+    const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
+    return this.http.delete<void>(`${this.apiUrl}delete/${name}/`, { headers });
+  }
+
   getWatchlists(): Observable<Record<string, string[]>> {
     const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
     return this.http.get<Record<string, string[]>>(`${this.apiUrl}`, { headers })

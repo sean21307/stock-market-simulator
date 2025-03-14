@@ -54,8 +54,11 @@ export class AuthService {
         localStorage.removeItem('refresh_token');
         window.location.reload();
       }, error: (err: Error) => {
-        alert("Failed to logout");
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        alert("Logout failed on backend");
         console.log(err);
+        window.location.reload();
       }
     });
   }

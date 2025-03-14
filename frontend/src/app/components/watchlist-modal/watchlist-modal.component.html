@@ -1,9 +1,9 @@
-<div class="z-1199 fixed inset-0 bg-black/50" (click)="closeModal()">
+<div class="z-1199 fixed inset-0 bg-black/50">
 </div>
 
-<div class="z-1200 fixed inset-0 bg-transparent flex justify-center items-center">
+<div class="z-1200 fixed inset-0 bg-transparent flex justify-center items-center" (click)="closeModal()">
 
-    <div class="border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt rounded-md p-6 shadow-lg w-[90%] max-w-lg relative text-on-surface dark:text-on-surface-dark">
+    <div (click)="$event.stopPropagation()" class="border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt rounded-md p-6 shadow-lg w-[90%] max-w-lg relative text-on-surface dark:text-on-surface-dark">
         
         <div class="flex justify-between items-center mb-2">
             <h2 class="text-lg text-on-surface-strong dark:text-on-surface-dark-strong">{{ symbol ? ('Add ' + symbol + ' to Your Lists') : 'Create Watchlist' }}</h2>
