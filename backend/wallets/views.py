@@ -32,7 +32,6 @@ def get_wallets(request):
     wallet_list = []
     for wallet in wallets:
         wallet_list.append(WalletSerializer(wallet).data)
-        update_wallet_value(wallet)
     return Response(wallet_list, status=status.HTTP_200_OK)
 
 @permission_classes([IsAuthenticated])
@@ -94,10 +93,14 @@ def add_shares(request, wallet_name):
             return Response({'error': 'Transaction would make wallet Balance negative'}, status=status.HTTP_400_BAD_REQUEST)
         wallet.save()
 
-        while quantity > 0:
-            wallet.share_set.create(symbol=symbol, buying_price=price)
-            quantity -= 1
+        shares = [
+            wallet.share_set.model(symbol=symbol, buying_price=price, wallet=wallet)
+            for _ in range(quantity)
+        ]
+
+        wallet.share_set.bulk_create(shares)
         update_wallet_value(wallet)
+
         return Response({'wallet': WalletSerializer(wallet).data}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -114,12 +117,17 @@ def sell_shares(request, wallet_name):
         user = User.objects.get(username=wallet_owner_username)
         wallet = user.wallet_set.get(name=wallet_name)
         wallet.balance += total_price
-        while quantity > 0:
-            share = wallet.share_set.filter(symbol=symbol).first()
-            share.delete()
-            quantity -= 1
+   
+        ids_to_delete = list(
+            wallet.share_set.filter(symbol=symbol)
+            .order_by('id')[:quantity]
+            .values_list('id', flat=True)  
+        )
+
+        wallet.share_set.filter(id__in=ids_to_delete).delete()
         wallet.save()
         update_wallet_value(wallet)
+        
         return Response({'wallet': WalletSerializer(wallet).data}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
