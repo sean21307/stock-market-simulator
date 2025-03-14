@@ -2,7 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,18 +9,15 @@ import { AuthService } from './auth.service';
 export class NewsService {
   private apiUrl = 'http://127.0.0.1:8000/news/';
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(private http: HttpClient) {}
 
   getGeneralNews(): Observable<any[]> {
-    const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
-    return this.http.get<any[]>(`${this.apiUrl}general/`, { headers });
+    return this.http.get<any[]>(`${this.apiUrl}`);
   }
 
   getStockNews(symbol: string, fromDate = '2024-01-01', toDate = '2024-03-01', page = 0, limit = 50): Observable<any[]> {
-    const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
     const params = { from: fromDate, to: toDate, page: page.toString(), limit: limit.toString() };
-
-    return this.http.get<any[]>(`${this.apiUrl}stock/${symbol}/`, { headers, params });
+    return this.http.get<any[]>(`${this.apiUrl}stock/${symbol}/`, { params });
   }
 
   getLatestStockNews(): Observable<any[]> {

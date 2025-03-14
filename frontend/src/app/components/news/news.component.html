@@ -1,20 +1,32 @@
-<div class="container">
-    <h2>General News</h2>
-    <ul>
-      <li *ngFor="let news of generalNews">
-        <h4>{{ news.title }}</h4>
-        <p>{{ news.description }}</p>
-        <a [href]="news.url" target="_blank">Read more</a>
-      </li>
-    </ul>
-  
-    <h2>Stock News for {{ selectedStock }}</h2>
-    <ul>
-      <li *ngFor="let news of stockNews">
-        <h4>{{ news.title }}</h4>
-        <p>{{ news.description }}</p>
-        <a [href]="news.url" target="_blank">Read more</a>
-      </li>
-    </ul>
-  </div>
-  
+<div class="container mx-auto px-4 py-6 bg-surface dark:bg-surface-dark">
+  <h2 class="text-2xl font-bold text-center mb-6 text-on-surface-strong dark:text-on-surface-dark-strong">📰 General News</h2>
+
+  @if (generalNews.length === 0) {
+    <div class="text-center">
+      <p class="text-gray-500 dark:text-gray-400">No news available.</p>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div *ngFor="let news of generalNews">
+        <a [href]="news.url" target="_blank" class="block bg-surface-light dark:bg-neutral-800 shadow-md rounded-lg overflow-hidden hover:no-underline">
+          <img 
+            [src]="news.image" 
+            alt="{{ news.title }}" 
+            class="w-full h-48 object-cover"
+          />
+          <div class="p-4 flex flex-col h-full">
+            <h5 class="text-lg font-semibold mb-2 text-on-surface-strong dark:text-on-surface-dark-strong">{{ news.title }}</h5>
+            <p class="text-gray-600 dark:text-gray-300 text-sm">
+              {{ news.publishedDate | date:'medium' }} - 
+              <span class="text-blue-600 dark:text-blue-400">{{ news.site }}</span>
+            </p>
+            <p class="text-gray-700 dark:text-gray-200 text-sm mt-2">
+              {{ news.text.length > 150 ? (news.text | slice:0:150) + '...' : news.text }}
+            </p>
+            <!-- <p class="text-gray-500 dark:text-gray-400 text-xs mt-2 break-all">🔗 {{ news.url }}</p>  -->
+          </div>
+        </a>
+      </div>
+    </div>
+  } 
+</div>
