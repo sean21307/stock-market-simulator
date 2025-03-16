@@ -163,6 +163,17 @@ export class StockDetailsComponent implements OnInit {
     }).format(value);
   }
 
+  loadStockData(symbol: string) {
+    this.stockPriceService.getStockInfo(symbol).subscribe({
+      next: (data: Stock) => {
+        this.stock = data;
+        this.currentPrice = data.stockInfo.price;
+        this.updateChartOptions();
+      }, error: (err: Error) => {
+        console.log(err);
+      }
+    });
+  }
 
   ngOnInit() {
     this.themeService.darkMode$.subscribe(isDark => {
@@ -170,20 +181,12 @@ export class StockDetailsComponent implements OnInit {
       this.updateChartOptions();
     });
 
-    const symbol = this.route.snapshot.paramMap.get('symbol');
-    if (symbol) {
-      this.stockPriceService.getStockInfo(symbol).subscribe({
-        next: (data: Stock) => {
-          console.log("her", data)
-          this.stock = data;
-          this.currentPrice = data.stockInfo.price;
-          this.updateChartOptions();
-        }, error: (err: Error) => {
-          console.log(err);
-        }
-      });
-
-    }
+    this.route.paramMap.subscribe(params => {
+      const symbol = params.get('symbol');
+      if (symbol) {
+        this.loadStockData(symbol)
+      }
+    })
 
     this.walletService.getSelectedWallet().subscribe({
       next: (wallet: WalletDetails) => {

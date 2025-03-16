@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+import { RouterModule, RouterOutlet } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ThemeService } from '../../services/theme.service';
 import { DropdownComponent } from "../dropdown/dropdown.component";
@@ -8,11 +8,15 @@ import { WalletService } from '../../services/wallet.service';
 import { Wallet } from '../../models/wallet.model';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { debounceTime, Subject, switchMap } from 'rxjs';
+import { SearchResult } from '../../models/searchResult.model';
+import { StockPriceService } from '../../services/stock-price.service';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, FormsModule, DropdownComponent],
+  imports: [CommonModule, RouterOutlet, FormsModule, DropdownComponent, RouterModule],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css'
 })
@@ -24,14 +28,46 @@ export class SidebarComponent {
   wallets: Wallet[] = [];
   walletNames: string[] = [];
   loggedIn = false;
+  searchQuery = '';
+  searchResults: SearchResult[] = [];
+  searchSubject = new Subject<string>();
+  isFocused: boolean = false;
 
   constructor(
     private themeService: ThemeService, 
     private walletService: WalletService, 
     private authService: AuthService, 
+    private stockService: StockPriceService,
     private router: Router,
-  ) {}
+    private http: HttpClient
+  ) {
+    this.searchSubject.pipe(
+      debounceTime(300),
+      switchMap(query => this.stockService.getSearchResults(query))
+    ).subscribe(results => {
+      this.searchResults = results;
+    });
+  }
+
+  onSearchChange() {
+    if (this.searchQuery.trim().length == 0) {
+      this.searchResults = [];
+      return;
+    }
+    this.searchSubject.next(this.searchQuery);
+  }
+
+  onFocus() {
+    this.isFocused = true;
+  }
   
+  onBlur() {
+    // timeout required to allow page to navigate
+    setTimeout(() => {
+      this.isFocused = false;
+    }, 100);
+  }
+
   ngOnInit() {
     this.themeService.darkMode$.subscribe(isDark => {
       this.darkMode = isDark;
