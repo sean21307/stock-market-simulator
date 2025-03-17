@@ -2,7 +2,11 @@
     <app-watchlist-modal [symbol]="stock.stockInfo.symbol" (close)="watchlistModalOpen = false"></app-watchlist-modal>
 }
 
-<div class="bg-surface dark:bg-surface-dark h-screen grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 grid-rows-[auto_auto_1fr] gap-6 p-8"> 
+<div class="bg-surface dark:bg-surface-dark h-screen grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 grid-rows-[auto_auto_auto_1fr] gap-6 p-8"> 
+    <div class="col-span-full row-span-2">
+        <app-news-stock-modal [stockSymbol]="stock.stockInfo.symbol"></app-news-stock-modal>
+    </div>
+    
     <!-- grid-rows-8 md:grid-rows-7 xl:grid-rows-5  -->
     <div class="md:col-span-2 row-span-4">
         <app-card>
@@ -56,8 +60,6 @@
         </div>
     }
     
-
-    <app-news-stock-modal [stockSymbol]="stock.stockInfo.symbol"></app-news-stock-modal>
 
     <div class="md:col-span-2 xl:col-span-1">
         <div class="rounded-lg relative p-8 border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark flex flex-col">
