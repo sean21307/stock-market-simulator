@@ -24,11 +24,28 @@
 
             <div>
               <button
+                *ngIf="!isEditing"
                 (click)="toggleEdit()"
                 class="px-4 py-2 text-sm font-medium text-on-surface rounded-radius transition-colors duration-200
                 bg-primary-dark hover:bg-primary focus:outline-none focus-visible:outline-2 focus-visible:outline-primary
                 dark:bg-transparent dark:text-primary dark:border-2 dark:border-primary dark:hover:bg-primary dark:hover:border-primary-light dark:focus-visible:outline-primary-dark">
-                {{ isEditing ? 'Save' : 'Edit' }}
+                Edit
+              </button>
+
+              <button
+                *ngIf="isEditing"
+                (click)="updateProfile()"
+                class="px-4 py-2 text-sm font-medium text-on-surface rounded-radius transition-colors duration-200
+                bg-success hover:bg-success-dark focus:outline-none focus-visible:outline-2 focus-visible:outline-success">
+                Save
+              </button>
+
+              <button
+                *ngIf="isEditing"
+                (click)="toggleEdit()"
+                class="px-4 py-2 text-sm font-medium text-on-surface rounded-radius transition-colors duration-200
+                bg-error hover:bg-error-dark focus:outline-none focus-visible:outline-2 focus-visible:outline-error">
+                Cancel
               </button>
             </div>
           </form>

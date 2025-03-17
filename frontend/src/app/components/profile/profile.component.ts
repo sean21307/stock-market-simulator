@@ -69,13 +69,26 @@ export class ProfileComponent implements OnInit {
       return;
     }
 
-    const storedUsername = localStorage.getItem('username') || '';
-    const storedEmail = localStorage.getItem('email') || '';
-
     this.profileForm = this.fb.group({
-      username: [{ value: storedUsername, disabled: true }],
-      email: [{ value: storedEmail, disabled: true }]
+      username: [{ value: '', disabled: true }],
+      email: [{ value: '', disabled: true }]
     });
+
+    this.authService.getUserProfile().subscribe(
+      (userData) => {
+        console.log("User profile:", userData);
+        this.user = userData; // Store user data
+
+        this.profileForm.patchValue({
+          username: userData.username,
+          email: userData.email
+        });
+      },
+      (error) => {
+        console.error("Failed to fetch user profile", error);
+        alert("Error loading profile data");
+      }
+    );
 
     this.walletService.getWallets().subscribe({
       next: (data: Wallet[]) => {
@@ -103,4 +116,25 @@ export class ProfileComponent implements OnInit {
       this.profileForm.get('email')?.disable();
     }
   }
+
+  updateProfile() {
+  if (this.profileForm.invalid) {
+    alert("Please enter valid data");
+    return;
+  }
+
+  const updatedProfile = this.profileForm.value;
+
+  this.authService.patchUserProfile(updatedProfile).subscribe(
+    (response) => {
+      console.log("Profile updated:", response);
+      alert("Profile updated successfully!");
+      this.toggleEdit(); // Exit edit mode
+    },
+    (error) => {
+      console.error("Failed to update profile", error);
+      alert("Failed to update profile");
+    }
+  );
+}
 }
