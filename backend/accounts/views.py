@@ -63,7 +63,6 @@ def user_profile(request):
 
     if request.method == 'GET':
         return Response({
-            "id": user.id,
             "username": user.username,
             "email": user.email,
         }, status=status.HTTP_200_OK)
