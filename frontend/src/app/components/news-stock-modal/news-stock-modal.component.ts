@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { NewsService } from '../../services/news.service';
 import { CommonModule } from '@angular/common'; 
 import { FormsModule } from '@angular/forms';
@@ -12,12 +12,11 @@ import { HttpClientModule } from '@angular/common/http';
   styleUrls: ['./news-stock-modal.component.css']
 })
 export class NewsStockModalComponent implements OnInit {
+  private newsService = inject(NewsService);
   @Input() stockSymbol: string = ''; 
   stockNews: any[] = []; 
   isLoading = false; 
   errorMessage = '';
-
-  constructor(private newsService: NewsService) {}
 
   ngOnInit(): void {
     if (this.stockSymbol) {
@@ -25,7 +24,6 @@ export class NewsStockModalComponent implements OnInit {
     }
   }
 
-  
   fetchStockNews(): void {
     this.isLoading = true;
     this.errorMessage = '';
@@ -41,7 +39,4 @@ export class NewsStockModalComponent implements OnInit {
       }
     );
   }
-
-  
-  
 }
