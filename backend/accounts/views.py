@@ -57,9 +57,9 @@ def test_auth_token(request, format=None):
     return Response(content, status=status.HTTP_200_OK)
 
 @api_view(['GET', 'PUT', 'PATCH'])
-@permission_classes([IsAuthenticated])  # Only authenticated users can access
+@permission_classes([IsAuthenticated])
 def user_profile(request):
-    user = request.user  # Get the currently logged-in user
+    user = request.user
 
     if request.method == 'GET':
         return Response({

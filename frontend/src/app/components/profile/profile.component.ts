@@ -77,7 +77,7 @@ export class ProfileComponent implements OnInit {
     this.authService.getUserProfile().subscribe(
       (userData) => {
         console.log("User profile:", userData);
-        this.user = userData; // Store user data
+        this.user = userData;
 
         this.profileForm.patchValue({
           username: userData.username,
