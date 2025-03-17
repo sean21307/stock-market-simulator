@@ -45,9 +45,9 @@ export class AuthComponent {
     this.authForm = this.fb.group(
       {
         username: ['', [Validators.required]],
-        email: [''], 
+        email: [''],
         password: ['', [Validators.required, Validators.minLength(3)]],
-        confirmPassword: [''] 
+        confirmPassword: ['']
       },
       { validators: confirmPasswordValidator() }
     );
@@ -120,15 +120,13 @@ export class AuthComponent {
       console.log('Logging in:', { username, password });
       this.authService.loginUser({ username, password }).subscribe(
         (response) => {
-          
+
           localStorage.setItem('access_token', response.access);
           localStorage.setItem('refresh_token', response.refresh);
-          localStorage.setItem('username', username); 
+          localStorage.setItem('username', username);
 
           console.log('Login successful');
           this.router.navigate(['/profile']);
-          window.location.reload();
-
         },
         (error) => {
           // TODO: display incorrect credentials notification

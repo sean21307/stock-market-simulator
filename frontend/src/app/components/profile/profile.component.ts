@@ -136,5 +136,5 @@ export class ProfileComponent implements OnInit {
       alert("Failed to update profile");
     }
   );
-}
+  }
 }
