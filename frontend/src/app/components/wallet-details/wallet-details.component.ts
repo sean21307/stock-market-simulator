@@ -13,11 +13,12 @@ import { ThemeService } from '../../services/theme.service';
 import { WatchlistModalComponent } from '../watchlist-modal/watchlist-modal.component';
 import { WatchlistService } from '../../services/watchlist.service';
 import { Watchlist } from '../../models/watchlist.model';
+import { ModalComponent } from '../modal/modal.component';
 
 @Component({
   selector: 'app-wallet-details',
   standalone: true,
-  imports: [CardComponent, CommonModule, RouterModule, AgCharts, WatchlistModalComponent],
+  imports: [CardComponent, CommonModule, RouterModule, AgCharts, WatchlistModalComponent, ModalComponent],
   templateUrl: './wallet-details.component.html',
   styleUrl: './wallet-details.component.css'
 })
@@ -30,6 +31,10 @@ export class WalletDetailsComponent implements OnInit {
   prices!: { date: Date, closing_price: number }[];
   chartOptions!: AgChartOptions;
   darkMode = false;
+
+  deleteWatchlistModalOpen = false;
+  deleteWatchlistName: string | undefined = undefined;
+
   watchlistModalOpen = false;
   watchlistStockDict: Record<string, PartialStock> = {};
   watchlists: Record<string, string[]> = {};
@@ -71,6 +76,27 @@ export class WalletDetailsComponent implements OnInit {
     return data;
   }
 
+  promptDeleteWatchlist(name: string) {
+    this.deleteWatchlistName = name;
+    this.deleteWatchlistModalOpen = true;
+  }
+
+  deleteWatchlist() {
+    if (!this.deleteWatchlistName) return;
+
+    this.watchlistService.deleteWatchlist(this.deleteWatchlistName).subscribe({
+      next: () => {
+        if (!this.deleteWatchlistName) return;
+        delete this.watchlists[this.deleteWatchlistName];
+        this.deleteWatchlistModalOpen = false;
+      },
+      error: (err: Error) => {
+        alert("Failed to delete watchlist. Check console for errors");
+        console.error('Error deleting watchlist:', err);
+        this.deleteWatchlistModalOpen = false;
+      },
+    });
+  }
 
   updateChartOptions() {
     //if (!isPlatformBrowser(this.platformId)) return;

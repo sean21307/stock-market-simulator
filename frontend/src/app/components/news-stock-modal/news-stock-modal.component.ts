@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { Component, Input, OnInit, SimpleChanges, inject } from '@angular/core';
 import { NewsService } from '../../services/news.service';
 import { CommonModule } from '@angular/common'; 
 import { FormsModule } from '@angular/forms';
@@ -17,9 +17,16 @@ export class NewsStockModalComponent implements OnInit {
   stockNews: any[] = []; 
   isLoading = false; 
   errorMessage = '';
-
+  newsCollapsed = false;
+  
   ngOnInit(): void {
     if (this.stockSymbol) {
+      this.fetchStockNews();
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['stockSymbol'] && changes['stockSymbol'].currentValue) {
       this.fetchStockNews();
     }
   }
