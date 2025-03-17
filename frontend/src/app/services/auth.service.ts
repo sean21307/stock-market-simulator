@@ -50,15 +50,18 @@ export class AuthService {
     
     this.http.post(`${this.apiUrl}logout/`, { refresh: refreshToken }).subscribe({
       next: () => {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
         window.location.reload();
       }, error: (err: Error) => {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         alert("Logout failed on backend");
         console.log(err);
+<<<<<<< HEAD
         window.location.reload();
+=======
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+>>>>>>> e1ada01aa35bb397a24acce139fa20c3e4a04a0d
       }
     });
   }

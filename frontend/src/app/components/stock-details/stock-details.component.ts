@@ -16,6 +16,7 @@ import { Wallet } from '../../models/wallet.model';
 import { WalletDetails } from '../../models/walletDetails.model';
 import { ChartService } from '../../services/chart.service';
 import { WatchlistModalComponent } from '../watchlist-modal/watchlist-modal.component';
+import { NewsStockModalComponent } from '../news-stock-modal/news-stock-modal.component';
 
 
 function integerValidator(): ValidatorFn {
@@ -44,7 +45,7 @@ function maxSharesValidator(getSharesDict: () => Record<string, number>, stockSy
 @Component({
   selector: 'app-stock-details',
   standalone: true,
-  imports: [CardComponent, AgCharts, ReactiveFormsModule, CommonModule, WatchlistModalComponent],
+  imports: [CardComponent, AgCharts, ReactiveFormsModule, CommonModule, WatchlistModalComponent, NewsStockModalComponent],
   templateUrl: './stock-details.component.html',
   styleUrl: './stock-details.component.css',
 })
