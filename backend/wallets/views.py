@@ -18,7 +18,7 @@ import os
 from dotenv import load_dotenv
 import fmpsdk
 
-from wallets.serializers import WalletSerializer, ShareSerializer
+from wallets.serializers import WalletSerializer, ShareSerializer, PurchaseSerializer, SaleSerializer
 
 load_dotenv()
 apikey = os.environ.get("API_KEY")
@@ -99,6 +99,13 @@ def add_shares(request, wallet_name):
         ]
 
         wallet.share_set.bulk_create(shares)
+        wallet.purchase_set.create(
+            symbol=symbol,
+            quantity_purchased=quantity,
+            quantity_available=quantity,
+            price_per_share=price,
+            total_price= price * quantity,
+        )
         update_wallet_value(wallet)
 
         return Response({'wallet': WalletSerializer(wallet).data}, status=status.HTTP_200_OK)
@@ -122,6 +129,32 @@ def sell_shares(request, wallet_name):
             wallet.share_set.filter(symbol=symbol)
             .order_by('id')[:quantity]
             .values_list('id', flat=True)  
+        )
+
+        wallet_purchases = list(wallet.purchase_set.filter(symbol=symbol, quantity_available__gt=0).order_by('date'))
+        index = 0
+        total_purchase_price = 0
+        number_of_shares = quantity
+        while quantity > 0:
+            current = wallet_purchases[index]
+            if current.quantity_available > quantity:
+                current.quantity_available -= quantity
+                total_purchase_price += current.price_per_share * quantity
+                quantity = 0
+            else:
+                total_purchase_price += current.price_per_share * current.quantity_available
+                quantity -= current.quantity_available
+                current.quantity_available = 0
+            current.save()
+            index += 1
+
+        profit = total_purchase_price - total_price
+        wallet.sale_set.create(
+            quantity_sold=number_of_shares,
+            symbol=symbol,
+            price_per_share=price,
+            total_price= total_price,
+            profit=profit,
         )
 
         wallet.share_set.filter(id__in=ids_to_delete).delete()
@@ -175,6 +208,24 @@ def get_selected_wallet(request):
     wallet = Profile.objects.get(user=user).selected_wallet
 
     return Response({"selected_wallet_name" : wallet.name}, status=status.HTTP_200_OK)
+
+@permission_classes([IsAuthenticated])
+@api_view(['GET'])
+def get_transaction_history(request, wallet_name):
+    username = request.user
+    user = User.objects.get(username=username)
+    wallet = user.wallet_set.get(name=wallet_name)
+    purchase_list = wallet.purchase_set.values("symbol","quantity_purchased","price_per_share","total_price","date")
+    sale_list = wallet.sale_set.values("symbol","quantity_sold","price_per_share","total_price","profit","date")
+
+    purchases = list()
+    for purchase in purchase_list:
+        purchases.append(PurchaseSerializer(purchase).data)
+    sales = list()
+    for sale in sale_list:
+        sales.append(SaleSerializer(sale).data)
+
+    return Response({"purchases" : purchases, "sales" : sales}, status=status.HTTP_200_OK)
 
 
 def update_wallet_value(wallet):
