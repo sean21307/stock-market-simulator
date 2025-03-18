@@ -7,11 +7,13 @@ import { WalletFormComponent } from './components/wallet-form/wallet-form.compon
 import { WalletDetailsComponent } from './components/wallet-details/wallet-details.component';
 import { StocksComponent } from './components/stocks/stocks.component';
 import { NewsComponent } from './components/news/news.component';
+import { InsightsComponent } from './components/insights/insights.component';
 
 
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
+    { path: 'insights', component: InsightsComponent },
     { path: 'stocks', component: StocksComponent },
     { path: 'stock/:symbol', component: StockDetailsComponent },
     { path: 'auth', component: AuthComponent },
