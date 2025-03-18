@@ -2,8 +2,8 @@
     <app-watchlist-modal [symbol]="stock.stockInfo.symbol" (close)="watchlistModalOpen = false"></app-watchlist-modal>
 }
 
-<div class="bg-surface dark:bg-surface-dark h-screen grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 grid-rows-[auto_auto_auto_1fr] gap-6 p-8"> 
-    <div class="col-span-full row-span-2">
+<div class="bg-surface dark:bg-surface-dark h-screen grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 grid-rows-[min-content_min-content_auto] gap-6 p-8"> 
+    <div class="col-span-full row-span-2" *ngIf="stock">
         <app-news-stock-modal [stockSymbol]="stock.stockInfo.symbol"></app-news-stock-modal>
     </div>
     
