@@ -38,8 +38,16 @@ export class AuthService {
     });
   }
 
+    putUserProfile(updatedData: any): Observable<any> {
+    return this.http.patch(`${this.apiUrl}profile/update`, updatedData, {
+      headers: {
+        Authorization: `Bearer ${this.getToken()}`
+      }
+    });
+  }
+
   patchUserProfile(updatedData: any): Observable<any> {
-    return this.http.patch(`${this.apiUrl}profile/`, updatedData, {
+    return this.http.patch(`${this.apiUrl}profile/partial-update`, updatedData, {
       headers: {
         Authorization: `Bearer ${this.getToken()}`
       }

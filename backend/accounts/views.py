@@ -56,31 +56,53 @@ def test_auth_token(request, format=None):
 
     return Response(content, status=status.HTTP_200_OK)
 
-@api_view(['GET', 'PUT', 'PATCH'])
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def user_profile(request):
+def get_user_profile(request):
     user = request.user
+    return Response({
+        "username": user.username,
+        "email": user.email,
+    }, status=status.HTTP_200_OK)
 
-    if request.method == 'GET':
-        return Response({
-            "username": user.username,
-            "email": user.email,
-        }, status=status.HTTP_200_OK)
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def put_user_profile(request):
+    user = request.user
+    new_username = request.data.get("username")
+    new_email = request.data.get("email")
 
-    elif request.method in ['PUT', 'PATCH']:
-        new_username = request.data.get("username", user.username)
-        new_email = request.data.get("email", user.email)
+    if not new_username or not new_email:
+        return Response({"error": "Both username and email are required for a full update"},
+                        status=status.HTTP_400_BAD_REQUEST)
 
-        # Check if new email is taken (excluding the current user)
-        if new_email != user.email and User.objects.filter(email=new_email).exists():
-            return Response({"error": "Email already taken"}, status=status.HTTP_400_BAD_REQUEST)
+    if new_email != user.email and User.objects.filter(email=new_email).exists():
+        return Response({"error": "Email already taken"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check if new username is taken (excluding the current user)
-        if new_username != user.username and User.objects.filter(username=new_username).exists():
-            return Response({"error": "Username already taken"}, status=status.HTTP_400_BAD_REQUEST)
+    if new_username != user.username and User.objects.filter(username=new_username).exists():
+        return Response({"error": "Username already taken"}, status=status.HTTP_400_BAD_REQUEST)
 
-        user.username = new_username
-        user.email = new_email
-        user.save()
+    user.username = new_username
+    user.email = new_email
+    user.save()
 
-        return Response({"message": "Profile updated successfully"}, status=status.HTTP_200_OK)
+    return Response({"message": "Profile updated successfully"}, status=status.HTTP_200_OK)
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def patch_user_profile(request):
+    user = request.user
+    new_username = request.data.get("username", user.username)
+    new_email = request.data.get("email", user.email)
+
+    if new_email != user.email and User.objects.filter(email=new_email).exists():
+        return Response({"error": "Email already taken"}, status=status.HTTP_400_BAD_REQUEST)
+
+    if new_username != user.username and User.objects.filter(username=new_username).exists():
+        return Response({"error": "Username already taken"}, status=status.HTTP_400_BAD_REQUEST)
+
+    user.username = new_username
+    user.email = new_email
+    user.save()
+
+    return Response({"message": "Profile updated successfully"}, status=status.HTTP_200_OK)
