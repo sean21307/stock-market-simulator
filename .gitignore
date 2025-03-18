@@ -18,3 +18,5 @@ backend/stock_market_venv/
 Thumbs.db
 
 venv
+
+frontend/.idea/

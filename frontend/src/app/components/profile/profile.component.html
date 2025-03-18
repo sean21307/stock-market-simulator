@@ -10,10 +10,57 @@
 <div class="bg-surface dark:bg-surface-dark h-screen grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 grid-rows-8 md:grid-rows-7 xl:grid-rows-5 auto-rows-fr gap-6 p-8">
     <div class="md:col-span-2 row-span-3">
         <app-card>
-            <p class="text-2xl text-on-surface-strong dark:text-on-surface-dark-strong">Profile Information</p>
+          <p class="text-2xl text-on-surface-strong dark:text-on-surface-dark-strong">Profile Information</p>
+          <form [formGroup]="profileForm" class="mt-4 space-y-4">
+            <div>
+              <label class="block text-lg font-medium text-gray-700 dark:text-gray-300">Username</label>
+              <input
+                type="text"
+                formControlName="username"
+                class="w-full mt-1 px-4 py-2 bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-neutral-700"
+                [disabled]="!isEditing"
+              />
+            </div>
+            <div>
+              <label class="block text-lg font-medium text-gray-700 dark:text-gray-300">Email</label>
+              <input
+                type="email"
+                formControlName="email"
+                class="w-full mt-1 px-4 py-2 bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-neutral-700"
+                [disabled]="!isEditing"
+              />
+            </div>
+
+            <div>
+              <button
+                *ngIf="!isEditing"
+                (click)="toggleEdit()"
+                class="px-4 py-2 text-sm font-medium text-on-surface rounded-radius transition-colors duration-200
+                bg-primary-dark hover:bg-primary focus:outline-none focus-visible:outline-2 focus-visible:outline-primary
+                dark:bg-transparent dark:text-primary dark:border-2 dark:border-primary dark:hover:bg-primary dark:hover:border-primary-light dark:focus-visible:outline-primary-dark">
+                Edit
+              </button>
+
+              <button
+                *ngIf="isEditing"
+                (click)="updateProfile()"
+                class="px-4 py-2 text-sm font-medium text-on-surface rounded-radius transition-colors duration-200
+                bg-success hover:bg-success-dark focus:outline-none focus-visible:outline-2 focus-visible:outline-success">
+                Save
+              </button>
+
+              <button
+                *ngIf="isEditing"
+                (click)="toggleEdit()"
+                class="px-4 py-2 text-sm font-medium text-on-surface rounded-radius transition-colors duration-200
+                bg-error hover:bg-error-dark focus:outline-none focus-visible:outline-2 focus-visible:outline-error">
+                Cancel
+              </button>
+            </div>
+          </form>
         </app-card>
     </div>
-    
+
     <div class="md:col-span-1 row-span-3">
         <app-card>
             <div class="flex justify-between items-center pb-3">
@@ -22,16 +69,18 @@
                 </p>
                 <svg (click)="routeToWalletPage('new')" class="size-7 cursor-pointer hover:text-gray-400 dark:hover:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                </svg>                               
+                </svg>
             </div>
-            
-            
-            
+
+
+
             @if ( wallets ) {
                 <div class="h-[90%] overflow-y-auto scrollbar scrollbar-thumb-on-surface-dark scrollbar-track-outline-dark">
                     <div class="w-[95%]">
                         @for (wallet of wallets; track wallet.name; let isLast = $last; let isFirst = $first) {
+
                             <div (click)="routeToWalletPage(wallet.name)" class="group p-1 cursor-pointer hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-600" 
+
                                 [ngClass]="{
                                     'pb-3': isFirst,
                                     'pt-3': isLast,
@@ -44,6 +93,7 @@
                                     } @else {
                                         <p> {{ wallet.name | titlecase }} </p>
                                     }
+
                                     
                                     <div class="flex gap-2 align-middle">
                                         <p> ${{ wallet.balance | number:'1.2-2' }}</p>
@@ -52,19 +102,20 @@
                                         </svg>
                                     </div>
                                     
+
                                 </div>
-                                
+
                                 <p class="text-on-surface/60 dark:text-on-surface-dark/60">{{ wallet.description }}</p>
                             </div>
-    
+
                             @if (!isLast) {
                                 <hr class="px-2 border-gray-300 dark:border-neutral-700 border-1 w-full mx-auto">
                             }
                         }
                     </div>
-                    
+
                 </div>
-                
+
             } @else {
                 <p>Loading Wallets...</p>
             }

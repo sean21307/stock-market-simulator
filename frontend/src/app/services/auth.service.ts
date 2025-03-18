@@ -30,8 +30,25 @@ export class AuthService {
     return null;
   }
 
+  getUserProfile(): Observable<any> {
+    return this.http.get(`${this.apiUrl}profile/`, {
+      headers: {
+        Authorization: `Bearer ${this.getToken()}`
+      }
+    });
+  }
+
+    updateUserProfile(updatedData: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}profile/update`, updatedData, {
+      headers: {
+        Authorization: `Bearer ${this.getToken()}`
+      }
+    });
+  }
+
+
   get localStorage(): typeof window['localStorage'] | undefined  {
-    
+
     return isPlatformBrowser(this.platformId) ? window['localStorage'] : undefined;
   }
 
@@ -39,19 +56,18 @@ export class AuthService {
     if (this.localStorage) {
       localStorage.setItem('access_token', response.access);
       localStorage.setItem('refresh_token', response.refresh);
-      localStorage.setItem('username', response.username); 
+      localStorage.setItem('username', response.username);
     }
-     
+
   }
 
   // Logout user and blacklist refresh token
   logoutUser() {
     const refreshToken = localStorage.getItem('refresh_token');
-    
+
     this.http.post(`${this.apiUrl}logout/`, { refresh: refreshToken }).subscribe({
       next: () => {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
+
         window.location.reload();
       }, error: (err: Error) => {
         localStorage.removeItem('access_token');
@@ -59,6 +75,8 @@ export class AuthService {
         window.location.reload();
         alert("Logout failed on backend");
         console.log(err);
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
       }
     });
   }

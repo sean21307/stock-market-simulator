@@ -1,4 +1,7 @@
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.response import Response
@@ -13,6 +16,11 @@ def register_user(request):
     username = request.data.get('username')
     password = request.data.get('password')
     email = request.data.get('email')
+
+    try:
+        validate_email(email)
+    except ValidationError as e:
+        return Response({"error": "Invalid Email"}, status=status.HTTP_400_BAD_REQUEST)
 
     # Check if username already exists
     if User.objects.filter(username=username).exists():
@@ -56,4 +64,38 @@ def test_auth_token(request, format=None):
 
     return Response(content, status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_profile(request):
+    user = request.user
+    return Response({
+        "username": user.username,
+        "email": user.email,
+    }, status=status.HTTP_200_OK)
 
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def put_user_profile(request):
+    user = request.user
+    new_username = request.data.get("username")
+    new_email = request.data.get("email")
+    try:
+        validate_email(new_email)
+    except ValidationError as e:
+        return Response({"error": "Invalid Email"}, status=status.HTTP_400_BAD_REQUEST)
+
+    if not new_username or not new_email:
+        return Response({"error": "Both username and email are required for a full update"},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    if new_email != user.email and User.objects.filter(email=new_email).exists():
+        return Response({"error": "Email already taken"}, status=status.HTTP_400_BAD_REQUEST)
+
+    if new_username != user.username and User.objects.filter(username=new_username).exists():
+        return Response({"error": "Username already taken"}, status=status.HTTP_400_BAD_REQUEST)
+
+    user.username = new_username
+    user.email = new_email
+    user.save()
+
+    return Response({"message": "Profile updated successfully"}, status=status.HTTP_200_OK)
