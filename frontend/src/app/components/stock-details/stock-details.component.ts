@@ -21,6 +21,8 @@ import { NewsStockModalComponent } from '../news-stock-modal/news-stock-modal.co
 
 function integerValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
+    return null; // remove if integers should be required
+
     if (control.value && !Number.isInteger(Number(control.value))) {
       return { 'notInteger': true };
     }
