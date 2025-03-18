@@ -127,11 +127,11 @@
                             </ng-container>
                             Quantity
                         </label>
-                        <input ngModel pattern="[0-9]*" [ngClass]="{'border-danger': quantityInvalid}" type="string" formControlName="quantity" 
+                        <input ngModel pattern="^\d*\.?\d+$" [ngClass]="{'border-danger': quantityInvalid}" type="string" formControlName="quantity" 
                             class="w-full p-2 mt-1 border rounded outline-none bg-surface dark:bg-surface-dark text-on-surface dark:text-on-surface-dark focus:ring-2 focus:ring-outline dark:focus:ring-outline-dark">
                             @if (quantityInvalid) {
                                 @if (quantityNonInt) {
-                                    <small class="pl-0.5 text-danger">Error: Quantity must be an integer</small>
+                                    <small class="pl-0.5 text-danger">Error: Quantity must be a number</small>
                                 } @else {
                                     @if (!buyTab && buyForm.controls['quantity'].hasError('exceedsShares')) {
                                         

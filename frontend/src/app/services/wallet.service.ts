@@ -59,10 +59,17 @@ export class WalletService {
   }
 
   getSharesCountDictionary(shares: Share[]): Record<string, number> {
-    return shares.reduce((acc, share) => {
-        acc[share.symbol] = (acc[share.symbol] || 0) + 1;
-        return acc;
-    }, {} as Record<string, number>);
+    let acc = {} as Record<string, number>
+    shares.forEach((share: Share) => {
+      acc[share.symbol] = share.quantity;
+    })
+
+    return acc 
+
+    // return shares.reduce((acc, share) => {
+    //     acc[share.symbol] = (acc[share.symbol] || 0) + 1;
+    //     return acc;
+    // }, {} as Record<string, number>);
   }
 
 
