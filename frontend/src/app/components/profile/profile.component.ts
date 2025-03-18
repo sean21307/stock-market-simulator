@@ -5,13 +5,14 @@ import { Router } from '@angular/router';
 import { Wallet } from '../../models/wallet.model';
 import { WalletService } from '../../services/wallet.service';
 import { CommonModule, TitleCasePipe } from '@angular/common';
+import {FormBuilder, FormGroup, ReactiveFormsModule} from "@angular/forms";
 import { ModalComponent } from '../modal/modal.component';
 
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CardComponent, TitleCasePipe, CommonModule, ModalComponent],
+  imports: [CardComponent, TitleCasePipe, CommonModule,ReactiveFormsModule, ModalComponent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
@@ -23,6 +24,9 @@ export class ProfileComponent implements OnInit {
   deleteWalletModalOpen = false;
   deleteWalletName: string | undefined = undefined;
 
+  user: { username: string; email: string } | null = null;
+   profileForm!: FormGroup;
+   isEditing: boolean = false;
 
   constructor(
     private fb: FormBuilder,
