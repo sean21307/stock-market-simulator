@@ -25,7 +25,7 @@ class WalletValue(models.Model):
 #   FK wallet_id - > Wallet
 class Share(models.Model):
     symbol = models.CharField(max_length=50)
-    buying_price = models.DecimalField(max_digits=7, decimal_places=2)
+    quantity = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
 
 

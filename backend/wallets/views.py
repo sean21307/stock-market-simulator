@@ -1,5 +1,6 @@
 import decimal
 import json
+from decimal import Decimal
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
@@ -9,6 +10,7 @@ from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from unicodedata import digit
 
 from accounts.models import Profile
 from wallets.models import Wallet, WalletValue
@@ -80,10 +82,10 @@ def add_shares(request, wallet_name):
 
     try:
         symbol = request.data.get('symbol')
-        quantity = int(request.data.get('quantity')) # ensure only int quantities
+        quantity = Decimal(request.data.get('quantity'))
 
-        price = fmpsdk.quote_short(apikey=apikey,symbol=symbol)[0]['price']
-        total_price = decimal.Decimal(price * quantity)
+        price = Decimal(fmpsdk.quote_short(apikey=apikey,symbol=symbol)[0]['price'])
+        total_price = price * quantity
         wallet_owner_username = request.user
 
         user = User.objects.get(username=wallet_owner_username)
@@ -93,12 +95,10 @@ def add_shares(request, wallet_name):
             return Response({'error': 'Transaction would make wallet Balance negative'}, status=status.HTTP_400_BAD_REQUEST)
         wallet.save()
 
-        shares = [
-            wallet.share_set.model(symbol=symbol, buying_price=price, wallet=wallet)
-            for _ in range(quantity)
-        ]
+        share = wallet.share_set.get_or_create(symbol=symbol)[0]
+        share.quantity = share.quantity + quantity
+        share.save()
 
-        wallet.share_set.bulk_create(shares)
         wallet.purchase_set.create(
             symbol=symbol,
             quantity_purchased=quantity,
@@ -117,19 +117,20 @@ def add_shares(request, wallet_name):
 def sell_shares(request, wallet_name):
     try:
         symbol = request.data.get('symbol')
-        quantity = request.data.get('quantity')
+        quantity = Decimal(request.data.get('quantity'))
         price = fmpsdk.quote_short(apikey=apikey,symbol=symbol)[0]['price']
         total_price = decimal.Decimal(price * quantity)
         wallet_owner_username = request.user
         user = User.objects.get(username=wallet_owner_username)
         wallet = user.wallet_set.get(name=wallet_name)
         wallet.balance += total_price
-   
-        ids_to_delete = list(
-            wallet.share_set.filter(symbol=symbol)
-            .order_by('id')[:quantity]
-            .values_list('id', flat=True)  
-        )
+
+        share = wallet.share_set.get(symbol=symbol)
+        share.quantity = share.quantity - quantity
+        if(share.quantity == 0):
+            share.delete()
+        else:
+            share.save()
 
         wallet_purchases = list(wallet.purchase_set.filter(symbol=symbol, quantity_available__gt=0).order_by('date'))
         index = 0
@@ -157,7 +158,6 @@ def sell_shares(request, wallet_name):
             profit=profit,
         )
 
-        wallet.share_set.filter(id__in=ids_to_delete).delete()
         wallet.save()
         update_wallet_value(wallet)
         
@@ -233,7 +233,7 @@ def update_wallet_value(wallet):
     quotes = fmpsdk.quote(apikey=apikey,symbol=symbols)
     balance = 0
     for quote in quotes:
-        quantity = wallet.share_set.filter(symbol=quote['symbol']).count()
-        balance += quantity * quote['price']
+        num_of_shares = wallet.share_set.get(symbol=quote['symbol']).quantity
+        balance += num_of_shares * quote['price']
     wallet.walletvalue_set.create(value=balance)
 
