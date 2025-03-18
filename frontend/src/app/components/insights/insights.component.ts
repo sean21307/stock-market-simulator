@@ -1,13 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, NgModule, OnInit } from '@angular/core';
 import { Transaction } from '../../models/transaction.model';
 import { CommonModule } from '@angular/common';
 import { WalletService } from '../../services/wallet.service';
 import { WalletDetails } from '../../models/walletDetails.model';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-insights',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './insights.component.html',
   styleUrl: './insights.component.css'
 })

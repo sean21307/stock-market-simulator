@@ -43,7 +43,8 @@
                                 <tbody class="divide-y divide-outline dark:divide-outline-dark bg-transparent">
                                     @for (transaction of transactions; track transaction.date; let isLast = $last) {
                                         <tr 
-                                            class="bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark"
+                                            [routerLink]="['/stock', transaction.symbol]" routerLinkActive="router-link-active"
+                                            class="cursor-pointer bg-surface-alt dark:bg-surface-dark-alt hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-600 text-on-surface dark:text-on-surface-dark"
                                             [ngClass]="isLast ? 'rounded-b-full' : ''">
 
                                             <td class="p-4 pl-8">

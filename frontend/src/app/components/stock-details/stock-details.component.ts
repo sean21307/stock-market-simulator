@@ -183,6 +183,8 @@ export class StockDetailsComponent implements OnInit {
 
   updateChartOptions() {
     if (!this.stock || !isPlatformBrowser(this.platformId)) return;
+    console.log(this.stock.prices);
+
 
     this.chartOptions = this.chartService.getChartOptions(
       this.stock.prices
@@ -210,6 +212,7 @@ export class StockDetailsComponent implements OnInit {
     this.stockPriceService.getStockInfo(symbol).subscribe({
       next: (data: Stock) => {
         this.stock = data;
+        this.stock.prices = [...this.stock.prices.slice(0, -1)];
         this.currentPrice = data.stockInfo.price;
         this.updateChartOptions();
       },
