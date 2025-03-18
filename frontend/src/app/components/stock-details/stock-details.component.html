@@ -2,7 +2,11 @@
     <app-watchlist-modal [symbol]="stock.stockInfo.symbol" (close)="watchlistModalOpen = false"></app-watchlist-modal>
 }
 
-<div class="bg-surface dark:bg-surface-dark h-screen grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 grid-rows-[auto_1fr] gap-6 p-8"> 
+<div class="bg-surface dark:bg-surface-dark h-screen grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 grid-rows-[auto_auto_auto_1fr] gap-6 p-8"> 
+    <div class="col-span-full row-span-2">
+        <app-news-stock-modal [stockSymbol]="stock.stockInfo.symbol"></app-news-stock-modal>
+    </div>
+    
     <!-- grid-rows-8 md:grid-rows-7 xl:grid-rows-5  -->
     <div class="md:col-span-2 row-span-4">
         <app-card>
@@ -55,11 +59,13 @@
             
         </div>
     }
-    <div class="row-span-4 md:col-span-2 xl:col-span-1">
+    
+
+    <div class="md:col-span-2 xl:col-span-1">
         <div class="rounded-lg relative p-8 border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark flex flex-col">
 
         
-            @if ( wallet ) {
+            @if ( wallet && stock ) {
                 
                 @if (transactionComplete || transactionLoading) {
                     @if (transactionLoading) {
@@ -121,11 +127,11 @@
                             </ng-container>
                             Quantity
                         </label>
-                        <input ngModel pattern="[0-9]*" [ngClass]="{'border-danger': quantityInvalid}" type="string" formControlName="quantity" 
+                        <input ngModel pattern="^\d*\.?\d+$" [ngClass]="{'border-danger': quantityInvalid}" type="string" formControlName="quantity" 
                             class="w-full p-2 mt-1 border rounded outline-none bg-surface dark:bg-surface-dark text-on-surface dark:text-on-surface-dark focus:ring-2 focus:ring-outline dark:focus:ring-outline-dark">
                             @if (quantityInvalid) {
                                 @if (quantityNonInt) {
-                                    <small class="pl-0.5 text-danger">Error: Quantity must be an integer</small>
+                                    <small class="pl-0.5 text-danger">Error: Quantity must be a number</small>
                                 } @else {
                                     @if (!buyTab && buyForm.controls['quantity'].hasError('exceedsShares')) {
                                         
@@ -185,5 +191,32 @@
             }
         </div>
     </div>
+
+    <div class="md:col-span-2 xl:col-span-1">
+        <div class="rounded-lg relative p-8 border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark flex flex-col h-[400px] overflow-y-auto">
+            @if (stock) {
+                <h2 class="text-2xl mb-2">Company Profile</h2>
+                <p class="font-bold">Industry</p>
+                <p class="mb-2">{{ stock.stockInfo.industry }}</p>
+    
+                <p class="font-bold">Market Cap</p>
+                <p class="mb-2">{{ formatMarketCap(stock.stockInfo.mktCap) }}</p>
+    
+                <p class="font-bold">Number of Employees</p>
+                <p class="mb-2">{{ stock.stockInfo.fullTimeEmployees | number:'1.0-0' }}</p>
+    
+                <p class="font-bold">Business Summary</p>
+                <p>
+                    {{ descriptionExpanded ? stock.stockInfo.description : (stock.stockInfo.description | slice:0:200) + '...' }}
+                    <button (click)="descriptionExpanded = !descriptionExpanded" class="cursor-pointer text-primary dark:text-primary-dark underline ml-1">
+                        {{ descriptionExpanded ? 'Show Less' : 'Read More' }}
+                    </button>
+                </p>
+            } @else {
+                <h2 class="text-2xl">Loading...</h2>
+            }
+        </div>
+    </div>
+    
 </div>
 

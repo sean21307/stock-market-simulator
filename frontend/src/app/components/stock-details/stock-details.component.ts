@@ -16,10 +16,13 @@ import { Wallet } from '../../models/wallet.model';
 import { WalletDetails } from '../../models/walletDetails.model';
 import { ChartService } from '../../services/chart.service';
 import { WatchlistModalComponent } from '../watchlist-modal/watchlist-modal.component';
+import { NewsStockModalComponent } from '../news-stock-modal/news-stock-modal.component';
 
 
 function integerValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
+    return null; // remove if integers should be required
+
     if (control.value && !Number.isInteger(Number(control.value))) {
       return { 'notInteger': true };
     }
@@ -44,7 +47,7 @@ function maxSharesValidator(getSharesDict: () => Record<string, number>, stockSy
 @Component({
   selector: 'app-stock-details',
   standalone: true,
-  imports: [CardComponent, AgCharts, ReactiveFormsModule, CommonModule, WatchlistModalComponent],
+  imports: [CardComponent, AgCharts, ReactiveFormsModule, CommonModule, WatchlistModalComponent, NewsStockModalComponent],
   templateUrl: './stock-details.component.html',
   styleUrl: './stock-details.component.css',
 })
@@ -64,6 +67,7 @@ export class StockDetailsComponent implements OnInit {
   wallet!: WalletDetails;
   transactionComplete = false;
   transactionLoading = false;
+  descriptionExpanded = false;
 
   constructor(
     private walletService: WalletService,
@@ -151,25 +155,41 @@ export class StockDetailsComponent implements OnInit {
     )
   }
 
+  formatMarketCap(value: number): string {
+    return new Intl.NumberFormat('en-US', { 
+        style: 'currency', 
+        currency: 'USD', 
+        notation: 'compact', 
+        compactDisplay: 'short',
+        minimumFractionDigits: 2, 
+        maximumFractionDigits: 2 
+    }).format(value);
+  }
+
+  loadStockData(symbol: string) {
+    this.stockPriceService.getStockInfo(symbol).subscribe({
+      next: (data: Stock) => {
+        this.stock = data;
+        this.currentPrice = data.stockInfo.price;
+        this.updateChartOptions();
+      }, error: (err: Error) => {
+        console.log(err);
+      }
+    });
+  }
+
   ngOnInit() {
     this.themeService.darkMode$.subscribe(isDark => {
       this.darkMode = isDark;
       this.updateChartOptions();
     });
 
-    const symbol = this.route.snapshot.paramMap.get('symbol');
-    if (symbol) {
-      this.stockPriceService.getStockInfo(symbol).subscribe({
-        next: (data: Stock) => {
-          this.stock = data;
-          this.currentPrice = data.stockInfo.price;
-          this.updateChartOptions();
-        }, error: (err: Error) => {
-          console.log(err);
-        }
-      });
-
-    }
+    this.route.paramMap.subscribe(params => {
+      const symbol = params.get('symbol');
+      if (symbol) {
+        this.loadStockData(symbol)
+      }
+    })
 
     this.walletService.getSelectedWallet().subscribe({
       next: (wallet: WalletDetails) => {

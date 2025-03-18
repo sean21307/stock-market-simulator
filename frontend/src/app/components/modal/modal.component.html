@@ -1,0 +1,29 @@
+<div class="z-1199 fixed inset-0 bg-black/50">
+</div>
+
+<div class="z-1200 fixed inset-0 bg-transparent flex justify-center items-center" (click)="closeModal()">
+
+    <div (click)="$event.stopPropagation()" class="border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt rounded-md p-6 shadow-lg w-[90%] max-w-lg relative text-on-surface dark:text-on-surface-dark">
+        
+        <div class="flex justify-between items-center mb-2">
+            <h2 class="text-lg text-on-surface-strong dark:text-on-surface-dark-strong">{{ header }}</h2>
+            
+            <svg (click)="closeModal()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-7 cursor-pointer hover:text-gray-400 dark:hover:text-white">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+        </div>
+
+        <p class="text-on-surface dark:text-on-surface-dark">
+            {{ text }}
+        </p>
+
+        <div class="flex justify-between items-center gap-4">
+            <button (click)="closeModal()" type="submit" class="mt-4 cursor-pointer w-full py-1 dark:text-on-primary text-on-primary-dark rounded bg-transparent border border-primary dark:border-primary-dark hover:bg-secondary dark:hover:bg-secondary-dark/10">
+                Cancel
+            </button>
+            <button (click)="confirm()" type="submit" class="mt-4 cursor-pointer w-full py-1 text-on-primary dark:text-on-primary-dark rounded bg-primary dark:bg-primary-dark hover:bg-secondary dark:hover:bg-secondary-dark">
+                Confirm
+            </button>
+        </div>
+    </div>
+</div>

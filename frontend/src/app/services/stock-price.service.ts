@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { PartialStock, Stock } from '../models/stock.model';
 import { AllStock } from '../models/allStocks.model';
+import { SearchResult } from '../models/searchResult.model';
 
 
 
@@ -19,6 +20,11 @@ export class StockPriceService {
 
   private baseUrl = 'http://127.0.0.1:8000/stocks/';
 
+  // Fetch stocks based on search query
+  public getSearchResults(query: string): Observable<SearchResult[]> {
+    query = query.trim();
+    return this.http.get<SearchResult[]>(`${this.baseUrl}search/${query}`);
+  }
 
   // Fetch detailed stock info for a specific symbol
   public getStockInfo(symbol: string): Observable<Stock> {
