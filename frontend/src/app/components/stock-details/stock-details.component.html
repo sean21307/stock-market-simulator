@@ -114,7 +114,7 @@
                             Sell
                         </button>
                     </div>
-                    <p class="text-xl mb-3">You have {{ (sharesDict[stock.stockInfo.symbol] || 0) | number:'1.0' }} shares.</p>
+                    <p class="text-xl mb-3">You have {{ (sharesDict[stock.stockInfo.symbol] || 0) }} shares.</p>
                     <form [formGroup]="buyForm" (ngSubmit)="onSubmit()" class="mt-4">
                         
                         <div class="mb-4">
