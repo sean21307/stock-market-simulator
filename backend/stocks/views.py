@@ -12,6 +12,9 @@ import fmpsdk
 load_dotenv()
 apikey = os.environ.get("API_KEY")
 
+@api_view(['GET'])
+def get_stock_from_search(request, query):
+    return Response(fmpsdk.search_ticker(apikey=apikey, query=query, limit=5, exchange="NASDAQ"))
 
 @api_view(['GET'])
 def get_stock_details_with_1y_EOD_data(request, symbol):

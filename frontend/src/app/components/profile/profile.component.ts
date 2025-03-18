@@ -5,11 +5,12 @@ import { Router } from '@angular/router';
 import { Wallet } from '../../models/wallet.model';
 import { WalletService } from '../../services/wallet.service';
 import { CommonModule, TitleCasePipe } from '@angular/common';
+import { ModalComponent } from '../modal/modal.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CardComponent, TitleCasePipe, CommonModule],
+  imports: [CardComponent, TitleCasePipe, CommonModule, ModalComponent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
@@ -18,6 +19,8 @@ export class ProfileComponent implements OnInit {
   wallets!: Wallet[];
   walletPage = 1;
   WALLET_PAGE_SIZE = 6;
+  deleteWalletModalOpen = false;
+  deleteWalletName: string | undefined = undefined;
   
 
   constructor(
@@ -57,11 +60,33 @@ export class ProfileComponent implements OnInit {
     }
   }
 
+  promptDeleteWallet(name: string) {
+    this.deleteWalletName = name;
+    this.deleteWalletModalOpen = true;
+  }
+
+  deleteWallet() {
+    if (!this.deleteWalletName) return;
+
+    this.walletService.deleteWallet(this.deleteWalletName).subscribe({
+      next: () => {
+        if (!this.deleteWalletName) return;
+        this.wallets = this.wallets.filter((wallet) => wallet.name != this.deleteWalletName);
+        this.deleteWalletModalOpen = false;
+      },
+      error: (err: Error) => {
+        alert("Failed to delete wallet. Check console for errors");
+        console.error('Error deleting wallet:', err);
+        this.deleteWalletModalOpen = false;
+      },
+    });
+  }
+
   ngOnInit() {
     console.log(this.authService.getToken());
     if (this.authService.getToken() == null) {
-      //this.router.navigate(['/auth']);
-      //return;
+      this.router.navigate(['/auth']);
+      return;
     }
 
     this.walletService.getWallets().subscribe({

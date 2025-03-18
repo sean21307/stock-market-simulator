@@ -14,6 +14,10 @@ from datetime import timedelta
 from pathlib import Path
 import environ
 
+import pymysql
+pymysql.install_as_MySQLdb()
+
+
 env = environ.Env()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -64,6 +68,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# need this for now because the vercel links have different urls based on the branch
+CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:4200',

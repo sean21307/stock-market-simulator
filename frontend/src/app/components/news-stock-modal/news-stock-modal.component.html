@@ -1,0 +1,81 @@
+<div class="bg-surface-alt dark:bg-surface-dark-alt rounded-lg shadow-lg overflow-hidden border-outline border dark:border-outline-dark">
+    <div class="bg-surface-alt dark:bg-surface-dark-alt flex justify-between items-center p-4">
+        <div class="flex w-full justify-between items-center text-on-surface dark:text-on-surface-dark">
+            <h5 class="text-xl">
+                News for {{ stockSymbol }}
+            </h5>
+            
+            @if (!newsCollapsed) {
+                <svg (click)="newsCollapsed=!newsCollapsed" class="size-6 hover:dark:text-white cursor-pointer" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
+                </svg>
+            } @else {
+                <svg (click)="newsCollapsed=!newsCollapsed" class="size-6 hover:dark:text-white cursor-pointer" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+            }
+            
+        </div>
+        
+    </div>
+
+    <div [ngClass]="{'hidden': newsCollapsed}" class="overflow-x-auto scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600">
+        <ng-container *ngIf="isLoading; else newsContent">
+            <div class="flex justify-center py-4">
+                <span class="text-on-surface dark:text-on-surface-dark">Loading...</span>
+            </div>
+        </ng-container>
+
+        <ng-template #newsContent>
+            <ng-container *ngIf="errorMessage; else noNews">
+                <div class="alert alert-danger bg-danger text-on-danger dark:bg-danger dark:text-on-danger p-4 rounded-md mb-4">
+                    <span>{{ errorMessage }}</span>
+                </div>
+            </ng-container>
+
+            <ng-template #noNews>
+                <ng-container *ngIf="stockNews.length === 0; else displayNews">
+                    <div class="alert alert-info bg-info text-on-info dark:bg-info dark:text-on-info p-4 rounded-md mb-4">
+                        No news available.
+                    </div>
+                </ng-container>
+
+                <ng-template #displayNews>
+                    <div class="flex space-x-4 overflow-x-auto">
+                        <div *ngFor="let news of stockNews; let i = index; let last = last; let first = first"
+                            class="flex-shrink-0 w-72 mb-4"
+                            [ngClass]="{ 'ms-4': first, 'me-4': last }">
+
+                            <div class="h-full bg-surface dark:bg-surface-dark p-3 rounded-md shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col">
+                                @if (news.image) {
+                                    <img *ngIf="news.image" [src]="news.image" alt="news image" class="w-full h-32 rounded-md object-cover mb-3">
+                                } @else {
+                                    <img src="https://placehold.co/1600x900?text=No+Image" alt="news image" class="w-full h-32 rounded-md object-cover mb-3">  
+                                }
+                                
+                            
+                                <div class="flex-1">
+                                    <h5 class="text-lg font-semibold text-on-surface dark:text-on-surface-dark">
+                                        <a [href]="news.url" target="_blank" class="text-info dark:text-info hover:underline line-clamp-2">
+                                            {{ news.title }}
+                                        </a>
+                                    </h5>
+                                    <p class="text-sm text-on-surface dark:text-on-surface-dark mt-2 truncate">
+                                        {{ news.description }}
+                                    </p>
+                                </div>
+                            
+                                <div class="mt-auto">
+                                    <p class="text-xs text-on-surface-strong dark:text-on-surface-dark-strong mt-2">
+                                        <i>{{ news.publishedDate | date: 'medium' }}</i>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </ng-template>
+            </ng-template>
+        </ng-template>
+    </div>
+</div>

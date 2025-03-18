@@ -2,6 +2,7 @@ import { Wallet } from "./wallet.model";
 
 export interface Share {
     symbol: string,
+    quantity: number,
     buying_price: number,
 }
 
