@@ -9,9 +9,11 @@ class WalletSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ShareSerializer(serializers.ModelSerializer):
+    quantity = serializers.DecimalField(max_digits=15, decimal_places=2, coerce_to_string=False)
+
     class Meta:
         model = Share
-        fields = '__all__'
+        fields = ['symbol','quantity']
 
 class PurchaseSerializer(serializers.ModelSerializer):
     class Meta:

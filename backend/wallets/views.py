@@ -85,6 +85,7 @@ def add_shares(request, wallet_name):
         quantity = Decimal(request.data.get('quantity'))
 
         price = Decimal(fmpsdk.quote_short(apikey=apikey,symbol=symbol)[0]['price'])
+        print(type(price), " ",type(quantity))
         total_price = price * quantity
         wallet_owner_username = request.user
 
@@ -118,7 +119,7 @@ def sell_shares(request, wallet_name):
     try:
         symbol = request.data.get('symbol')
         quantity = Decimal(request.data.get('quantity'))
-        price = fmpsdk.quote_short(apikey=apikey,symbol=symbol)[0]['price']
+        price = Decimal(fmpsdk.quote_short(apikey=apikey,symbol=symbol)[0]['price'])
         total_price = decimal.Decimal(price * quantity)
         wallet_owner_username = request.user
         user = User.objects.get(username=wallet_owner_username)
@@ -234,6 +235,6 @@ def update_wallet_value(wallet):
     balance = 0
     for quote in quotes:
         num_of_shares = wallet.share_set.get(symbol=quote['symbol']).quantity
-        balance += num_of_shares * quote['price']
+        balance += num_of_shares * Decimal(quote['price'])
     wallet.walletvalue_set.create(value=balance)
 
