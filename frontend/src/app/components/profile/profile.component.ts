@@ -125,7 +125,7 @@ export class ProfileComponent implements OnInit {
 
   const updatedProfile = this.profileForm.value;
 
-  this.authService.patchUserProfile(updatedProfile).subscribe(
+  this.authService.updateUserProfile(updatedProfile).subscribe(
     (response) => {
       console.log("Profile updated:", response);
       alert("Profile updated successfully!");

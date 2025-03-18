@@ -38,21 +38,14 @@ export class AuthService {
     });
   }
 
-    putUserProfile(updatedData: any): Observable<any> {
-    return this.http.patch(`${this.apiUrl}profile/update`, updatedData, {
+    updateUserProfile(updatedData: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}profile/update`, updatedData, {
       headers: {
         Authorization: `Bearer ${this.getToken()}`
       }
     });
   }
 
-  patchUserProfile(updatedData: any): Observable<any> {
-    return this.http.patch(`${this.apiUrl}profile/partial-update`, updatedData, {
-      headers: {
-        Authorization: `Bearer ${this.getToken()}`
-      }
-    });
-  }
 
   get localStorage(): typeof window['localStorage'] | undefined  {
 
