@@ -128,7 +128,7 @@ def sell_shares(request, wallet_name):
 
         share = wallet.share_set.get(symbol=symbol)
         share.quantity = share.quantity - quantity
-        if(share.quantity == 0):
+        if share.quantity < 0.01:
             share.delete()
         else:
             share.save()
@@ -137,9 +137,9 @@ def sell_shares(request, wallet_name):
         index = 0
         total_purchase_price = 0
         number_of_shares = quantity
-        while quantity > 0:
+        while quantity > 0.001:
             current = wallet_purchases[index]
-            if current.quantity_available > quantity:
+            if current.quantity_available >= quantity:
                 current.quantity_available -= quantity
                 total_purchase_price += current.price_per_share * quantity
                 quantity = 0

@@ -4,6 +4,7 @@ import { map, Observable, of, switchMap, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
 import { Wallet } from '../models/wallet.model';
 import { Share, WalletDetails } from '../models/walletDetails.model';
+import { Transaction } from '../models/transaction.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,11 @@ export class WalletService {
   private apiUrl = 'http://127.0.0.1:8000/wallets/';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
+
+  getTransactionHistory(walletName: string): Observable<{purchases: Transaction[], sales: Transaction[]}> {
+    const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
+    return this.http.get<{purchases: Transaction[], sales: Transaction[]}>(`${this.apiUrl}${walletName}/transaction-history`, { headers });
+  }
 
   getWallets(): Observable<Wallet[]> {
     const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };

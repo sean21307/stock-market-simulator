@@ -2,8 +2,8 @@
     <app-watchlist-modal [symbol]="stock.stockInfo.symbol" (close)="watchlistModalOpen = false"></app-watchlist-modal>
 }
 
-<div class="bg-surface dark:bg-surface-dark h-screen grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 grid-rows-[auto_auto_auto_1fr] gap-6 p-8"> 
-    <div class="col-span-full row-span-2">
+<div class="bg-surface dark:bg-surface-dark h-screen grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 grid-rows-[min-content_min-content_auto] gap-6 p-8"> 
+    <div class="col-span-full row-span-2" *ngIf="stock">
         <app-news-stock-modal [stockSymbol]="stock.stockInfo.symbol"></app-news-stock-modal>
     </div>
     
@@ -114,7 +114,7 @@
                             Sell
                         </button>
                     </div>
-                    <p class="text-xl mb-3">You have {{ (sharesDict[stock.stockInfo.symbol] || 0) | number:'1.0' }} shares.</p>
+                    <p class="text-xl mb-3">You have {{ (sharesDict[stock.stockInfo.symbol] || 0) }} shares.</p>
                     <form [formGroup]="buyForm" (ngSubmit)="onSubmit()" class="mt-4">
                         
                         <div class="mb-4">
@@ -127,7 +127,7 @@
                             </ng-container>
                             Quantity
                         </label>
-                        <input ngModel pattern="^\d*\.?\d+$" [ngClass]="{'border-danger': quantityInvalid}" type="string" formControlName="quantity" 
+                        <input ngModel [ngClass]="{'border-danger': quantityInvalid}" type="string" formControlName="quantity" 
                             class="w-full p-2 mt-1 border rounded outline-none bg-surface dark:bg-surface-dark text-on-surface dark:text-on-surface-dark focus:ring-2 focus:ring-outline dark:focus:ring-outline-dark">
                             @if (quantityInvalid) {
                                 @if (quantityNonInt) {
