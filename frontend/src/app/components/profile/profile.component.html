@@ -14,19 +14,19 @@
           <form [formGroup]="profileForm" class="mt-4 space-y-4">
             <div>
               <label class="block text-lg font-medium text-gray-700 dark:text-gray-300">Username</label>
-              <input
+              <input required
                 type="text"
                 formControlName="username"
-                class="w-full mt-1 px-4 py-2 bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-neutral-700"
+                class="w-full mt-1 px-4 py-2 bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-300 rounded-sm border border-gray-300 dark:border-neutral-700"
                 [disabled]="!isEditing"
               />
             </div>
             <div>
               <label class="block text-lg font-medium text-gray-700 dark:text-gray-300">Email</label>
-              <input
+              <input required
                 type="email"
                 formControlName="email"
-                class="w-full mt-1 px-4 py-2 bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-neutral-700"
+                class="w-full mt-1 px-4 py-2 bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-300 rounded-sm border border-gray-300 dark:border-neutral-700"
                 [disabled]="!isEditing"
               />
             </div>
@@ -35,27 +35,27 @@
               <button
                 *ngIf="!isEditing"
                 (click)="toggleEdit()"
-                class="px-4 py-2 text-sm font-medium text-on-surface rounded-radius transition-colors duration-200
-                bg-primary-dark hover:bg-primary focus:outline-none focus-visible:outline-2 focus-visible:outline-primary
-                dark:bg-transparent dark:text-primary dark:border-2 dark:border-primary dark:hover:bg-primary dark:hover:border-primary-light dark:focus-visible:outline-primary-dark">
+                class="max-w-16 cursor-pointer w-full py-2 text-on-primary dark:text-on-primary-dark rounded-radius bg-primary dark:bg-primary-dark hover:bg-secondary dark:hover:bg-secondary-dark">
                 Edit
               </button>
 
-              <button
-                *ngIf="isEditing"
-                (click)="updateProfile()"
-                class="px-4 py-2 text-sm font-medium text-on-surface rounded-radius transition-colors duration-200
-                bg-success hover:bg-success-dark focus:outline-none focus-visible:outline-2 focus-visible:outline-success">
-                Save
-              </button>
+              @if (isEditing) {
+                <div class="flex">
+                    <button
+                        (click)="updateProfile()"
+                        class="max-w-16 cursor-pointer w-full py-2 text-on-primary dark:text-on-primary-dark rounded-radius bg-primary dark:bg-primary-dark hover:bg-secondary dark:hover:bg-secondary-dark">
+                        Save
+                    </button>
 
-              <button
-                *ngIf="isEditing"
-                (click)="toggleEdit()"
-                class="px-4 py-2 text-sm font-medium text-on-surface rounded-radius transition-colors duration-200
-                bg-error hover:bg-error-dark focus:outline-none focus-visible:outline-2 focus-visible:outline-error">
-                Cancel
-              </button>
+                    <button
+                        (click)="toggleEdit()"
+                        class="cursor-pointer max-w-16 px-4 py-2 text-sm font-medium text-on-surface dark:text-on-surface-dark/75 rounded-radius transition-colors duration-200
+                        bg-error hover:bg-error-dark focus:outline-none focus-visible:outline-2 focus-visible:outline-error">
+                        Cancel
+                    </button>
+                </div>
+              }
+              
             </div>
           </form>
         </app-card>

@@ -53,8 +53,8 @@ export class InsightsComponent implements OnInit {
         )
       },
       (error) => {
-        alert('Registration failed. Check console for errors.');
-        console.error('Registration failed', error);
+        alert("You don't have a wallet selected.");
+        console.error(error);
       }
     );
   }
