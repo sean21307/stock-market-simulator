@@ -23,3 +23,12 @@ def get_stock_news(request, symbol):
         return Response(stock_news)
     except Exception as e:
         return Response({"error": str(e)}, status=500)
+
+@api_view(['GET'])
+def get_stock_news_titles(request, symbol):
+    try:
+        stock_news = fmpsdk.stock_news(apikey=apikey, tickers=[symbol])
+        titles = [news_item['title'] for news_item in stock_news] 
+        return Response(titles)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)

@@ -29,6 +29,7 @@ import { WalletDetails } from '../../models/walletDetails.model';
 import { ChartService } from '../../services/chart.service';
 import { WatchlistModalComponent } from '../watchlist-modal/watchlist-modal.component';
 import { NewsStockModalComponent } from '../news-stock-modal/news-stock-modal.component';
+import { AiStockModalComponent } from '../ai-stock-modal/ai-stock-modal.component';
 
 function integerValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
@@ -67,6 +68,7 @@ function maxSharesValidator(
     CommonModule,
     WatchlistModalComponent,
     NewsStockModalComponent,
+    AiStockModalComponent,
   ],
   templateUrl: './stock-details.component.html',
   styleUrl: './stock-details.component.css',

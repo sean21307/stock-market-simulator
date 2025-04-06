@@ -24,5 +24,6 @@ urlpatterns = [
     path('watchlists/', include('watchlist.urls')),
     path('wallets/', include("wallets.urls")),
     path('news/', include("news.urls")),
+    path('stock-prediction/', include("prediction.urls")),
 
 ]
