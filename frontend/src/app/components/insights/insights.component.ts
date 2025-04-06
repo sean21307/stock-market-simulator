@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { WalletService } from '../../services/wallet.service';
 import { WalletDetails } from '../../models/walletDetails.model';
 import { RouterModule } from '@angular/router';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-insights',
@@ -15,7 +16,7 @@ import { RouterModule } from '@angular/router';
 export class InsightsComponent implements OnInit {
   transactions!: Transaction[];
 
-  constructor(private walletService: WalletService) {}
+  constructor(private walletService: WalletService, private notificationService: NotificationService) {}
 
   getDate(timestamp: string) {
     return new Date(timestamp).toLocaleDateString("en-US", { 
@@ -53,7 +54,8 @@ export class InsightsComponent implements OnInit {
     link.setAttribute("download", "transactions.csv");
     document.body.appendChild(link);
     link.click();
-    alert("Transactions successfully exported to CSV!");
+    this.notificationService.addNotification({variant: 'success', title:'Success!', message:'Exported and downloaded transaction data.'});
+    // alert("Transactions successfully exported to CSV!");
   }
 
 
