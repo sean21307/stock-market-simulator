@@ -11,17 +11,17 @@ import { PredictionService } from '../../services/prediction.service';
   styleUrls: ['./ai-stock-modal.component.css']
 })
 export class AiStockModalComponent implements OnInit {
-  @Input() stockSymbol: string = '';  // Accept stock symbol as input from the parent
+  @Input() stockSymbol: string = '';  
   prediction: any = null;
   errorMessage: string = '';
   isLoading: boolean = false;
-  predictionCollapsed: boolean = true;  // Add the predictionCollapsed property
+  predictionCollapsed: boolean = true;  
 
   constructor(private predictionService: PredictionService) {}
 
   ngOnInit(): void {
     if (this.stockSymbol) {
-      this.fetchPricePrediction();  // Fetch prediction when stockSymbol is provided
+      this.fetchPricePrediction();
     }
   }
 
