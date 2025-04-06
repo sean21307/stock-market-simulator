@@ -5,6 +5,8 @@ import { WalletService } from '../../services/wallet.service';
 import { WalletDetails } from '../../models/walletDetails.model';
 import { RouterModule } from '@angular/router';
 import { NotificationService } from '../../services/notification.service';
+import { StockPriceService } from '../../services/stock-price.service';
+import { CongressTrade } from '../../models/congressTrade.model';
 
 @Component({
   selector: 'app-insights',
@@ -15,8 +17,13 @@ import { NotificationService } from '../../services/notification.service';
 })
 export class InsightsComponent implements OnInit {
   transactions!: Transaction[];
+  congressTrades!: CongressTrade[];
 
-  constructor(private walletService: WalletService, private notificationService: NotificationService) {}
+  constructor(
+    private walletService: WalletService, 
+    private notificationService: NotificationService,
+    private stockService: StockPriceService,
+  ) {}
 
   getDate(timestamp: string) {
     return new Date(timestamp).toLocaleDateString("en-US", { 
@@ -61,6 +68,10 @@ export class InsightsComponent implements OnInit {
 
 
   ngOnInit() {
+    this.stockService.getCongressTrades().subscribe(result => {
+      this.congressTrades = result;
+    })
+
     this.walletService.getSelectedWalletName().subscribe(
       (response: string) => {
         this.walletService.getTransactionHistory(response).subscribe(
