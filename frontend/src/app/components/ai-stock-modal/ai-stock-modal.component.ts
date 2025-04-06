@@ -14,7 +14,7 @@ export class AiStockModalComponent implements OnInit {
   @Input() stockSymbol: string = '';  
   prediction: any = null;
   errorMessage: string = '';
-  isLoading: boolean = false;
+  isLoading: boolean = true;
   predictionCollapsed: boolean = true;  
 
   constructor(private predictionService: PredictionService) {}

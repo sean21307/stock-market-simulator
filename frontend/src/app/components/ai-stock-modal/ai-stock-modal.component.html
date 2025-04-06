@@ -37,11 +37,29 @@
             <div class="flex flex-col space-y-2">
               <div class="bg-surface dark:bg-surface-dark rounded-md p-3 shadow">
                 <p class="text-on-surface dark:text-on-surface-dark">
-                  <strong>Prediction:</strong> {{ prediction.symbol }} stock price is likely to go
-                  <span [ngClass]="{'text-green-500': prediction.prediction.positive > prediction.prediction.negative, 'text-red-500': prediction.prediction.negative > prediction.prediction.positive}">
-                    {{ prediction.prediction.likely_to_go_UP > prediction.prediction.likely_to_go_DOWN ? 'UP' : 'DOWN' }}
+                  <strong>Prediction:</strong> {{ prediction.symbol }} stock price is likely to
+                  <span
+                    [ngClass]="{
+                      'text-green-500': prediction.prediction.likely_to_go_UP > prediction.prediction.likely_to_go_DOWN &&
+                                        prediction.prediction.likely_to_go_UP > prediction.prediction.likely_to_remain_NEUTRAL,
+                      'text-red-500': prediction.prediction.likely_to_go_DOWN > prediction.prediction.likely_to_go_UP &&
+                                      prediction.prediction.likely_to_go_DOWN > prediction.prediction.likely_to_remain_NEUTRAL,
+                      'text-yellow-500': prediction.prediction.likely_to_remain_NEUTRAL >= prediction.prediction.likely_to_go_UP &&
+                                         prediction.prediction.likely_to_remain_NEUTRAL >= prediction.prediction.likely_to_go_DOWN
+                    }"
+                  >
+                    {{
+                      prediction.prediction.likely_to_go_UP > prediction.prediction.likely_to_go_DOWN &&
+                      prediction.prediction.likely_to_go_UP > prediction.prediction.likely_to_remain_NEUTRAL
+                        ? 'INCREASE'
+                        : prediction.prediction.likely_to_go_DOWN > prediction.prediction.likely_to_go_UP &&
+                          prediction.prediction.likely_to_go_DOWN > prediction.prediction.likely_to_remain_NEUTRAL
+                          ? 'DECREASE'
+                          : 'STAY NEUTRAL'
+                    }}
                   </span>
                 </p>
+                
                 <div class="text-on-surface dark:text-on-surface-dark">
                   <strong>Sentiment Analysis:</strong>
                   <ul>
