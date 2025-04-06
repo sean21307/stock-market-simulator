@@ -33,6 +33,31 @@ export class InsightsComponent implements OnInit {
     }).replace(/^0/, '');
   }
 
+  exportToCSV() {
+    if (!this.transactions || this.transactions.length === 0) {
+        alert("No transactions to export.");
+        return;
+    }
+
+    let csvContent = "Type,Date,Time,Asset,Price Purchased,Profit/Loss\n";
+
+    this.transactions.forEach(transaction => {
+        let row = `${transaction.type},${this.getDate(transaction.date)} ${this.getTime(transaction.date)},${transaction.symbol},$${transaction.total_price},$${transaction.profit || '0'}`;
+        csvContent += row + "\n";
+    });
+
+    let blob = new Blob([csvContent], { type: "text/csv" });
+    let url = window.URL.createObjectURL(blob);
+    let link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "transactions.csv");
+    document.body.appendChild(link);
+    link.click();
+    alert("Transactions successfully exported to CSV!");
+  }
+
+
+
   ngOnInit() {
     this.walletService.getSelectedWalletName().subscribe(
       (response: string) => {
