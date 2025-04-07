@@ -13,14 +13,13 @@ from rest_framework.views import APIView
 from unicodedata import digit
 
 from accounts.models import Profile
-from wallets.models import Wallet, WalletValue
-
+from wallets.models import Wallet, WalletValue, Order
 
 import os
 from dotenv import load_dotenv
 import fmpsdk
 
-from wallets.serializers import WalletSerializer, ShareSerializer, PurchaseSerializer, SaleSerializer
+from wallets.serializers import WalletSerializer, ShareSerializer, PurchaseSerializer, SaleSerializer, OrderSerializer
 
 load_dotenv()
 apikey = os.environ.get("API_KEY")
@@ -227,6 +226,45 @@ def get_transaction_history(request, wallet_name):
         sales.append(SaleSerializer(sale).data)
 
     return Response({"purchases" : purchases, "sales" : sales}, status=status.HTTP_200_OK)
+
+@permission_classes([IsAuthenticated])
+@api_view(['GET'])
+def get_orders(request, wallet_name):
+    username = request.user
+    user = User.objects.get(username=username)
+    wallet = user.wallet_set.get(name=wallet_name)
+    orders = wallet.order_set.all()
+    orders_list = []
+    for order in orders:
+        orders_list.append(OrderSerializer(order).data)
+    return Response(orders_list, status=status.HTTP_200_OK)
+
+@permission_classes([IsAuthenticated])
+@api_view(['POST'])
+def create_order(request, wallet_name):
+    username = request.user
+    user = User.objects.get(username=username)
+    wallet = user.wallet_set.get(name=wallet_name)
+    type = request.data['type']
+    symbol = request.data.get('symbol')
+    quantity = request.data.get('quantity')
+    target_price = request.data.get('target_price')
+
+    order = wallet.order_set.create(
+        type=type,
+        symbol=symbol,
+        quantity=quantity,
+        target_price=target_price,
+    )
+
+    return Response(OrderSerializer(order).data, status=status.HTTP_200_OK)
+
+@permission_classes([IsAuthenticated])
+@api_view(['DELETE'])
+def delete_order(request, order_id):
+    Order.objects.get(id=order_id).delete()
+    return Response(status=status.HTTP_200_OK)
+
 
 
 def update_wallet_value(wallet):
