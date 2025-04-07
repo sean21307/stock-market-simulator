@@ -265,6 +265,73 @@ def delete_order(request, order_id):
     Order.objects.get(id=order_id).delete()
     return Response(status=status.HTTP_200_OK)
 
+@api_view(['POST'])
+def complete_buy_order(request, wallet_id, order_id):
+    stock_price = Decimal(request.data.get('stock_price'))
+    wallet = Wallet.objects.get(id=wallet_id)
+    order = Order.objects.get(id=order_id)
+    try:
+        share = wallet.share_set.get(symbol=order.symbol)
+        share.quantity += order.quantity
+    except ObjectDoesNotExist:
+        share = wallet.share_set.create(symbol=order.symbol, quantity=order.quantity)
+    share.save()
+    wallet.balance -= stock_price * order.quantity
+    wallet.save()
+    wallet.purchase_set.create(
+        symbol=order.symbol,
+        quantity_purchased=order.quantity,
+        quantity_available=order.quantity,
+        price_per_share=stock_price,
+        total_price=stock_price * order.quantity,
+    )
+    order.delete()
+    return Response(status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def complete_sell_order(request, wallet_id, order_id):
+    stock_price = Decimal(request.data['stock_price'])
+    wallet = Wallet.objects.get(id=wallet_id)
+    order = Order.objects.get(id=order_id)
+    total_price = order.quantity * stock_price
+    wallet.balance += total_price
+
+    share = wallet.share_set.get(symbol=order.symbol)
+    share.quantity = share.quantity - order.quantity
+    if share.quantity < 0.01:
+        share.delete()
+    else:
+        share.save()
+
+    wallet_purchases = list(wallet.purchase_set.filter(symbol=order.symbol, quantity_available__gt=0).order_by('date'))
+    index = 0
+    total_purchase_price = 0
+    number_of_shares = order.quantity
+    while order.quantity > 0.001:
+        current = wallet_purchases[index]
+        if current.quantity_available >= order.quantity:
+            current.quantity_available -= order.quantity
+            total_purchase_price += current.price_per_share * order.quantity
+            order.quantity = 0
+        else:
+            total_purchase_price += current.price_per_share * current.quantity_available
+            order.quantity -= current.quantity_available
+            current.quantity_available = 0
+        current.save()
+        index += 1
+
+    profit = total_purchase_price - total_price
+    wallet.sale_set.create(
+        quantity_sold=number_of_shares,
+        symbol=order.quantity,
+        price_per_share=stock_price,
+        total_price=total_price,
+        profit=profit,
+    )
+    order.delete()
+    wallet.save()
+
+    return Response(status=status.HTTP_200_OK)
 
 
 def update_wallet_value(wallet):
