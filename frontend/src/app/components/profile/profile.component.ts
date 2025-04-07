@@ -7,6 +7,7 @@ import { WalletService } from '../../services/wallet.service';
 import { CommonModule, TitleCasePipe } from '@angular/common';
 import {FormBuilder, FormGroup, ReactiveFormsModule} from "@angular/forms";
 import { ModalComponent } from '../modal/modal.component';
+import { NotificationService } from '../../services/notification.service';
 
 
 @Component({
@@ -32,7 +33,8 @@ export class ProfileComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private walletService: WalletService,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) {}
 
   get totalPages() {
@@ -81,7 +83,7 @@ export class ProfileComponent implements OnInit {
         this.deleteWalletModalOpen = false;
       },
       error: (err: Error) => {
-        alert("Failed to delete wallet. Check console for errors");
+        this.notificationService.addNotification({variant: 'danger', title:'Oops!', message:'Something went wrong when deleting wallet. Please try again.'}) 
         console.error('Error deleting wallet:', err);
         this.deleteWalletModalOpen = false;
       },
@@ -96,7 +98,7 @@ export class ProfileComponent implements OnInit {
     }
 
     this.profileForm = this.fb.group({
-      username: [{ value: '', disabled: true }],
+      username: [{ value: '', disabled: true, }],
       email: [{ value: '', disabled: true }]
     });
 
@@ -144,22 +146,22 @@ export class ProfileComponent implements OnInit {
   }
 
   updateProfile() {
-  if (this.profileForm.invalid) {
-    alert("Please enter valid data");
-    return;
-  }
+    if (this.profileForm.invalid) {
+      this.notificationService.addNotification({variant: 'warning', title:'Invalid Form Data', message:'Please enter valid data and try again.'}) 
+      return;
+    }
 
   const updatedProfile = this.profileForm.value;
 
   this.authService.updateUserProfile(updatedProfile).subscribe(
     (response) => {
       console.log("Profile updated:", response);
-      alert("Profile updated successfully!");
+      this.notificationService.addNotification({variant: 'success', title:'Success!', message:'Your profile changes have been saved successfully.'}) 
       this.toggleEdit(); // Exit edit mode
     },
     (error) => {
+      this.notificationService.addNotification({variant: 'danger', title:'Oops!', message:'Something went wrong when updating profile. Please try again.'}) 
       console.error("Failed to update profile", error);
-      alert("Failed to update profile");
     }
   );
   }

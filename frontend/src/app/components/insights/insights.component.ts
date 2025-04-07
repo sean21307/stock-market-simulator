@@ -4,6 +4,9 @@ import { CommonModule } from '@angular/common';
 import { WalletService } from '../../services/wallet.service';
 import { WalletDetails } from '../../models/walletDetails.model';
 import { RouterModule } from '@angular/router';
+import { NotificationService } from '../../services/notification.service';
+import { StockPriceService } from '../../services/stock-price.service';
+import { CongressTrade } from '../../models/congressTrade.model';
 
 @Component({
   selector: 'app-insights',
@@ -14,8 +17,13 @@ import { RouterModule } from '@angular/router';
 })
 export class InsightsComponent implements OnInit {
   transactions!: Transaction[];
+  congressTrades!: CongressTrade[];
 
-  constructor(private walletService: WalletService) {}
+  constructor(
+    private walletService: WalletService, 
+    private notificationService: NotificationService,
+    private stockService: StockPriceService,
+  ) {}
 
   getDate(timestamp: string) {
     return new Date(timestamp).toLocaleDateString("en-US", { 
@@ -53,12 +61,17 @@ export class InsightsComponent implements OnInit {
     link.setAttribute("download", "transactions.csv");
     document.body.appendChild(link);
     link.click();
-    alert("Transactions successfully exported to CSV!");
+    this.notificationService.addNotification({variant: 'success', title:'Success!', message:'Exported and downloaded transaction data.'});
+    // alert("Transactions successfully exported to CSV!");
   }
 
 
 
   ngOnInit() {
+    this.stockService.getCongressTrades().subscribe(result => {
+      this.congressTrades = result;
+    })
+
     this.walletService.getSelectedWalletName().subscribe(
       (response: string) => {
         this.walletService.getTransactionHistory(response).subscribe(
@@ -78,8 +91,8 @@ export class InsightsComponent implements OnInit {
         )
       },
       (error) => {
-        alert('Registration failed. Check console for errors.');
-        console.error('Registration failed', error);
+        alert("You don't have a wallet selected.");
+        console.error(error);
       }
     );
   }
