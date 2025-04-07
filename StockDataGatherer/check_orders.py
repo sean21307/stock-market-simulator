@@ -12,13 +12,15 @@ backend_url = os.environ.get("BACKEND_URL")
 
 def get_stock_prices():
     sql = "SELECT DISTINCT symbol from wallets_order"
-    cursor = db.cursor()
-    cursor.execute(sql)
+    c = db.cursor()
+    c.execute(sql)
+    rows = list(c.fetchall())
+    symbols = [item[0] for item in rows]
+    return fmpsdk.quote(apikey, symbol=symbols)
 
 
 def check_orders():
-
-    stocks = get_stock_prices();fmpsdk.quote(apikey=apikey, symbol=symbols_list)
+    stocks = get_stock_prices();
 
     stock_prices = dict()
     for stock in stocks:
