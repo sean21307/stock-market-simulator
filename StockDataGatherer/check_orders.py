@@ -10,8 +10,15 @@ load_dotenv()
 apikey = os.environ.get("API_KEY")
 backend_url = os.environ.get("BACKEND_URL")
 
+def get_stock_prices():
+    sql = "SELECT DISTINCT symbol from wallets_order"
+    cursor = db.cursor()
+    cursor.execute(sql)
+
+
 def check_orders():
-    stocks = fmpsdk.quote(apikey=apikey, symbol=symbols_list)
+
+    stocks = get_stock_prices();fmpsdk.quote(apikey=apikey, symbol=symbols_list)
 
     stock_prices = dict()
     for stock in stocks:
