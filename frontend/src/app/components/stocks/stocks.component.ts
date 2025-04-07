@@ -5,11 +5,12 @@ import { StockPriceService } from '../../services/stock-price.service';
 import { CardComponent } from "../card/card.component";
 import { DropdownComponent } from "../dropdown/dropdown.component";
 import { AllStock } from '../../models/allStocks.model';
+import {LosersAndGainersComponent} from "../losers-and-gainers/losers-and-gainers.component";
 
 @Component({
   selector: 'app-stocks',
   standalone: true,
-  imports: [CommonModule, RouterModule, CardComponent, DropdownComponent],
+  imports: [CommonModule, RouterModule, CardComponent, DropdownComponent, LosersAndGainersComponent],
   templateUrl: './stocks.component.html',
   styleUrl: './stocks.component.css'
 })

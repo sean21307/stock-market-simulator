@@ -1,6 +1,7 @@
+
 <div *ngIf="stocks.length > 0; else loading">
     <div class="container-fluid d-flex flex-column vh-100 p-8 col-span-3">
-  
+
       <div class="overflow-hidden w-full overflow-x-auto rounded-radius border border-outline dark:border-outline-dark">
         <table class="w-full text-left text-sm text-on-surface dark:text-on-surface-dark">
           <thead
@@ -16,7 +17,7 @@
               class="cursor-pointer bg-surface-alt dark:bg-surface-dark-alt hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-600 text-on-surface dark:text-on-surface-dark">
               <td class="p-4 flex items-center space-x-3">
                 <img src="https://images.financialmodelingprep.com/symbol/{{ stock.symbol }}.png" class="w-10 h-10 object-contain rounded-md" />
-                  
+
                   <div>
                       <p class="font-medium">{{ stock.name }}</p>
                       <p class="text-xs text-gray-500 dark:text-gray-400">{{ stock.symbol }}</p>
@@ -31,10 +32,11 @@
           </tbody>
         </table>
       </div>
+      <app-losers-and-gainers></app-losers-and-gainers>
     </div>
   </div>
-  
-  
+
+
   <ng-template #loading>
     <div class="d-flex justify-content-center align-items-center vh-100">
       <div class="spinner-border text-primary" role="status">

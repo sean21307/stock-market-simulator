@@ -1,0 +1,39 @@
+<h1 style="text-decoration: underline; color: white">Losers</h1>
+
+<table style="color: white; border: white 5px solid">
+  <th>Symbol</th>
+  <th>Change</th>
+  <th>Price</th>
+  <th>Percent Change</th>
+  <th>Company</th>
+
+@for (loser of losers; track loser.ticker){
+  <tr>
+    <td>{{loser.ticker}}</td>
+    <td>{{loser.changes}}</td>
+    <td>{{loser.price}}</td>
+    <td>{{loser.changesPercentage}}</td>
+    <td>{{loser.companyName}}</td>
+  </tr>
+}
+  </table>
+
+<h1 style="text-decoration: underline; color: white">Winners</h1>
+
+<table style="color: white; border: white 5px solid">
+  <th>Symbol</th>
+  <th>Change</th>
+  <th>Price</th>
+  <th>Percent Change</th>
+  <th>Company</th>
+
+@for (winner of winners; track winner.ticker){
+  <tr>
+    <td>{{winner.ticker}}</td>
+    <td>{{winner.changes}}</td>
+    <td>{{winner.price}}</td>
+    <td>{{winner.changesPercentage}}</td>
+    <td>{{winner.companyName}}</td>
+  </tr>
+}
+  </table>
