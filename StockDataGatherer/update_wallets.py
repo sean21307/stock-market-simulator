@@ -8,9 +8,16 @@ from constants import symbols_list
 
 load_dotenv()
 apikey = os.environ.get("API_KEY")
+def get_stock_prices():
+    sql = "SELECT DISTINCT symbol from wallets_share"
+    c = db.cursor()
+    c.execute(sql)
+    rows = list(c.fetchall())
+    symbols = [item[0] for item in rows]
+    return fmpsdk.quote(apikey, symbol=symbols)
 
 def update_wallets():
-    stocks = fmpsdk.quote(apikey=apikey,symbol=symbols_list)
+    stocks = get_stock_prices()
 
     stock_prices = dict()
     for stock in stocks:
