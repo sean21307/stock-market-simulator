@@ -300,8 +300,12 @@ def complete_sell_order(request, wallet_id, order_id):
     order = Order.objects.get(id=order_id)
     total_price = order.quantity * stock_price
     wallet.balance += total_price
-
-    share = wallet.share_set.get(symbol=order.symbol)
+    try:
+        share = wallet.share_set.get(symbol=order.symbol)
+    except ObjectDoesNotExist:
+        order.status = "FAILED"
+        order.save()
+        return Response({"error":"Wallet quantity is less than order total"}, status=status.HTTP_400_BAD_REQUEST)
     if order.quantity > share.quantity:
         order.status = "FAILED"
         order.save()

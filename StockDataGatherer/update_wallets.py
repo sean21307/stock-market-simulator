@@ -18,16 +18,19 @@ def get_stock_prices():
 
 def update_wallets():
     stocks = get_stock_prices()
-
     stock_prices = dict()
     for stock in stocks:
         stock_prices[stock['symbol']] = stock['price']
-
     sql = "SELECT count(symbol), symbol, wallet_id FROM wallets_share GROUP BY symbol, wallet_id ORDER BY wallet_id;"
     c = db.cursor()
     c.execute(sql)
     rows = c.fetchall()
+
+    if len(rows) == 0:
+        print("No shares found")
+        return
     curr_wallet_id = rows[0][2]
+
     balance = 0
     values = ""
     for row in rows:

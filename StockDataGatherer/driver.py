@@ -39,4 +39,5 @@ while True:
             except Exception as ex:
                 print(ex)
             finally:
+                print("SLEEPING")
                 time.sleep(60 * 15)
