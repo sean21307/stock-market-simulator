@@ -16,8 +16,13 @@ import {LosersAndGainersComponent} from "../losers-and-gainers/losers-and-gainer
 })
 export class StocksComponent {
   stocks: AllStock[] = [];
+  selectedTab = "stocks";
 
   constructor(private stockService: StockPriceService) {}
+
+  selectTab(name: string) {
+    this.selectedTab = name;
+  }
 
   ngOnInit(): void {
     this.stockService.getAllStocks().subscribe((data) => {

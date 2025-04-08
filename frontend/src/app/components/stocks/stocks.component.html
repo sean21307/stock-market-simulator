@@ -1,7 +1,79 @@
+<div class="p-8 pb-0">
+  <div class="flex gap-2 overflow-x-auto border-b border-outline dark:border-outline-dark" role="tablist"
+    aria-label="tab options">
+
+    <button type="button" role="tab" aria-controls="tabpanelStocks" [attr.aria-selected]="selectedTab === 'stocks'"
+      [attr.tabindex]="selectedTab === 'stocks' ? '0' : '-1'" (click)="selectTab('stocks')"
+      [ngClass]="selectedTab === 'stocks' 
+        ? 'font-bold text-primary border-b-2 border-primary dark:border-primary-dark dark:text-primary-dark' 
+        : 'text-on-surface font-medium dark:text-on-surface-dark dark:hover:border-b-outline-dark-strong dark:hover:text-on-surface-dark-strong hover:border-b-2 hover:border-b-outline-strong hover:text-on-surface-strong'"
+      class="flex h-min items-center gap-2 px-4 py-2 text-sm cursor-pointer">
+
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+        class="size-6">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+      </svg>
+
+      Stocks
+    </button>
+
+    <button type="button" role="tab" aria-controls="tabpanelWinners" [attr.aria-selected]="selectedTab === 'winners'"
+      [attr.tabindex]="selectedTab === 'winners' ? '0' : '-1'" (click)="selectTab('winners')"
+      [ngClass]="selectedTab === 'winners' 
+        ? 'font-bold text-primary border-b-2 border-primary dark:border-primary-dark dark:text-primary-dark' 
+        : 'text-on-surface font-medium dark:text-on-surface-dark dark:hover:border-b-outline-dark-strong dark:hover:text-on-surface-dark-strong hover:border-b-2 hover:border-b-outline-strong hover:text-on-surface-strong'"
+      class="flex h-min items-center gap-2 px-4 py-2 text-sm cursor-pointer">
+
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+        class="size-6">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
+      </svg>
+
+      Winners
+    </button>
+
+    <button type="button" role="tab" aria-controls="tabpanelLosers" [attr.aria-selected]="selectedTab === 'losers'"
+      [attr.tabindex]="selectedTab === 'losers' ? '0' : '-1'" (click)="selectTab('losers')"
+      [ngClass]="selectedTab === 'losers' 
+        ? 'font-bold text-primary border-b-2 border-primary dark:border-primary-dark dark:text-primary-dark' 
+        : 'text-on-surface font-medium dark:text-on-surface-dark dark:hover:border-b-outline-dark-strong dark:hover:text-on-surface-dark-strong hover:border-b-2 hover:border-b-outline-strong hover:text-on-surface-strong'"
+      class="flex h-min items-center gap-2 px-4 py-2 text-sm cursor-pointer">
+
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+        class="size-6">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M2.25 6 9 12.75l4.286-4.286a11.948 11.948 0 0 1 4.306 6.43l.776 2.898m0 0 3.182-5.511m-3.182 5.51-5.511-3.181" />
+      </svg>
+
+      Losers
+    </button>
+
+
+  </div>
+
+  <!-- Panel Content -->
+  <div class="px-2 py-4 text-on-surface dark:text-on-surface-dark">
+    <div *ngIf="selectedTab === 'groups'" id="tabpanelGroups" role="tabpanel" aria-label="groups">
+      <b><a href="#" class="underline">Groups</a></b> tab is selected
+    </div>
+    <div *ngIf="selectedTab === 'likes'" id="tabpanelLikes" role="tabpanel" aria-label="likes">
+      <b><a href="#" class="underline">Likes</a></b> tab is selected
+    </div>
+    <div *ngIf="selectedTab === 'comments'" id="tabpanelComments" role="tabpanel" aria-label="comments">
+      <b><a href="#" class="underline">Comments</a></b> tab is selected
+    </div>
+    <div *ngIf="selectedTab === 'saved'" id="tabpanelSaved" role="tabpanel" aria-label="saved">
+      <b><a href="#" class="underline">Saved</a></b> tab is selected
+    </div>
+  </div>
+</div>
+
 
 <div *ngIf="stocks.length > 0; else loading">
-    <div class="container-fluid d-flex flex-column vh-100 p-8 col-span-3">
-
+  @if (selectedTab == "stocks") {
+    <div class="p-8 pt-2 col-span-3">
       <div class="overflow-hidden w-full overflow-x-auto rounded-radius border border-outline dark:border-outline-dark">
         <table class="w-full text-left text-sm text-on-surface dark:text-on-surface-dark">
           <thead
@@ -16,12 +88,13 @@
             <tr *ngFor="let stock of stocks" [routerLink]="['/stock', stock.symbol]"
               class="cursor-pointer bg-surface-alt dark:bg-surface-dark-alt hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-600 text-on-surface dark:text-on-surface-dark">
               <td class="p-4 flex items-center space-x-3">
-                <img src="https://images.financialmodelingprep.com/symbol/{{ stock.symbol }}.png" class="w-10 h-10 object-contain rounded-md" />
+                <img src="https://images.financialmodelingprep.com/symbol/{{ stock.symbol }}.png"
+                  class="w-10 h-10 object-contain rounded-md" />
 
-                  <div>
-                      <p class="font-medium">{{ stock.name }}</p>
-                      <p class="text-xs text-gray-500 dark:text-gray-400">{{ stock.symbol }}</p>
-                  </div>
+                <div>
+                  <p class="font-medium">{{ stock.name }}</p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">{{ stock.symbol }}</p>
+                </div>
               </td>
               <td class="p-4">${{ stock.price | number:'1.2-2' }}</td>
               <td class="p-4"
@@ -32,16 +105,18 @@
           </tbody>
         </table>
       </div>
-      <app-losers-and-gainers></app-losers-and-gainers>
+    </div>
+  } @else {
+    <app-losers-and-gainers [showWinners]="selectedTab==='winners'"></app-losers-and-gainers>
+  }
+</div>
+
+
+<ng-template #loading>
+  <div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="spinner-border text-primary" role="status">
+      <span class="sr-only">Loading...</span>
     </div>
   </div>
-
-
-  <ng-template #loading>
-    <div class="d-flex justify-content-center align-items-center vh-100">
-      <div class="spinner-border text-primary" role="status">
-        <span class="sr-only">Loading...</span>
-      </div>
-    </div>
-    <p class="text-center mt-3">Fetching the latest stock data...</p>
-  </ng-template>
+  <p class="text-center mt-3">Fetching the latest stock data...</p>
+</ng-template>
