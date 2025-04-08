@@ -71,11 +71,17 @@
                     @if (transactionLoading) {
                         <p class="text-xl">Processing Transaction...</p>
                     } @else {
-                        @if (buyTab) {
-                            <p class="text-xl">Successfully bought {{ quantity | number:'1.0' }} shares of {{ stock.stockInfo.symbol }}.</p>
+                        @if (orderType === 'Limit') {
+                            <p class="text-xl">Successfully placed order.</p>
                         } @else {
-                            <p class="text-xl">Successfully sold {{ quantity | number:'1.0' }} shares of {{ stock.stockInfo.symbol }}.</p>
+                            @if (buyTab) {
+                                <p class="text-xl">Successfully bought {{ quantity | number:'1.0' }} shares of {{ stock.stockInfo.symbol }}.</p>
+                            } @else {
+                                <p class="text-xl">Successfully sold {{ quantity | number:'1.0' }} shares of {{ stock.stockInfo.symbol }}.</p>
+                            }
                         }
+
+                        
     
                         <button (click)="reload()" type="submit" class="mt-2 cursor-pointer w-full py-2 text-on-primary dark:text-on-primary-dark rounded bg-primary dark:bg-primary-dark hover:bg-secondary dark:hover:bg-secondary-dark">
                             OK
@@ -114,42 +120,75 @@
                             Sell
                         </button>
                     </div>
-                    <p class="text-xl mb-3">You have {{ (sharesDict[stock.stockInfo.symbol] || 0) }} shares.</p>
-                    <form [formGroup]="buyForm" (ngSubmit)="onSubmit()" class="mt-4">
-                        
+                    <p class="text-lg mb-3">You have {{ (sharesDict[stock.stockInfo.symbol] || 0) }} shares.</p>
+                    
+                    <div class="mt-2 relative flex w-full max-w-xs flex-col gap-1 text-on-surface dark:text-on-surface-dark mb-4">
+                        <label for="orderType" class="w-fit pl-0.5 text-sm">Order Type</label>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="absolute pointer-events-none right-3 top-9 size-5">
+                            <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                        </svg>
+                        <select [(ngModel)]="orderType" id="orderType" name="orderType" class="w-full appearance-none rounded-radius p-2 border outline-none bg-surface dark:bg-surface-dark text-on-surface dark:text-on-surface-dark focus:ring-2 focus:ring-outline dark:focus:ring-outline-dark">
+                            <option value="Market">Market</option>
+                            <option value="Limit">Limit</option>
+                        </select>
+                    </div>                        
+                    
+
+                    <form [formGroup]="buyForm" (ngSubmit)="onSubmit()" class="mt-1">
                         <div class="mb-4">
-                        <label class="flex w-fit items-center gap-1 pl-0.5 text-sm"
-                            [ngClass]="quantityInvalid ? 'text-danger' : 'text-on-surface dark:text-on-surface-dark'">
-                            <ng-container *ngIf="quantityInvalid">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor" class="w-4 h-4">
-                                    <path d="M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z"/>
-                                </svg>
-                            </ng-container>
-                            Quantity
-                        </label>
-                        <input ngModel [ngClass]="{'border-danger': quantityInvalid}" type="string" formControlName="quantity" 
-                            class="w-full p-2 mt-1 border rounded outline-none bg-surface dark:bg-surface-dark text-on-surface dark:text-on-surface-dark focus:ring-2 focus:ring-outline dark:focus:ring-outline-dark">
-                            @if (quantityInvalid) {
-                                @if (quantityNonInt) {
-                                    <small class="pl-0.5 text-danger">Error: Quantity must be a number</small>
-                                } @else {
-                                    @if (!buyTab && buyForm.controls['quantity'].hasError('exceedsShares')) {
-                                        
-                                        <small class="pl-0.5 text-danger">
-                                            {{ sharesDict[stock.stockInfo.symbol] ? 
-                                                ('Error: You cannot sell more than ' + (stock ? sharesDict[stock.stockInfo.symbol] : '?') + ' shares.') : 
-                                                'You don\'t have any shares to sell' 
-                                            }}
-                                        </small>
-                                        
+                            <label class="flex w-fit items-center gap-1 pl-0.5 text-sm"
+                                [ngClass]="quantityInvalid ? 'text-danger' : 'text-on-surface dark:text-on-surface-dark'">
+                                <ng-container *ngIf="quantityInvalid">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor" class="w-4 h-4">
+                                        <path d="M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z"/>
+                                    </svg>
+                                </ng-container>
+                                Quantity
+                            </label>
+                            <input ngModel [ngClass]="{'border-danger': quantityInvalid}" type="string" formControlName="quantity" 
+                                class="w-full p-2 mt-1 border rounded outline-none bg-surface dark:bg-surface-dark text-on-surface dark:text-on-surface-dark focus:ring-2 focus:ring-outline dark:focus:ring-outline-dark">
+                                @if (quantityInvalid) {
+                                    @if (quantityNonInt) {
+                                        <small class="pl-0.5 text-danger">Error: Quantity must be a number</small>
                                     } @else {
-                                        <small class="pl-0.5 text-danger">Error: Quantity is required</small>
+                                        @if (!buyTab && buyForm.controls['quantity'].hasError('exceedsShares')) {
+                                            
+                                            <small class="pl-0.5 text-danger">
+                                                {{ sharesDict[stock.stockInfo.symbol] ? 
+                                                    ('Error: You cannot sell more than ' + (stock ? sharesDict[stock.stockInfo.symbol] : '?') + ' shares.') : 
+                                                    'You don\'t have any shares to sell' 
+                                                }}
+                                            </small>
+                                            
+                                        } @else {
+                                            <small class="pl-0.5 text-danger">Error: Quantity is required</small>
+                                        }
                                     }
                                 }
-                            }
                         </div>
 
-                        <div class="my-3">
+                        <div class="mb-4" *ngIf="orderType==='Limit'">
+                            <label class="flex w-fit items-center gap-1 pl-0.5 text-sm"
+                                [ngClass]="limitPriceInvalid ? 'text-danger' : 'text-on-surface dark:text-on-surface-dark'">
+                                <ng-container *ngIf="limitPriceInvalid">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor" class="w-4 h-4">
+                                        <path d="M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z"/>
+                                    </svg>
+                                </ng-container>
+                                Limit Price
+                            </label>
+                            <input ngModel [ngClass]="{'border-danger': limitPriceInvalid}" type="string" formControlName="limitPrice" 
+                                class="w-full p-2 mt-1 border rounded outline-none bg-surface dark:bg-surface-dark text-on-surface dark:text-on-surface-dark focus:ring-2 focus:ring-outline dark:focus:ring-outline-dark">
+                                @if (limitPriceInvalid) {
+                                    @if (limitPriceNonInt) {
+                                        <small class="pl-0.5 text-danger">Error: Limit price must be a number</small>
+                                    } @else {
+                                        <small class="pl-0.5 text-danger">Error: Limit price is required</small>
+                                    }
+                                }
+                        </div>
+
+                        <div class="my-3" *ngIf="orderType!=='Limit'">
                             @if (quantity && !quantityInvalid) {
                                 <div class="flex justify-between my-1">
                                     <p class="text-md">Current balance:</p>
@@ -176,13 +215,12 @@
                                     </div>
                                 }
                             }
-                            
                         </div>
                         
                         
 
                         <button type="submit" class="cursor-pointer w-full py-2 text-on-primary dark:text-on-primary-dark rounded bg-primary dark:bg-primary-dark hover:bg-secondary dark:hover:bg-secondary-dark">
-                            {{ (buyTab ? 'Buy' : 'Sell') }}
+                            {{ orderType === 'Limit' ? 'Place Order' : (buyTab ? 'Buy' : 'Sell') }}
                         </button>
                     </form>
                 }
