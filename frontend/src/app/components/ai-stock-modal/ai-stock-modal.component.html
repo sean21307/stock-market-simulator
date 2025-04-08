@@ -1,0 +1,93 @@
+<div class="bg-surface-alt dark:bg-surface-dark-alt rounded-lg shadow-lg overflow-hidden border-outline border dark:border-outline-dark">
+    <div class="bg-surface-alt dark:bg-surface-dark-alt flex justify-between items-center p-4">
+      <div class="flex w-full justify-between items-center text-on-surface dark:text-on-surface-dark">
+        <h5 class="text-xl">
+          AI Price Prediction for {{ stockSymbol }}
+        </h5>
+  
+        <svg (click)="predictionCollapsed = !predictionCollapsed"
+          class="size-6 hover:dark:text-white cursor-pointer"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor">
+          <path *ngIf="!predictionCollapsed" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
+          <path *ngIf="predictionCollapsed" stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+      </div>
+    </div>
+  
+    <div [ngClass]="{ 'hidden': predictionCollapsed }" class="p-4">
+      <ng-container *ngIf="isLoading; else predictionContent">
+        <div class="flex justify-center py-4">
+          <span class="text-on-surface dark:text-on-surface-dark">Loading predictions...</span>
+        </div>
+      </ng-container>
+  
+      <ng-template #predictionContent>
+        <ng-container *ngIf="errorMessage; else predictionList">
+          <div class="alert alert-danger bg-danger text-on-danger dark:bg-danger dark:text-on-danger p-4 rounded-md mb-4">
+            <span>{{ errorMessage }}</span>
+          </div>
+        </ng-container>
+  
+        <ng-template #predictionList>
+          <ng-container *ngIf="prediction; else noPrediction">
+            <div class="flex flex-col space-y-2">
+              <div class="bg-surface dark:bg-surface-dark rounded-md p-3 shadow">
+                <p class="text-on-surface dark:text-on-surface-dark">
+                  <strong>Prediction:</strong> {{ prediction.symbol }} stock price is likely to
+                  <span
+                    [ngClass]="{
+                      'text-green-500': prediction.prediction.likely_to_go_UP > prediction.prediction.likely_to_go_DOWN &&
+                                        prediction.prediction.likely_to_go_UP > prediction.prediction.likely_to_remain_NEUTRAL,
+                      'text-red-500': prediction.prediction.likely_to_go_DOWN > prediction.prediction.likely_to_go_UP &&
+                                      prediction.prediction.likely_to_go_DOWN > prediction.prediction.likely_to_remain_NEUTRAL,
+                      'text-yellow-500': prediction.prediction.likely_to_remain_NEUTRAL >= prediction.prediction.likely_to_go_UP &&
+                                         prediction.prediction.likely_to_remain_NEUTRAL >= prediction.prediction.likely_to_go_DOWN
+                    }"
+                  >
+                    {{
+                      prediction.prediction.likely_to_go_UP > prediction.prediction.likely_to_go_DOWN &&
+                      prediction.prediction.likely_to_go_UP > prediction.prediction.likely_to_remain_NEUTRAL
+                        ? 'INCREASE'
+                        : prediction.prediction.likely_to_go_DOWN > prediction.prediction.likely_to_go_UP &&
+                          prediction.prediction.likely_to_go_DOWN > prediction.prediction.likely_to_remain_NEUTRAL
+                          ? 'DECREASE'
+                          : 'STAY NEUTRAL'
+                    }}
+                  </span>
+                </p>
+                
+                <div class="text-on-surface dark:text-on-surface-dark">
+                  <strong>Sentiment Analysis:</strong>
+                  <ul>
+                    <li><strong>Positive:</strong> {{ prediction.prediction.likely_to_go_UP }}%</li>
+                    <li><strong>Negative:</strong> {{ prediction.prediction.likely_to_go_DOWN }}%</li>
+                    <li><strong>Neutral:</strong> {{ prediction.prediction.likely_to_remain_NEUTRAL	 }}%</li>
+                  </ul>
+                </div>
+              </div>
+  
+              <div *ngIf="prediction.titles && prediction.titles.length > 0">
+                <h5 class="text-lg text-on-surface dark:text-on-surface-dark mt-4">Based On Most Recent News Titles:</h5>
+                <ul>
+                  <li *ngFor="let title of prediction.titles" class="text-on-surface dark:text-on-surface-dark">
+                    {{ title }}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </ng-container>
+  
+          <ng-template #noPrediction>
+            <div class="alert alert-info bg-info text-on-info dark:bg-info dark:text-on-info p-4 rounded-md">
+              No predictions available.
+            </div>
+          </ng-template>
+        </ng-template>
+      </ng-template>
+    </div>
+  </div>
+  

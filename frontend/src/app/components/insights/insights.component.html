@@ -7,6 +7,11 @@
             <div>
                 <h2 class="text-2xl">Transaction History</h2>
             </div>
+            <button class="text-lg font-medium text-primary  dark:text-primary-dark/60 cursor-pointer" (click)="exportToCSV()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-7 hover:text-primary/50 dark:hover:text-primary-dark">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+            </button>
         </div>
 
         <div>
@@ -29,7 +34,7 @@
                                     </svg></a>
                             </p>
                         } @else {
-                            <table class="w-full text-left text-sm text-on-surface dark:text-on-surface-dark">
+                            <table class="w-full lg:table-fixed text-left text-sm text-on-surface dark:text-on-surface-dark">
                                 <thead
                                     class="border-b border-outline bg-transparent text-sm text-on-surface-strong dark:border-outline-dark dark:text-on-surface-dark-strong">
                                     <tr>
@@ -48,7 +53,7 @@
                                             [ngClass]="isLast ? 'rounded-b-full' : ''">
 
                                             <td class="p-4 pl-8">
-                                                <p class="font-medium">{{ transaction.type }}</p>
+                                                <p class="font-medium">{{ transaction.type === "Buy" ? 'Purchase' : 'Sale' }}</p>
                                             </td>
 
                                             <td class="p-4">
@@ -79,35 +84,6 @@
                                                         ${{ transaction.profit }}</p>
                                                 }
                                             </td>
-                                            <!-- <td class="p-4 pl-7">
-                                                <div class="flex items-center space-x-3">
-                                                    <div>
-                                                        <p class="font-medium">{{ transaction.typ }}</p>
-                                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ symbol }}</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-
-
-                                            <td class="p-4">
-                                                <p>${{ stockDict[symbol].price * sharesDict[symbol] | number:'1.2-2' }}</p>
-                                                <p class="text-xs">{{ sharesDict[symbol] + ' ' + symbol}}</p>
-                                            </td>
-
-                                            <td class="p-4">
-                                                <p>${{ stockDict[symbol].price | number:'1.2-2' }}</p>
-                                                <p class="text-xs"
-                                                    [ngClass]="{'text-success': stockDict[symbol].changesPercentage >= 0, 'text-danger': stockDict[symbol].changesPercentage < 0}">
-                                                    {{ (stockDict[symbol].changesPercentage > 0 ? '+' : '') }}{{
-                                                    stockDict[symbol].changesPercentage | number:'1.2-2' }}%
-                                                </p>
-                                            </td>
-
-                                            <td class="p-4">
-                                                {{ (stockDict[symbol].price * sharesDict[symbol] / portfolioValue * 100) |
-                                                number:'1.2-2' }}%
-                                            </td> -->
-
                                         </tr>
                                     }
                                 </tbody>
@@ -119,7 +95,99 @@
                 </div>
 
             } @else {
-                <p>Loading</p>
+                <p class="p-4">Loading</p>
+            }
+        </div>
+    </div>
+
+
+    <!-- senate transactions table -->
+    <div
+        class="mt-12 w-full md:min-h-0 rounded-lg relative border-outline border dark:border-outline-dark bg-surface-alt dark:bg-surface-dark-alt text-on-surface dark:text-on-surface-dark flex flex-col">
+        <div class="p-8 pb-6 flex justify-between mb-1">
+            <div>
+                <h2 class="text-2xl">Recent Congress & Senate Trades</h2>
+            </div>
+        </div>
+
+        <div>
+            @if (congressTrades) {
+                <div class="container-fluid d-flex flex-column px-0">
+
+                    <div
+                        class="overflow-hidden w-full overflow-x-auto border-t border-outline dark:border-outline-dark rounded-b-lg">
+                        @if (transactions.length == 0) {
+                            <p class="p-8 text-xl text-on-surface dark:text-on-surface-dark">You haven't completed any transactions with this wallet. <a
+                                    href="/stocks"
+                                    class="font-medium text-primary underline-offset-2 hover:underline focus:underline focus:outline-hidden dark:text-primary-dark">Explore
+                                    Stocks
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                                        aria-hidden="true" stroke="currentColor" class="size-4 inline">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                                    </svg></a>
+                            </p>
+                        } @else {
+                            <table class="w-full lg:table-fixed text-left text-sm text-on-surface dark:text-on-surface-dark">
+                                <thead
+                                    class="border-b border-outline bg-transparent text-sm text-on-surface-strong dark:border-outline-dark dark:text-on-surface-dark-strong">
+                                    <tr>
+                                        <th scope="col" class="p-4 pl-8">Politician</th>
+                                        <th scope="col" class="p-4">Type</th>
+                                        <th scope="col" class="p-4">Date</th>
+                                        <th scope="col" class="p-4">Asset</th>
+                                        <th scope="col" class="p-4">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-outline dark:divide-outline-dark bg-transparent">
+                                    @for (transaction of congressTrades; track $index; let isLast = $last) {
+                                        <tr 
+                                            [routerLink]="['/stock', transaction.symbol]" routerLinkActive="router-link-active"
+                                            class="cursor-pointer bg-surface-alt dark:bg-surface-dark-alt hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-600 text-on-surface dark:text-on-surface-dark"
+                                            [ngClass]="isLast ? 'rounded-b-full' : ''">
+
+                                            <td class="p-4 pl-8">
+                                                
+                                                <div class="flex items-center space-x-3">
+                                                    <div>
+                                                        <p class="font-medium">{{ transaction.firstName + " " + transaction.lastName }}</p>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ transaction.chamber }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <td class="p-4">
+                                                <p class="font-medium">{{ transaction.type }}</p>
+                                            </td>
+
+                                            <td class="p-4">
+                                                <p class="font-medium">{{ getDate(transaction.transactionDate) }}</p>
+                                            </td>
+
+                                            <td class="p-4">
+                                                <div class="flex items-center space-x-3">
+                                                    <div>
+                                                        <p class="font-medium">{{ transaction.symbol }}</p>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ transaction.assetDescription }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <td class="p-4">
+                                                <p class="font-medium">{{ transaction.amount }}</p>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+
+
+                    </div>
+                </div>
+
+            } @else {
+                <p class="p-4">Loading</p>
             }
         </div>
     </div>

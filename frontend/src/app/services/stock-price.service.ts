@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { PartialStock, Stock } from '../models/stock.model';
 import { AllStock } from '../models/allStocks.model';
 import { SearchResult } from '../models/searchResult.model';
+import { CongressTrade } from '../models/congressTrade.model';
 
 
 
@@ -19,6 +20,11 @@ export class StockPriceService {
   constructor(private http: HttpClient) { }
 
   private baseUrl = 'http://127.0.0.1:8000/stocks/';
+
+  // Fetch recent trades from congress
+  public getCongressTrades(): Observable<CongressTrade[]> {
+    return this.http.get<CongressTrade[]>(`${this.baseUrl}congress/`);
+  }
 
   // Fetch stocks based on search query
   public getSearchResults(query: string): Observable<SearchResult[]> {

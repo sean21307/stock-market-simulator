@@ -15,6 +15,13 @@ def get_stock_prices():
     rows = list(c.fetchall())
     symbols = [item[0] for item in rows]
     return fmpsdk.quote(apikey, symbol=symbols)
+def get_stock_prices():
+    sql = "SELECT DISTINCT symbol from wallets_share"
+    c = db.cursor()
+    c.execute(sql)
+    rows = list(c.fetchall())
+    symbols = [item[0] for item in rows]
+    return fmpsdk.quote(apikey, symbol=symbols)
 
 def update_wallets():
     stocks = get_stock_prices()

@@ -31,6 +31,7 @@ import { ChartService } from '../../services/chart.service';
 import { WatchlistModalComponent } from '../watchlist-modal/watchlist-modal.component';
 import { NewsStockModalComponent } from '../news-stock-modal/news-stock-modal.component';
 import { OrderService } from '../../services/order.service';
+import { AiStockModalComponent } from '../ai-stock-modal/ai-stock-modal.component';
 
 function integerValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
@@ -69,6 +70,7 @@ function maxSharesValidator(
     CommonModule,
     WatchlistModalComponent,
     NewsStockModalComponent,
+    AiStockModalComponent,
     FormsModule,
   ],
   templateUrl: './stock-details.component.html',
