@@ -4,5 +4,6 @@ export interface Order {
   symbol: string,
   quantity: number,
   target_price: number,
+  date?: 'string',
   status?: "PENDING" | "COMPLETED" | "FAILED"
 }
