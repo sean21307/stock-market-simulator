@@ -1,6 +1,6 @@
 export interface Order {
   id?: number,
-  type: "buy" | "sell",
+  type: "Buy" | "Sell",
   symbol: string,
   quantity: number,
   target_price: number,

@@ -71,11 +71,17 @@
                     @if (transactionLoading) {
                         <p class="text-xl">Processing Transaction...</p>
                     } @else {
-                        @if (buyTab) {
-                            <p class="text-xl">Successfully bought {{ quantity | number:'1.0' }} shares of {{ stock.stockInfo.symbol }}.</p>
+                        @if (orderType === 'Limit') {
+                            <p class="text-xl">Successfully placed order.</p>
                         } @else {
-                            <p class="text-xl">Successfully sold {{ quantity | number:'1.0' }} shares of {{ stock.stockInfo.symbol }}.</p>
+                            @if (buyTab) {
+                                <p class="text-xl">Successfully bought {{ quantity | number:'1.0' }} shares of {{ stock.stockInfo.symbol }}.</p>
+                            } @else {
+                                <p class="text-xl">Successfully sold {{ quantity | number:'1.0' }} shares of {{ stock.stockInfo.symbol }}.</p>
+                            }
                         }
+
+                        
     
                         <button (click)="reload()" type="submit" class="mt-2 cursor-pointer w-full py-2 text-on-primary dark:text-on-primary-dark rounded bg-primary dark:bg-primary-dark hover:bg-secondary dark:hover:bg-secondary-dark">
                             OK

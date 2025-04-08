@@ -14,20 +14,19 @@ export class OrderService {
 
   getOrders(walletName: String): Observable<Order[]> {
     const headers = { Authorization: `Bearer ${this.authService.getToken()}` };
-    return this.http.get<Order[]>(this.apiURL + `${walletName}`);
+    return this.http.get<Order[]>(this.apiURL + `${walletName}`, { headers });
   }
 
   createOrder(createdOrder: Order, walletName: string): Observable<Order> {
-    const headers = { Authorization: `Bearer ${this.authService.getToken()}` };
-    console.log(createdOrder);
+    const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
     return this.http.post<Order>(
       this.apiURL + `${walletName}/create`,
-      createdOrder
+      createdOrder, { headers }
     );
   }
 
   deleteOrder(orderID: number) {
     const headers = { Authorization: `Bearer ${this.authService.getToken()}` };
-    return this.http.delete(this.apiURL + `delete/${orderID}`);
+    return this.http.delete(this.apiURL + `delete/${orderID}`, { headers });
   }
 }

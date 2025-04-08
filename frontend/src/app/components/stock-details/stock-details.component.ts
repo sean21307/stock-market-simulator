@@ -32,6 +32,7 @@ import { WatchlistModalComponent } from '../watchlist-modal/watchlist-modal.comp
 import { NewsStockModalComponent } from '../news-stock-modal/news-stock-modal.component';
 import { OrderService } from '../../services/order.service';
 import { AiStockModalComponent } from '../ai-stock-modal/ai-stock-modal.component';
+import { NotificationService } from '../../services/notification.service';
 
 function integerValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
@@ -116,6 +117,7 @@ export class StockDetailsComponent implements OnInit {
     private chartService: ChartService,
     private router: Router,
     private orderService: OrderService,
+    private notificationService: NotificationService,
     @Inject(PLATFORM_ID) private platformId: any
   ) {}
 
@@ -176,7 +178,7 @@ export class StockDetailsComponent implements OnInit {
       if (this.orderType === 'Limit') {
 
         this.orderService.createOrder({
-          type: 'buy',
+          type: 'Buy',
           symbol: this.stock.stockInfo.symbol,
           quantity: +(this.buyForm.value.quantity ?? 0),
           target_price: +(this.buyForm.value.limitPrice ?? 0),
@@ -186,7 +188,9 @@ export class StockDetailsComponent implements OnInit {
             this.transactionComplete = true;
           },
           error: (err: Error) => {
+            this.notificationService.addNotification({variant: 'danger', title:'Oops!', message:'Something went wrong when creating your order. Please try again.'});
             console.log(err);
+            this.transactionLoading = false;
           },
         });
 
@@ -202,14 +206,16 @@ export class StockDetailsComponent implements OnInit {
             this.transactionComplete = true;
           },
           error: (err: Error) => {
+            this.notificationService.addNotification({variant: 'danger', title:'Oops!', message:'Something went wrong when purchasing shares. Please try again.'});
             console.log(err);
+            this.transactionLoading = false;
           },
         });
       }
     } else {
       if (this.orderType === 'Limit') {
         this.orderService.createOrder({
-          type: 'sell',
+          type: 'Sell',
           symbol: this.stock.stockInfo.symbol,
           quantity: +(this.buyForm.value.quantity ?? 0),
           target_price: +(this.buyForm.value.limitPrice ?? 0),
@@ -219,7 +225,9 @@ export class StockDetailsComponent implements OnInit {
             this.transactionComplete = true;
           },
           error: (err: Error) => {
+            this.notificationService.addNotification({variant: 'danger', title:'Oops!', message:'Something went wrong when placing order. Please try again.'});
             console.log(err);
+            this.transactionLoading = false;
           },
         });
 
@@ -235,7 +243,9 @@ export class StockDetailsComponent implements OnInit {
               this.transactionComplete = true;
             },
             error: (err: Error) => {
+              this.notificationService.addNotification({variant: 'danger', title:'Oops!', message:'Something went wrong when purchasing shares. Please try again.'});
               console.log(err);
+              this.transactionLoading = false;
             },
           });
       }
