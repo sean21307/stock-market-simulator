@@ -18,6 +18,7 @@ import {
   AbstractControl,
   FormControl,
   FormGroup,
+  FormsModule,
   ReactiveFormsModule,
   ValidationErrors,
   ValidatorFn,
@@ -29,6 +30,7 @@ import { WalletDetails } from '../../models/walletDetails.model';
 import { ChartService } from '../../services/chart.service';
 import { WatchlistModalComponent } from '../watchlist-modal/watchlist-modal.component';
 import { NewsStockModalComponent } from '../news-stock-modal/news-stock-modal.component';
+import { OrderService } from '../../services/order.service';
 
 function integerValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
@@ -67,6 +69,7 @@ function maxSharesValidator(
     CommonModule,
     WatchlistModalComponent,
     NewsStockModalComponent,
+    FormsModule,
   ],
   templateUrl: './stock-details.component.html',
   styleUrl: './stock-details.component.css',
@@ -74,6 +77,7 @@ function maxSharesValidator(
 export class StockDetailsComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
 
+  orderType = "Market";
   watchlistModalOpen = false;
   buyTab = true;
   darkMode = false;
@@ -92,6 +96,11 @@ export class StockDetailsComponent implements OnInit {
         this.buyTab
       ),
     ]),
+
+    limitPrice: new FormControl(0, [
+      Validators.required,
+      Validators.pattern(/^\d+(\.\d+)?$/),
+    ])
   });
   wallet!: WalletDetails;
   transactionComplete = false;
@@ -104,6 +113,7 @@ export class StockDetailsComponent implements OnInit {
     private themeService: ThemeService,
     private chartService: ChartService,
     private router: Router,
+    private orderService: OrderService,
     @Inject(PLATFORM_ID) private platformId: any
   ) {}
 
@@ -118,9 +128,21 @@ export class StockDetailsComponent implements OnInit {
   }
 
   get quantity() {
-    console.log(this.buyForm.get('quantity')?.errors);
-
     return this.buyForm.get('quantity')?.value;
+  }
+
+  get limitPriceInvalid() {
+    const control = this.buyForm.get('limitPrice');
+    return control && control.invalid && (control.dirty || control.touched);
+  }
+
+  get limitPriceNonInt() {
+    const control = this.buyForm.get('limitPrice');
+    return control && control.invalid && control.hasError('pattern');
+  }
+
+  get limitPrice() {
+    return this.buyForm.get('limitPrice')?.value;
   }
 
   setBuying(state: boolean) {
@@ -149,7 +171,25 @@ export class StockDetailsComponent implements OnInit {
 
     this.transactionLoading = true;
     if (this.buyTab == true) {
-      this.walletService
+      if (this.orderType === 'Limit') {
+
+        this.orderService.createOrder({
+          type: 'buy',
+          symbol: this.stock.stockInfo.symbol,
+          quantity: +(this.buyForm.value.quantity ?? 0),
+          target_price: +(this.buyForm.value.limitPrice ?? 0),
+        }, this.wallet.wallet.name).subscribe({
+          next: () => {
+            this.transactionLoading = false;
+            this.transactionComplete = true;
+          },
+          error: (err: Error) => {
+            console.log(err);
+          },
+        });
+
+      } else {
+        this.walletService
         .purchaseShares({
           symbol: this.stock.stockInfo.symbol,
           quantity: Number(this.buyForm.value.quantity) ?? 0,
@@ -163,13 +203,15 @@ export class StockDetailsComponent implements OnInit {
             console.log(err);
           },
         });
+      }
     } else {
-      this.walletService
-        .sellShares({
+      if (this.orderType === 'Limit') {
+        this.orderService.createOrder({
+          type: 'sell',
           symbol: this.stock.stockInfo.symbol,
-          quantity: Number(this.buyForm.value.quantity) ?? 0,
-        })
-        .subscribe({
+          quantity: +(this.buyForm.value.quantity ?? 0),
+          target_price: +(this.buyForm.value.limitPrice ?? 0),
+        }, this.wallet.wallet.name).subscribe({
           next: () => {
             this.transactionLoading = false;
             this.transactionComplete = true;
@@ -178,6 +220,23 @@ export class StockDetailsComponent implements OnInit {
             console.log(err);
           },
         });
+
+      } else {
+        this.walletService
+          .sellShares({
+            symbol: this.stock.stockInfo.symbol,
+            quantity: Number(this.buyForm.value.quantity) ?? 0,
+          })
+          .subscribe({
+            next: () => {
+              this.transactionLoading = false;
+              this.transactionComplete = true;
+            },
+            error: (err: Error) => {
+              console.log(err);
+            },
+          });
+      }
     }
   }
 
