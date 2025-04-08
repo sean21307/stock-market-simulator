@@ -96,7 +96,13 @@ def get_quotes_by_symbols(request):
 
     return Response(stock_quotes)
 
+@api_view(['GET'])
+def get_stock_gainers(request):
+    gainers = fmpsdk.gainers(apikey=apikey)
 
+    return Response(gainers)
 
-
-    return Response("Hello Sean Nolan")
+@api_view(['GET'])
+def get_stock_losers(request):
+    losers = fmpsdk.losers(apikey=apikey)
+    return Response(losers)
