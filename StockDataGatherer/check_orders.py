@@ -26,7 +26,7 @@ def check_orders():
     for stock in stocks:
         stock_prices[stock['symbol']] = stock['price']
 
-    sql = "SELECT * FROM wallets_order"
+    sql = "SELECT * FROM wallets_order WHERE status = 'PENDING'"
     c = db.cursor()
     c.execute(sql)
     rows = c.fetchall()

@@ -270,6 +270,10 @@ def complete_buy_order(request, wallet_id, order_id):
     stock_price = Decimal(request.data.get('stock_price'))
     wallet = Wallet.objects.get(id=wallet_id)
     order = Order.objects.get(id=order_id)
+    if wallet.balance < stock_price * order.quantity:
+        order.status = "FAILED"
+        order.save()
+        return Response({"error":"Wallet balance is less than order total"}, status=status.HTTP_400_BAD_REQUEST)
     try:
         share = wallet.share_set.get(symbol=order.symbol)
         share.quantity += order.quantity
@@ -285,7 +289,8 @@ def complete_buy_order(request, wallet_id, order_id):
         price_per_share=stock_price,
         total_price=stock_price * order.quantity,
     )
-    order.delete()
+    order.status = "COMPLETED"
+    order.save()
     return Response(status=status.HTTP_200_OK)
 
 @api_view(['POST'])
@@ -297,6 +302,10 @@ def complete_sell_order(request, wallet_id, order_id):
     wallet.balance += total_price
 
     share = wallet.share_set.get(symbol=order.symbol)
+    if order.quantity > share.quantity:
+        order.status = "FAILED"
+        order.save()
+        return Response({"error":"Wallet quantity is less than order total"}, status=status.HTTP_400_BAD_REQUEST)
     share.quantity = share.quantity - order.quantity
     if share.quantity < 0.01:
         share.delete()
@@ -328,7 +337,8 @@ def complete_sell_order(request, wallet_id, order_id):
         total_price=total_price,
         profit=profit,
     )
-    order.delete()
+    order.status = "COMPLETED"
+    order.save()
     wallet.save()
 
     return Response(status=status.HTTP_200_OK)
