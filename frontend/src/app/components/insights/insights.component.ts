@@ -60,7 +60,10 @@ export class InsightsComponent implements OnInit {
   fetchOrderHistory() {
     this.orderService.getOrders(this.walletName).subscribe((response: Order[]) => {
       this.orders = response;
+    }, (err) => {
+      console.error(err);
     })
+    
   }
 
   exportToCSV() {
