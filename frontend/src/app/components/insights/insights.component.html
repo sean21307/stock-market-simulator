@@ -88,7 +88,7 @@
                                             <td class="p-4 text-on-surface/75 dark:text-on-surface-dark/75 flex justify-between align-middle items-center">
                                                 <p [ngClass]="{'text-success': order.status === 'COMPLETED', 'text-danger': order.status === 'FAILED'}">
                                                     {{ order.status }}</p>
-                                                <svg (click)="$event.stopPropagation(); deleteLimitOrderModalOpen=true; deleteLimitOrderId=order.id || -1;" [hidden]="order.status !== 'PENDING'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 cursor-pointer hover:text-danger me-4">
+                                                <svg *ngIf="order.status === 'PENDING'" (click)="$event.stopPropagation(); deleteLimitOrderModalOpen=true; deleteLimitOrderId=order.id || -1;" [hidden]="order.status !== 'PENDING'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 cursor-pointer hover:text-danger me-4">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                                 </svg>  
                                             </td>

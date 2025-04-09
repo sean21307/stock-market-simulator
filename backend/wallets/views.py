@@ -233,7 +233,7 @@ def get_orders(request, wallet_name):
     username = request.user
     user = User.objects.get(username=username)
     wallet = user.wallet_set.get(name=wallet_name)
-    orders = wallet.order_set.all()
+    orders = wallet.order_set.all().order_by('-date')
     orders_list = []
     for order in orders:
         orders_list.append(OrderSerializer(order).data)

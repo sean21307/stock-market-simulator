@@ -20,7 +20,7 @@
   
     <div [ngClass]="{ 'hidden': predictionCollapsed }" class="p-4">
 
-      <div *ngIf="isLoading" class="flex justify-center py-4 text-on-surface dark:text-on-surface-dark">
+      <div *ngIf="isLoading; else predictionContent" class="flex justify-center py-4 text-on-surface dark:text-on-surface-dark">
         Loading prediction data...
       </div>
 
