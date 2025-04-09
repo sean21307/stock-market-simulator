@@ -6,6 +6,8 @@ import update_wallets
 import os
 from dotenv import load_dotenv
 
+from StockDataGatherer import check_orders
+
 load_dotenv()
 apikey = os.environ.get("API_KEY")
 
@@ -33,7 +35,9 @@ while True:
         else:
             try:
                 update_wallets.update_wallets()
+                check_orders.check_orders()
             except Exception as ex:
                 print(ex)
             finally:
+                print("SLEEPING")
                 time.sleep(60 * 15)

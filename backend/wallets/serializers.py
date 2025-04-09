@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from wallets.models import Wallet, Share, Purchase, Sale
+from wallets.models import Wallet, Share, Purchase, Sale, Order
 
 
 class WalletSerializer(serializers.ModelSerializer):
@@ -24,3 +24,8 @@ class SaleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sale
         fields = ["symbol","quantity_sold","price_per_share","total_price","profit","date"]
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = '__all__'

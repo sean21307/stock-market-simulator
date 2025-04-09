@@ -13,14 +13,13 @@ from rest_framework.views import APIView
 from unicodedata import digit
 
 from accounts.models import Profile
-from wallets.models import Wallet, WalletValue
-
+from wallets.models import Wallet, WalletValue, Order
 
 import os
 from dotenv import load_dotenv
 import fmpsdk
 
-from wallets.serializers import WalletSerializer, ShareSerializer, PurchaseSerializer, SaleSerializer
+from wallets.serializers import WalletSerializer, ShareSerializer, PurchaseSerializer, SaleSerializer, OrderSerializer
 
 load_dotenv()
 apikey = os.environ.get("API_KEY")
@@ -227,6 +226,126 @@ def get_transaction_history(request, wallet_name):
         sales.append(SaleSerializer(sale).data)
 
     return Response({"purchases" : purchases, "sales" : sales}, status=status.HTTP_200_OK)
+
+@permission_classes([IsAuthenticated])
+@api_view(['GET'])
+def get_orders(request, wallet_name):
+    username = request.user
+    user = User.objects.get(username=username)
+    wallet = user.wallet_set.get(name=wallet_name)
+    orders = wallet.order_set.all()
+    orders_list = []
+    for order in orders:
+        orders_list.append(OrderSerializer(order).data)
+    return Response(orders_list, status=status.HTTP_200_OK)
+
+@permission_classes([IsAuthenticated])
+@api_view(['POST'])
+def create_order(request, wallet_name):
+    username = request.user
+    user = User.objects.get(username=username)
+    wallet = user.wallet_set.get(name=wallet_name)
+    type = request.data['type']
+    symbol = request.data.get('symbol')
+    quantity = request.data.get('quantity')
+    target_price = request.data.get('target_price')
+
+    order = wallet.order_set.create(
+        type=type,
+        symbol=symbol,
+        quantity=quantity,
+        target_price=target_price,
+    )
+
+    return Response(OrderSerializer(order).data, status=status.HTTP_200_OK)
+
+@permission_classes([IsAuthenticated])
+@api_view(['DELETE'])
+def delete_order(request, order_id):
+    Order.objects.get(id=order_id).delete()
+    return Response(status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def complete_buy_order(request, wallet_id, order_id):
+    stock_price = Decimal(request.data.get('stock_price'))
+    wallet = Wallet.objects.get(id=wallet_id)
+    order = Order.objects.get(id=order_id)
+    if wallet.balance < stock_price * order.quantity:
+        order.status = "FAILED"
+        order.save()
+        return Response({"error":"Wallet balance is less than order total"}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        share = wallet.share_set.get(symbol=order.symbol)
+        share.quantity += order.quantity
+    except ObjectDoesNotExist:
+        share = wallet.share_set.create(symbol=order.symbol, quantity=order.quantity)
+    share.save()
+    wallet.balance -= stock_price * order.quantity
+    wallet.save()
+    wallet.purchase_set.create(
+        symbol=order.symbol,
+        quantity_purchased=order.quantity,
+        quantity_available=order.quantity,
+        price_per_share=stock_price,
+        total_price=stock_price * order.quantity,
+    )
+    order.status = "COMPLETED"
+    order.save()
+    return Response(status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def complete_sell_order(request, wallet_id, order_id):
+    stock_price = Decimal(request.data['stock_price'])
+    wallet = Wallet.objects.get(id=wallet_id)
+    order = Order.objects.get(id=order_id)
+    total_price = order.quantity * stock_price
+    wallet.balance += total_price
+    try:
+        share = wallet.share_set.get(symbol=order.symbol)
+    except ObjectDoesNotExist:
+        order.status = "FAILED"
+        order.save()
+        return Response({"error":"Wallet quantity is less than order total"}, status=status.HTTP_400_BAD_REQUEST)
+    if order.quantity > share.quantity:
+        order.status = "FAILED"
+        order.save()
+        return Response({"error":"Wallet quantity is less than order total"}, status=status.HTTP_400_BAD_REQUEST)
+    share.quantity = share.quantity - order.quantity
+    if share.quantity < 0.01:
+        share.delete()
+    else:
+        share.save()
+
+    wallet_purchases = list(wallet.purchase_set.filter(symbol=order.symbol, quantity_available__gt=0).order_by('date'))
+    index = 0
+    total_purchase_price = 0
+    number_of_shares = order.quantity
+    while order.quantity > 0.001:
+        current = wallet_purchases[index]
+        if current.quantity_available >= order.quantity:
+            current.quantity_available -= order.quantity
+            total_purchase_price += current.price_per_share * order.quantity
+            order.quantity = 0
+        else:
+            total_purchase_price += current.price_per_share * current.quantity_available
+            order.quantity -= current.quantity_available
+            current.quantity_available = 0
+        current.save()
+        index += 1
+
+    profit = total_purchase_price - total_price
+    wallet.sale_set.create(
+        quantity_sold=number_of_shares,
+        symbol=order.quantity,
+        price_per_share=stock_price,
+        total_price=total_price,
+        profit=profit,
+    )
+    order.status = "COMPLETED"
+    order.save()
+    wallet.save()
+
+    return Response(status=status.HTTP_200_OK)
 
 
 def update_wallet_value(wallet):

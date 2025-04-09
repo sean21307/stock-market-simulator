@@ -1,5 +1,7 @@
 from datetime import timedelta, date
 
+import requests
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -11,6 +13,31 @@ import fmpsdk
 
 load_dotenv()
 apikey = os.environ.get("API_KEY")
+
+@api_view(['GET'])
+def get_congress_trades(request):
+    # fmpsdk doesn't have endpoints for house so just calling it normally
+    senate_url = 'https://financialmodelingprep.com/stable/senate-latest'
+    house_url = 'https://financialmodelingprep.com/stable/house-latest'
+
+    try:
+        senate_response = requests.get(senate_url, params={'apikey': apikey, 'limit': 20})
+        house_response = requests.get(house_url, params={'apikey': apikey, 'limit': 20})
+        senate_data = senate_response.json()
+        house_data = house_response.json()
+
+        for entry in senate_data:
+            entry['chamber'] = 'Senate'
+        for entry in house_data:
+            entry['chamber'] = 'House'
+
+        combined_data = senate_data + house_data
+        combined_data.sort(key=lambda x: x.get('transactionDate', ''), reverse=True)
+
+        return Response(combined_data)
+
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
 
 @api_view(['GET'])
 def get_stock_from_search(request, query):
@@ -69,7 +96,13 @@ def get_quotes_by_symbols(request):
 
     return Response(stock_quotes)
 
+@api_view(['GET'])
+def get_stock_gainers(request):
+    gainers = fmpsdk.gainers(apikey=apikey)
 
+    return Response(gainers)
 
-
-    return Response("Hello Sean Nolan")
+@api_view(['GET'])
+def get_stock_losers(request):
+    losers = fmpsdk.losers(apikey=apikey)
+    return Response(losers)
