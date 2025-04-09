@@ -25,5 +25,5 @@ urlpatterns = [
     path('wallets/', include("wallets.urls")),
     path('news/', include("news.urls")),
     path('stock-prediction/', include("prediction.urls")),
-
+    path('forum/', include('forum.urls')),
 ]
