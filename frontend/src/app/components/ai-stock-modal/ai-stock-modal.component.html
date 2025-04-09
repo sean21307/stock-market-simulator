@@ -23,12 +23,7 @@
       <div *ngIf="isLoading" class="flex justify-center py-4 text-on-surface dark:text-on-surface-dark">
         Loading prediction data...
       </div>
-      
-      <ng-container *ngIf="isLoading; else predictionContent">
-        <div class="flex justify-center py-4">
-          <span class="text-on-surface dark:text-on-surface-dark">Loading predictions...</span>
-        </div>
-      </ng-container>
+
   
       <ng-template #predictionContent>
         <ng-container *ngIf="errorMessage; else predictionList">
