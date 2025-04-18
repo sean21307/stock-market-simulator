@@ -55,7 +55,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',
     'watchlist',
-    'wallets.apps.WalletsConfig'
+    'wallets.apps.WalletsConfig',
+
 ]
 
 MIDDLEWARE = [
