@@ -1,36 +1,39 @@
 <div class="container mx-auto px-6 py-8 bg-surface dark:bg-surface-dark rounded-lg shadow-lg max-w-3xl">
-    <h2 class="text-3xl font-extrabold text-center mb-8 text-on-surface-strong dark:text-on-surface-dark-strong">
-      💡 Investing Tips
-    </h2>
-  
-    <div *ngIf="isLoading" class="text-center">
-      <p class="text-gray-500 dark:text-gray-400 text-xl">Loading tips...</p>
-    </div>
-  
-    <div *ngIf="!isLoading && tips.length > 0" class="bg-white dark:bg-neutral-800 shadow-md rounded-xl p-6">
-      <div class="flex justify-center items-center">
-        <p class="text-lg text-center text-gray-700 dark:text-gray-200 font-semibold">
-          "{{ tips[currentIndex] }}"
-        </p>
-      </div>
-  
-      <div class="mt-6 flex justify-between">
-        <button
-          (click)="prevTip()"
-          [disabled]="currentIndex === 0"
-          class="bg-black hover:bg-gray-800 text-white py-2 px-6 rounded-md disabled:opacity-50 transition duration-300"
-        >
-          Previous
-        </button>
-        <button
-          (click)="nextTip()"
-          [disabled]="currentIndex === tips.length - 1"
-          class="bg-black hover:bg-gray-800 text-white py-2 px-6 rounded-md disabled:opacity-50 transition duration-300"
-        >
-          Next
-        </button>
-      </div>
-    </div>
-  
+  <h2 class="text-3xl font-extrabold text-center mb-8 text-on-surface-strong dark:text-on-surface-dark-strong">
+    Investment Tips
+  </h2>
 
-  
+  <div *ngIf="isLoading" class="text-center">
+    <p class="text-gray-500 dark:text-gray-400 text-xl">Loading tips...</p>
+  </div>
+
+  <div *ngIf="!isLoading && tips.length > 0" class="bg-white dark:bg-neutral-800 shadow-md rounded-xl p-6">
+    <div class="flex justify-center items-center">
+      <p class="text-lg text-center text-gray-700 dark:text-gray-200 font-semibold">
+        "{{ tips[currentIndex] }}"
+      </p>
+    </div>
+
+    <div class="mt-6 flex justify-between">
+      <button
+        (click)="prevTip()"
+        [disabled]="currentIndex === 0"
+        class="bg-black hover:bg-gray-800 text-white py-2 px-6 rounded-md disabled:opacity-50 transition duration-300"
+      >
+        Previous
+      </button>
+      <button
+        (click)="nextTip()"
+        [disabled]="currentIndex === tips.length - 1"
+        class="bg-black hover:bg-gray-800 text-white py-2 px-6 rounded-md disabled:opacity-50 transition duration-300"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="mt-8 text-sm text-gray-600 dark:text-gray-400 text-center italic">
+    Disclaimer: The investment tips provided here are for educational purposes only and do not constitute financial advice. Always consult with a licensed financial advisor before making investment decisions.
+  </div>
+</div>
