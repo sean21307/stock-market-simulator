@@ -32,3 +32,12 @@ def get_stock_news_titles(request, symbol):
         return Response(titles)
     except Exception as e:
         return Response({"error": str(e)}, status=500)
+    
+@api_view(['GET'])
+def get_general_titles(request):
+    try:
+        general_news = fmpsdk.general_news(apikey=apikey, page=0)
+        titles = [news_item['title'] for news_item in general_news] 
+        return Response(titles)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
