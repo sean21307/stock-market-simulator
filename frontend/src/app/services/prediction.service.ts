@@ -13,4 +13,8 @@ export class PredictionService {
   getPricePrediction(symbol: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}${symbol}/`);
   }
+  getGeneralPricePrediction(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}`);
+  }
+
 }

@@ -10,7 +10,7 @@ HUGGING_FACE_API_KEY = os.getenv('HUGGING_FACE_TOKEN')
 
 FMP_API_KEY = os.environ.get("API_KEY")
 
-from news.views import get_stock_news_titles 
+from news.views import get_stock_news_titles , get_general_titles
 
 def query_huggingface_api(news_titles):
     headers = {"Authorization": f"Bearer {HUGGING_FACE_API_KEY}"}
@@ -94,5 +94,22 @@ def stock_prediction(request, symbol):
         "symbol": symbol,
         "prediction": prediction,
         "titles": recent_titles
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def general_news_prediction(request):
+    news_response = get_general_titles(request._request, )
+    news_titles = news_response.data  
+    
+
+    if not news_titles:
+        return Response({"error": "No news found"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    prediction = predict_price_movement(news_titles)
+    
+    return Response({
+        "prediction": prediction,
+        "titles": news_titles
     }, status=status.HTTP_200_OK)
 
