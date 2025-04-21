@@ -199,6 +199,7 @@ export class StockDetailsComponent implements OnInit {
         .purchaseShares({
           symbol: this.stock.stockInfo.symbol,
           quantity: Number(this.buyForm.value.quantity) ?? 0,
+          isEtf: this.stock.stockInfo.isEtf
         })
         .subscribe({
           next: () => {

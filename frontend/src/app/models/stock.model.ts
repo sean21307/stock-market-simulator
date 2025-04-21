@@ -12,6 +12,7 @@ interface StockInfo {
     mktCap: number,
     price: number,
     changesPercentage: number,
+    isEtf: boolean
 }
 
 export interface PartialStock {
