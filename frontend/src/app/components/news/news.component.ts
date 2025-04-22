@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NewsService } from '../../services/news.service';
 import { ThemeService } from '../../services/theme.service'; 
+import { AiGeneralModalComponent } from '../ai-general-modal/ai-general-modal.component';
+
 
 @Component({
   selector: 'app-news',
   standalone: true,
-  imports: [CommonModule, HttpClientModule],
+  imports: [CommonModule, HttpClientModule, AiGeneralModalComponent],
   templateUrl: './news.component.html',
   styleUrls: ['./news.component.css']
 })
