@@ -82,6 +82,7 @@ def add_shares(request, wallet_name):
     try:
         symbol = request.data.get('symbol')
         quantity = Decimal(request.data.get('quantity'))
+        isEtf = request.data.get('isEtf')
 
         price = Decimal(fmpsdk.quote_short(apikey=apikey,symbol=symbol)[0]['price'])
         print(type(price), " ",type(quantity))
@@ -97,6 +98,10 @@ def add_shares(request, wallet_name):
 
         share = wallet.share_set.get_or_create(symbol=symbol)[0]
         share.quantity = share.quantity + quantity
+        if isEtf:
+            share.category = "ETF"
+        else:
+            share.category = "Stock"
         share.save()
 
         wallet.purchase_set.create(
@@ -172,13 +177,30 @@ def get_shares(request, wallet_name):
     user = User.objects.get(username=username)
     wallet = user.wallet_set.get(name=wallet_name)
     shares = wallet.share_set.all()
+    etf_list = []
+    stock_list = []
+    other_list = []
     shares_list = []
     values_list = wallet.walletvalue_set.values("date","value")
     for share in shares:
+        if share.category == "ETF":
+            etf_list.append(ShareSerializer(share).data)
+        elif share.category == "Stock":
+            stock_list.append(ShareSerializer(share).data)
+        else:
+            other_list.append(ShareSerializer(share).data)
         shares_list.append(ShareSerializer(share).data)
     return Response({
         "wallet" : WalletSerializer(wallet).data,
         'shares' : shares_list,
+        "etf" : etf_list,
+        "stock" : stock_list,
+        "other" : other_list,
+        # 'shares': {
+        #     "etf": etf_list,
+        #     "stock": stock_list,
+        #     "other": other_list
+        # },
         'wallet_values_overtime' : values_list
     }, status=status.HTTP_200_OK)
 
