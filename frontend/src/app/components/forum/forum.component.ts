@@ -79,9 +79,6 @@ export class ForumComponent implements OnInit {
 
   loadPosts(): void {
     this.isLoading = true;
-    this.initializeMockData();
-    return;
-
     this.forumService.getPosts().subscribe({
       next: (posts) => {
         this.forumPosts = posts;
@@ -97,7 +94,6 @@ export class ForumComponent implements OnInit {
 
   openPostModal(post: ForumPost): void {
     this.selectedPost = { ...post };
-    // Load comments if not already loaded
     if (!this.selectedPost.comments) {
       this.forumService.getComments(post.id).subscribe({
         next: (comments) => {
@@ -124,7 +120,6 @@ export class ForumComponent implements OnInit {
         post.comments.push(comment);
         this.newCommentContent = '';
 
-        // Update the post in the main list
         const index = this.forumPosts.findIndex(p => p.id === post.id);
         if (index !== -1) {
           this.forumPosts[index] = { ...post };
@@ -138,7 +133,6 @@ export class ForumComponent implements OnInit {
     this.forumService.upvotePost(post.id).subscribe({
       next: () => {
         post.upvotes++;
-        // Update the post in the main list
         const index = this.forumPosts.findIndex(p => p.id === post.id);
         if (index !== -1) {
           this.forumPosts[index].upvotes = post.upvotes;
@@ -149,7 +143,7 @@ export class ForumComponent implements OnInit {
   }
 
   upvoteComment(comment: ForumComment): void {
-    this.forumService.upvoteComment(comment.id).subscribe({
+    this.forumService.upvoteComment(comment.postId, comment.id).subscribe({
       next: () => comment.upvotes++,
       error: (err) => console.error('Failed to upvote comment', err)
     });
@@ -179,66 +173,5 @@ export class ForumComponent implements OnInit {
   cancelPost(): void {
     this.showPostForm = false;
     this.newPost = { title: '', content: '' };
-  }
-
-  private initializeMockData(): void {
-    this.forumPosts = [
-      {
-        id: 1,
-        user: 'tech_enthusiast',
-        title: 'Getting started with Robinhood',
-        content: 'I\'m a noob can someone sell me their course',
-        created_at: new Date('2023-11-15T10:30:00').toISOString(),
-        upvotes: 24,
-        comments: [
-          {
-            id: 101,
-            user: 'robinhood_fan',
-            content: 'Duuuude I gotchu join my Discord',
-            created_at: new Date('2023-11-15T11:45:00').toISOString(),
-            upvotes: 8
-          },
-          {
-            id: 102,
-            user: 'web_dev_42',
-            content: 'Robinhood sucks just use Stock-Market-Simulator instead ur literally already here',
-            created_at: new Date('2023-11-15T14:20:00').toISOString(),
-            upvotes: 3
-          }
-        ]
-      },
-      {
-        id: 2,
-        user: 'retriment_guy',
-        title: 'Why is everything crashing????',
-        content: 'Dude... MY WHOLE IRA IS GONE',
-        created_at: new Date('2023-11-10T09:15:00').toISOString(),
-        upvotes: 42,
-        comments: [
-          {
-            id: 201,
-            user: 'econ-nerd',
-            content: 'Yeah you are cooked buddy im so sorry',
-            created_at: new Date('2023-11-10T10:30:00').toISOString(),
-            upvotes: 15
-          },
-          {
-            id: 202,
-            user: 'japanese-dude723',
-            content: 'Just be glad your not Japanese we are even more cooked',
-            created_at: new Date('2023-11-10T12:45:00').toISOString(),
-            upvotes: 5
-          },
-          {
-            id: 203,
-            user: 'bee_queen',
-            content: 'I think it will get better just HOLD',
-            created_at: new Date('2023-11-11T08:20:00').toISOString(),
-            upvotes: 12
-          }
-        ]
-      }
-    ];
-    this.isLoading = false;
   }
 }
