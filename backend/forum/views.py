@@ -3,8 +3,8 @@ from rest_framework import status
 from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .models import ForumPost
-from .serializers import ForumPostSerializer
+from .models import ForumPost, ForumComment
+from .serializers import ForumPostSerializer, ForumCommentSerializer
 
 # ====================== Post Operations ======================
 @permission_classes([IsAuthenticated])
@@ -12,6 +12,7 @@ from .serializers import ForumPostSerializer
 def get_forum_posts(request):
     posts = ForumPost.objects.all().order_by('-created_at')
     serializer = ForumPostSerializer(posts, many=True)
+    
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 @permission_classes([IsAuthenticated])
@@ -38,10 +39,15 @@ def create_forum_post(request):
             content=request.data.get('content'),
             user=request.user,
         )
-        return Response(ForumPostSerializer(post).data, status=status.HTTP_201_CREATED)
+        
+        post_data = ForumPostSerializer(post).data
+        post_data['username'] = request.user.username  
+
+        return Response(post_data, status=status.HTTP_201_CREATED)
+
     except Exception as e:
         return Response({'error': str(e), 'details': 'Check your request data format'},
-                      status=status.HTTP_400_BAD_REQUEST)
+                        status=status.HTTP_400_BAD_REQUEST)
 
 @permission_classes([IsAuthenticated])
 @api_view(['PUT'])
