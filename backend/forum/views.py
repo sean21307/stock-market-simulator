@@ -1,11 +1,10 @@
-from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status
 from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .models import ForumPost, ForumComment
-from .serializers import ForumPostSerializer, ForumCommentSerializer
+from .models import ForumPost
+from .serializers import ForumPostSerializer
 
 # ====================== Post Operations ======================
 @permission_classes([IsAuthenticated])
@@ -29,6 +28,11 @@ def get_single_post(request, post_id):
 @api_view(['POST'])
 def create_forum_post(request):
     try:
+        if not request.data.get('title'):
+            return Response({'error': 'Title is required'}, status=status.HTTP_400_BAD_REQUEST)
+        if not request.data.get('content'):
+            return Response({'error': 'Content is required'}, status=status.HTTP_400_BAD_REQUEST)
+
         post = ForumPost.objects.create(
             title=request.data.get('title'),
             content=request.data.get('content'),
@@ -36,7 +40,8 @@ def create_forum_post(request):
         )
         return Response(ForumPostSerializer(post).data, status=status.HTTP_201_CREATED)
     except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': str(e), 'details': 'Check your request data format'},
+                      status=status.HTTP_400_BAD_REQUEST)
 
 @permission_classes([IsAuthenticated])
 @api_view(['PUT'])
@@ -45,8 +50,6 @@ def update_forum_post(request, post_id):
         post = ForumPost.objects.get(id=post_id, user=request.user)
         post.title = request.data.get('title', post.title)
         post.content = request.data.get('content', post.content)
-        if 'image' in request.data:
-            post.image = request.data.get('image')
         post.save()
         return Response(ForumPostSerializer(post).data, status=status.HTTP_200_OK)
     except ObjectDoesNotExist:
@@ -94,19 +97,12 @@ def get_post_comments(request, post_id):
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @permission_classes([IsAuthenticated])
-@api_view(['GET'])
-def get_single_comment(request, post_id, comment_id):
-    try:
-        comment = ForumComment.objects.get(id=comment_id, post_id=post_id)
-        serializer = ForumCommentSerializer(comment)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    except ObjectDoesNotExist:
-        return Response({'error': 'Comment not found'}, status=status.HTTP_404_NOT_FOUND)
-
-@permission_classes([IsAuthenticated])
 @api_view(['POST'])
 def create_comment(request, post_id):
     try:
+        if not request.data.get('content'):
+            return Response({'error': 'Content is required'}, status=status.HTTP_400_BAD_REQUEST)
+
         post = ForumPost.objects.get(id=post_id)
         comment = ForumComment.objects.create(
             content=request.data.get('content'),

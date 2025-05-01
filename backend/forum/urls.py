@@ -16,8 +16,6 @@ urlpatterns = [
     # Comment operations (board-specific)
     path('posts/<int:post_id>/comments/', views.get_post_comments, name="post-comments"),
     path('posts/<int:post_id>/comments/create/', views.create_comment, name="create-comment"),
-    path('posts/<int:post_id>/comments/<int:comment_id>/', views.get_single_comment,
-         name="get-single-comment"),
     path('posts/<int:post_id>/comments/<int:comment_id>/update/', views.update_comment,
          name="update-comment"),
     path('posts/<int:post_id>/comments/<int:comment_id>/delete/', views.delete_comment,
