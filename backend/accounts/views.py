@@ -11,6 +11,7 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken  # Import RefreshToken for blacklisting
 
 from accounts.models import LeaderBoardRanking
+from wallets.serializers import LeaderBoardRankingSerializer
 
 
 @api_view(['POST'])
@@ -105,5 +106,15 @@ def put_user_profile(request):
 @api_view(['GET'])
 def get_leaderboard(request):
     leaderboard_rankings = LeaderBoardRanking.objects.all().order_by('-profit')
-    return Response(leaderboard_rankings, status=status.HTTP_200_OK)
+    rankings = []
+    for index, ranking in enumerate(leaderboard_rankings):
+        formated_ranking = {
+            "Rank" : index + 1,
+            "User": ranking.user.username,
+            "Profit": ranking.profit,
+        }
+        rankings.append(formated_ranking)
+    return Response(rankings, status=status.HTTP_200_OK)
+
+
 
