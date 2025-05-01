@@ -1,6 +1,5 @@
 export interface ForumPost {
   id: number;
-  board_name: string;
   user: string;
   title: string;
   content: string;

@@ -93,7 +93,7 @@ export class ForumComponent implements OnInit {
   }
 
   openPostModal(post: ForumPost): void {
-    this.selectedPost = { ...post };
+    this.selectedPost = post;
     if (!this.selectedPost.comments) {
       this.forumService.getComments(post.id).subscribe({
         next: (comments) => {

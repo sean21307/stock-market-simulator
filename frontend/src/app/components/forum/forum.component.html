@@ -177,7 +177,7 @@
             <p class="text-on-surface dark:text-on-surface-dark whitespace-pre-line">{{ selectedPost.content }}</p>
             <div class="flex items-center gap-4 mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
               <button
-                (click)="upvotePost(selectedPost)"
+                (click)="selectedPost && upvotePost(selectedPost)"
                 class="flex items-center gap-1 text-on-surface dark:text-on-surface-dark hover:text-primary dark:hover:text-primary-dark"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
