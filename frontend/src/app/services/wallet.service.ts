@@ -70,7 +70,7 @@ export class WalletService {
       acc[share.symbol] = share.quantity;
     })
 
-    return acc 
+    return acc
 
     // return shares.reduce((acc, share) => {
     //     acc[share.symbol] = (acc[share.symbol] || 0) + 1;
@@ -79,7 +79,7 @@ export class WalletService {
   }
 
 
-  purchaseShares(body: { symbol: string, quantity: number }): Observable<any> {
+  purchaseShares(body: { symbol: string, quantity: number, isEtf: boolean }): Observable<any> {
     return this.getSelectedWalletName().pipe(
       switchMap((walletName: string | null) => {
         if (!walletName) {

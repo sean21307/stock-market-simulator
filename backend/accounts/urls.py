@@ -17,4 +17,5 @@ urlpatterns = [
     path('logout/', views.logout_user, name='logout'),
     path('profile/', get_user_profile, name='get_user_profile'),
     path('profile/update', put_user_profile, name='put_user_profile'),
+    path('leaderboard/', views.get_leaderboard, name='get_leaderboard'),
 ]

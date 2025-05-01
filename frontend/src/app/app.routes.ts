@@ -9,6 +9,7 @@ import { StocksComponent } from './components/stocks/stocks.component';
 import { NewsComponent } from './components/news/news.component';
 import { InsightsComponent } from './components/insights/insights.component';
 import { TipsComponent } from './components/tips/tips.component';
+import {LeaderboardComponent} from "./components/leaderboard/leaderboard.component";
 
 
 
@@ -23,6 +24,7 @@ export const routes: Routes = [
     { path: 'wallet/:name', component: WalletDetailsComponent },
     { path: 'news', component: NewsComponent },
     { path: 'tips', component: TipsComponent },
+    { path: 'leaderboard', component: LeaderboardComponent },
 
 
 ];

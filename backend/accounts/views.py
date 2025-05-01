@@ -10,6 +10,9 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken  # Import RefreshToken for blacklisting
 
+from accounts.models import LeaderBoardRanking
+from wallets.serializers import LeaderBoardRankingSerializer
+
 
 @api_view(['POST'])
 def register_user(request):
@@ -99,3 +102,19 @@ def put_user_profile(request):
     user.save()
 
     return Response({"message": "Profile updated successfully"}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_leaderboard(request):
+    leaderboard_rankings = LeaderBoardRanking.objects.all().order_by('-profit')
+    rankings = []
+    for index, ranking in enumerate(leaderboard_rankings):
+        formated_ranking = {
+            "Rank" : index + 1,
+            "User": ranking.user.username,
+            "Profit": ranking.profit,
+        }
+        rankings.append(formated_ranking)
+    return Response(rankings, status=status.HTTP_200_OK)
+
+
+
