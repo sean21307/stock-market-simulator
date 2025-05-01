@@ -31,8 +31,21 @@ export class ForumService {
   }
 
   createPost(post: { title: string; content: string }): Observable<ForumPost> {
+    console.log('Attempting to create post with data:', JSON.stringify(post, null, 2));
+    const headers = this.getHeaders();
+    console.log('Request headers:', headers);
+    console.log('Making POST request to:', `${this.apiUrl}posts/create/`);
+
     return this.http.post<ForumPost>(`${this.apiUrl}posts/create/`, post, { headers: this.getHeaders() }).pipe(
-      catchError(this.handleError)
+      catchError(error => {
+        console.error('Error creating post:');
+        console.error('Status:', error.status);
+        console.error('Status Text:', error.statusText);
+        console.error('Error Response Body:', error.error);
+        console.error('Full Error:', error);
+
+        return this.handleError(error);
+      })
     );
   }
 
