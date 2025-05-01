@@ -368,7 +368,10 @@ def update_leaderboard_ranking(user):
         profits.append(profit['profit__sum'])
         print(3)
     max_profit = max(profits)
-    leaderboard_ranking = LeaderBoardRanking.objects.get_or_create(user=user)[0]
+    try:
+        leaderboard_ranking = LeaderBoardRanking.objects.get_or_create(user=user)[0]
+    except Exception as e:
+        leaderboard_ranking = LeaderBoardRanking.objects.create(user=user)
     print(4)
     if leaderboard_ranking.profit < max_profit:
         print(5)
