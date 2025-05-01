@@ -151,8 +151,14 @@ export class ForumComponent implements OnInit {
   }
 
   submitPost(): void {
+    if (!this.newPost.title.trim() || !this.newPost.content.trim()) {
+      console.warn('Title or content is empty');
+      return;
+    }
+  
     this.forumService.createPost(this.newPost).subscribe({
       next: (post) => {
+        console.log('Post created successfully:', post); // Verify the response
         this.forumPosts.unshift(post);
         this.newPost = { title: '', content: '' };
         this.showPostForm = false;
