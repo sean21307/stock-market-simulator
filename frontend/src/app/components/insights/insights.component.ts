@@ -10,11 +10,12 @@ import { CongressTrade } from '../../models/congressTrade.model';
 import { OrderService } from '../../services/order.service';
 import { Order } from '../../models/order.model';
 import { ModalComponent } from '../modal/modal.component';
+import { TableNavBarComponent } from "../table-nav-bar/table-nav-bar.component";
 
 @Component({
   selector: 'app-insights',
   standalone: true,
-  imports: [CommonModule, RouterModule, ModalComponent],
+  imports: [CommonModule, RouterModule, ModalComponent, TableNavBarComponent],
   templateUrl: './insights.component.html',
   styleUrl: './insights.component.css'
 })
@@ -32,6 +33,23 @@ export class InsightsComponent implements OnInit {
     private stockService: StockPriceService,
     private orderService: OrderService,
   ) {}
+
+
+  paginatedOrders: Order[] = [];
+  onOrderDataUpdated(items: any) {
+    this.paginatedOrders = items;
+  }
+
+  paginatedTrades: CongressTrade[] = [];
+  onCongressDataUpdated(items: any) {
+    this.paginatedTrades = items;
+  }
+
+  paginatedTransactions: Transaction[] = [];
+  onTransactionDataUpdated(items: any) {
+    this.paginatedTransactions = items;
+  }
+  
 
   deleteLimitOrder() {
     this.deleteLimitOrderModalOpen = false;
