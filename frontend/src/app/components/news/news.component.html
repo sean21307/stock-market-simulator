@@ -1,6 +1,11 @@
 <div class="container mx-auto px-4 py-6 bg-surface dark:bg-surface-dark">
   <h2 class="text-2xl font-bold text-center mb-6 text-on-surface-strong dark:text-on-surface-dark-strong">📰 General News</h2>
 
+  <div class="md:col-span-2 xl:col-span-3">
+    <app-ai-general-modal></app-ai-general-modal>
+    
+</div>
+
   @if (generalNews.length === 0) {
     <div class="text-center">
       <p class="text-gray-500 dark:text-gray-400">No news available.</p>
