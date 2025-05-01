@@ -33,7 +33,6 @@ def create_forum_post(request):
             title=request.data.get('title'),
             content=request.data.get('content'),
             user=request.user,
-            image=request.data.get('image', None)
         )
         return Response(ForumPostSerializer(post).data, status=status.HTTP_201_CREATED)
     except Exception as e:
