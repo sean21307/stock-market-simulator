@@ -359,13 +359,19 @@ def update_wallet_value(wallet):
     wallet.walletvalue_set.create(value=balance)
 
 def update_leaderboard_ranking(user):
+    print(1)
     wallets = Wallet.objects.filter(user=user)
     profits = []
+    print(2)
     for wallet in wallets:
         profit = wallet.sale_set.aggregate(Sum('profit'))
         profits.append(profit['profit__sum'])
+        print(3)
     max_profit = max(profits)
     leaderboard_ranking = LeaderBoardRanking.objects.get_or_create(user=user)[0]
+    print(4)
     if leaderboard_ranking.profit < max_profit:
+        print(5)
         leaderboard_ranking.profit = max_profit
+        print(6)
         leaderboard_ranking.save()
