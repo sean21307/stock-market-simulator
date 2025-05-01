@@ -7,7 +7,6 @@ class ForumPost(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     upvotes = models.PositiveIntegerField(default=0)
-    show_comments = models.BooleanField(default=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='forum_posts')
 
     class Meta:
