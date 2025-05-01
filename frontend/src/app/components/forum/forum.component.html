@@ -120,7 +120,7 @@
           >
             <div class="flex items-center gap-2 mb-2">
               <div class="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
-                <span class="text-sm text-on-surface-strong dark:text-on-surface-dark-strong">{{ post.user | slice:0:1 | uppercase }}</span>
+                <span class="text-sm text-on-surface-strong dark:text-on-surface-dark-strong">{{ post.user  }}</span>
               </div>
               <span class="text-sm font-medium text-on-surface-strong dark:text-on-surface-dark-strong">{{ post.user }}</span>
               <span class="text-xs text-gray-500 dark:text-gray-400">• {{ formatDate(post.created_at) }}</span>
@@ -166,7 +166,7 @@
           <div class="mb-6">
             <div class="flex items-center gap-2 mb-4">
               <div class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
-                <span class="text-sm text-on-surface-strong dark:text-on-surface-dark-strong">{{ selectedPost.user | slice:0:1 | uppercase }}</span>
+                <span class="text-sm text-on-surface-strong dark:text-on-surface-dark-strong">{{ selectedPost.user }}</span>
               </div>
               <div>
                 <div class="font-medium text-on-surface-strong dark:text-on-surface-dark-strong">{{ selectedPost.user }}</div>
@@ -199,7 +199,7 @@
             <h3 class="text-lg font-semibold mb-3 text-on-surface-strong dark:text-on-surface-dark-strong">Add a comment</h3>
             <div class="flex gap-3">
               <div class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
-                <span class="text-sm text-on-surface-strong dark:text-on-surface-dark-strong">{{ currentUser?.username | slice:0:1 | uppercase }}</span>
+                <span class="text-sm text-on-surface-strong dark:text-on-surface-dark-strong">{{ currentUser?.username }}</span>
               </div>
               <div class="flex-1">
                 <textarea
