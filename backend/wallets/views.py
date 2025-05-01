@@ -4,6 +4,7 @@ from decimal import Decimal
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Sum
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import permission_classes, api_view
@@ -12,8 +13,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from unicodedata import digit
 
-from accounts.models import Profile
-from wallets.models import Wallet, WalletValue, Order
+from accounts.models import Profile, LeaderBoardRanking
+from wallets.models import Wallet, WalletValue, Order, Sale
 
 import os
 from dotenv import load_dotenv
@@ -160,6 +161,7 @@ def sell_shares(request, wallet_name):
 
         wallet.save()
         update_wallet_value(wallet)
+        update_leaderboard_ranking(user)
         
         return Response({'wallet': WalletSerializer(wallet).data}, status=status.HTTP_200_OK)
     except Exception as e:
@@ -188,7 +190,6 @@ def update_or_make_selected_wallet(request, wallet_name):
     username = request.user
     user = User.objects.get(username=username)
     wallet = user.wallet_set.get(name=wallet_name)
-
     try:
         profile = Profile.objects.get(user=user)
         profile.selected_wallet = wallet
@@ -357,3 +358,14 @@ def update_wallet_value(wallet):
         balance += num_of_shares * Decimal(quote['price'])
     wallet.walletvalue_set.create(value=balance)
 
+def update_leaderboard_ranking(user):
+    wallets = Wallet.objects.filter(user=user)
+    profits = []
+    for wallet in wallets:
+        profit = wallet.sale_set.aggregate(Sum('profit'))
+        profits.append(profit['profit__sum'])
+    max_profit = max(profits)
+    leaderboard_ranking = LeaderBoardRanking.objects.get_or_create(user=user)[0]
+    if leaderboard_ranking.profit < max_profit:
+        leaderboard_ranking.profit = max_profit
+        leaderboard_ranking.save()

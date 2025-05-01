@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from accounts.models import LeaderBoardRanking
 from wallets.models import Wallet, Share, Purchase, Sale, Order
 
 
@@ -28,4 +29,9 @@ class SaleSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
+        fields = '__all__'
+
+class LeaderBoardRankingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LeaderBoardRanking
         fields = '__all__'

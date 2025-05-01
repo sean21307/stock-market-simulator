@@ -9,3 +9,7 @@ from wallets.models import Wallet
 class Profile(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE,)
     selected_wallet = models.ForeignKey(Wallet,on_delete=models.CASCADE,)
+
+class LeaderBoardRanking(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    profit = models.FloatField(default=0)
