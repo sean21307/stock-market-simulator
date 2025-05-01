@@ -81,6 +81,7 @@ export class ForumComponent implements OnInit {
     this.isLoading = true;
     this.forumService.getPosts().subscribe({
       next: (posts) => {
+        console.log(posts);
         this.forumPosts = posts;
         this.isLoading = false;
       },
@@ -150,8 +151,6 @@ export class ForumComponent implements OnInit {
   }
 
   submitPost(): void {
-    if (!this.newPost.title.trim() || !this.newPost.content.trim()) return;
-
     this.forumService.createPost(this.newPost).subscribe({
       next: (post) => {
         this.forumPosts.unshift(post);
