@@ -107,6 +107,20 @@ export class ForumComponent implements OnInit {
     }
   }
 
+  deletePost(postId: number): void {
+    if (!confirm('Are you sure you want to delete this post?')) return;
+  
+    this.forumService.deletePost(postId).subscribe({
+      next: () => {
+        this.forumPosts = this.forumPosts.filter(post => post.id !== postId);
+        if (this.selectedPost && this.selectedPost.id === postId) {
+          this.closePostModal();
+        }
+      },
+      error: (err) => console.error('Failed to delete post', err)
+    });
+  }
+
   closePostModal(): void {
     this.selectedPost = null;
     this.newCommentContent = '';
@@ -171,6 +185,9 @@ export class ForumComponent implements OnInit {
     return this.datePipe.transform(dateString, 'medium');
   }
 
+
+  
+
   onCreatePost(): void {
     this.showPostForm = true;
   }
@@ -179,4 +196,6 @@ export class ForumComponent implements OnInit {
     this.showPostForm = false;
     this.newPost = { title: '', content: '' };
   }
+
+  
 }

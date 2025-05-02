@@ -29,6 +29,13 @@ export class ForumService {
     return this.http.post<ForumPost>(`${this.apiUrl}posts/create/`, post, { headers });
   }
 
+  deletePost(postId: number): Observable<void> {
+    const headers = {
+      Authorization: `Bearer ${this.authService.getToken()}`
+    };
+    return this.http.delete<void>(`${this.apiUrl}posts/${postId}/delete/`, { headers });
+  }
+
   upvotePost(postId: number): Observable<void> {
     const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
     return this.http.patch<void>(`${this.apiUrl}posts/${postId}/upvote/`, {}, { headers });
