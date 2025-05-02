@@ -56,6 +56,16 @@ export class ForumService {
   upvoteComment(postId: number, commentId: number): Observable<ForumComment> {
     const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
     return this.http.patch<ForumComment>(`${this.apiUrl}posts/${postId}/comments/${commentId}/upvote/`, {}, { headers });
-}
+  }
 
+  updatePost(postId: number, post: { title: string; content: string }): Observable<ForumPost> {
+    const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
+    return this.http.put<ForumPost>(`${this.apiUrl}posts/${postId}/update/`, post, { headers });
+  }
+
+  updateComment(postId: number, commentId: number, content: string): Observable<ForumComment> {
+  const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
+    return this.http.put<ForumComment>(
+      `${this.apiUrl}posts/${postId}/comments/${commentId}/update/`, { content }, { headers });
+  }
 }
