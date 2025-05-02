@@ -11,7 +11,7 @@ urlpatterns = [
     path('posts/<int:post_id>/delete/', views.delete_forum_post, name="delete-forum-post"),
     path('posts/<int:post_id>/upvote/', views.upvote_post, name="upvote-post"),
 
-    # Comment operations (board-specific)
+    # Comment operations
     path('posts/<int:post_id>/comments/', views.get_post_comments, name="post-comments"),
     path('posts/<int:post_id>/comments/create/', views.create_comment, name="create-comment"),
     path('posts/<int:post_id>/comments/<int:comment_id>/update/', views.update_comment,

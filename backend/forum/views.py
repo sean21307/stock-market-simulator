@@ -76,7 +76,7 @@ def delete_forum_post(request, post_id):
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @permission_classes([IsAuthenticated])
-@api_view(['POST'])
+@api_view(['PATCH'])
 def upvote_post(request, post_id):
     try:
         post = ForumPost.objects.get(id=post_id)
@@ -155,7 +155,7 @@ def delete_comment(request, post_id, comment_id):
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @permission_classes([IsAuthenticated])
-@api_view(['POST'])
+@api_view(['PATCH'])
 def upvote_comment(request, post_id, comment_id):
     try:
         comment = ForumComment.objects.get(
