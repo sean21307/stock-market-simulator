@@ -13,7 +13,7 @@ export class ForumService {
   constructor(private http: HttpClient, private authService: AuthService) {}
 
   // ====================== Post Operations ======================
-  
+
   getPosts(): Observable<ForumPost[]> {
     const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
     return this.http.get<ForumPost[]>(`${this.apiUrl}posts/`, { headers });
@@ -31,11 +31,11 @@ export class ForumService {
 
   upvotePost(postId: number): Observable<void> {
     const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
-    return this.http.post<void>(`${this.apiUrl}posts/${postId}/upvote/`, {}, { headers });
+    return this.http.patch<void>(`${this.apiUrl}posts/${postId}/upvote/`, {}, { headers });
   }
 
   // ====================== Comment Operations ======================
-  
+
   getComments(postId: number): Observable<ForumComment[]> {
     const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
     return this.http.get<ForumComment[]>(`${this.apiUrl}posts/${postId}/comments/`, { headers });
@@ -48,8 +48,7 @@ export class ForumService {
 
   upvoteComment(postId: number, commentId: number): Observable<void> {
     const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
-    return this.http.post<void>(`${this.apiUrl}posts/${postId}/comments/${commentId}/upvote/`, {}, { headers });
+    return this.http.patch<void>(`${this.apiUrl}posts/${postId}/comments/${commentId}/upvote/`, {}, { headers });
   }
-
-
+  
 }
