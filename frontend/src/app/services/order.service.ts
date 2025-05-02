@@ -14,6 +14,7 @@ export class OrderService {
 
   getOrders(walletName: String): Observable<Order[]> {
     const headers = { Authorization: `Bearer ${this.authService.getToken()}` };
+    console.log(this.apiURL + `${walletName}`);
     return this.http.get<Order[]>(this.apiURL + `${walletName}`, { headers });
   }
 

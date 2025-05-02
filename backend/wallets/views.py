@@ -4,6 +4,7 @@ from decimal import Decimal
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Sum
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import permission_classes, api_view
@@ -12,8 +13,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from unicodedata import digit
 
-from accounts.models import Profile
-from wallets.models import Wallet, WalletValue, Order
+from accounts.models import Profile, LeaderBoardRanking
+from wallets.models import Wallet, WalletValue, Order, Sale
 
 import os
 from dotenv import load_dotenv
@@ -82,6 +83,7 @@ def add_shares(request, wallet_name):
     try:
         symbol = request.data.get('symbol')
         quantity = Decimal(request.data.get('quantity'))
+        isEtf = request.data.get('isEtf')
 
         price = Decimal(fmpsdk.quote_short(apikey=apikey,symbol=symbol)[0]['price'])
         print(type(price), " ",type(quantity))
@@ -97,6 +99,10 @@ def add_shares(request, wallet_name):
 
         share = wallet.share_set.get_or_create(symbol=symbol)[0]
         share.quantity = share.quantity + quantity
+        if isEtf:
+            share.category = "ETF"
+        else:
+            share.category = "Stock"
         share.save()
 
         wallet.purchase_set.create(
@@ -160,6 +166,7 @@ def sell_shares(request, wallet_name):
 
         wallet.save()
         update_wallet_value(wallet)
+        update_leaderboard_ranking(user)
         
         return Response({'wallet': WalletSerializer(wallet).data}, status=status.HTTP_200_OK)
     except Exception as e:
@@ -172,13 +179,30 @@ def get_shares(request, wallet_name):
     user = User.objects.get(username=username)
     wallet = user.wallet_set.get(name=wallet_name)
     shares = wallet.share_set.all()
+    etf_list = []
+    stock_list = []
+    other_list = []
     shares_list = []
     values_list = wallet.walletvalue_set.values("date","value")
     for share in shares:
+        if share.category == "ETF":
+            etf_list.append(ShareSerializer(share).data)
+        elif share.category == "Stock":
+            stock_list.append(ShareSerializer(share).data)
+        else:
+            other_list.append(ShareSerializer(share).data)
         shares_list.append(ShareSerializer(share).data)
     return Response({
         "wallet" : WalletSerializer(wallet).data,
         'shares' : shares_list,
+        "etf" : etf_list,
+        "stock" : stock_list,
+        "other" : other_list,
+        # 'shares': {
+        #     "etf": etf_list,
+        #     "stock": stock_list,
+        #     "other": other_list
+        # },
         'wallet_values_overtime' : values_list
     }, status=status.HTTP_200_OK)
 
@@ -188,7 +212,6 @@ def update_or_make_selected_wallet(request, wallet_name):
     username = request.user
     user = User.objects.get(username=username)
     wallet = user.wallet_set.get(name=wallet_name)
-
     try:
         profile = Profile.objects.get(user=user)
         profile.selected_wallet = wallet
@@ -233,7 +256,7 @@ def get_orders(request, wallet_name):
     username = request.user
     user = User.objects.get(username=username)
     wallet = user.wallet_set.get(name=wallet_name)
-    orders = wallet.order_set.all()
+    orders = wallet.order_set.all().order_by('-date')
     orders_list = []
     for order in orders:
         orders_list.append(OrderSerializer(order).data)
@@ -357,3 +380,15 @@ def update_wallet_value(wallet):
         balance += num_of_shares * Decimal(quote['price'])
     wallet.walletvalue_set.create(value=balance)
 
+def update_leaderboard_ranking(user):
+    wallets = Wallet.objects.filter(user=user)
+    profits = []
+    for wallet in wallets:
+        profit = wallet.sale_set.aggregate(Sum('profit'))
+        if profit['profit__sum'] is not None:
+            profits.append(profit['profit__sum'])
+    max_profit = max(profits)
+    leaderboard_ranking = LeaderBoardRanking.objects.get_or_create(user=user)[0]
+    if leaderboard_ranking.profit < max_profit:
+        leaderboard_ranking.profit = max_profit
+        leaderboard_ranking.save()

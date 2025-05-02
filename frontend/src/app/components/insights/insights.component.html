@@ -53,7 +53,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-outline dark:divide-outline-dark bg-transparent">
-                                    @for (order of orders; track order.id; let isLast = $last) {
+                                    @for (order of paginatedOrders; track order.id; let isLast = $last) {
                                         <tr 
                                             [routerLink]="['/stock', order.symbol]" routerLinkActive="router-link-active"
                                             class="cursor-pointer bg-surface-alt dark:bg-surface-dark-alt hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-600 text-on-surface dark:text-on-surface-dark"
@@ -88,12 +88,18 @@
                                             <td class="p-4 text-on-surface/75 dark:text-on-surface-dark/75 flex justify-between align-middle items-center">
                                                 <p [ngClass]="{'text-success': order.status === 'COMPLETED', 'text-danger': order.status === 'FAILED'}">
                                                     {{ order.status }}</p>
-                                                <svg (click)="$event.stopPropagation(); deleteLimitOrderModalOpen=true; deleteLimitOrderId=order.id || -1;" [hidden]="order.status !== 'PENDING'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 cursor-pointer hover:text-danger me-4">
+                                                <svg *ngIf="order.status === 'PENDING'" (click)="$event.stopPropagation(); deleteLimitOrderModalOpen=true; deleteLimitOrderId=order.id || -1;" [hidden]="order.status !== 'PENDING'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 cursor-pointer hover:text-danger me-4">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                                 </svg>  
                                             </td>
                                         </tr>
                                     }
+
+                                    <tr>
+                                        <td colspan="5">
+                                            <app-table-nav-bar [data]="orders" (dataUpdated)="onOrderDataUpdated($event)"></app-table-nav-bar>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         }
@@ -151,7 +157,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-outline dark:divide-outline-dark bg-transparent">
-                                    @for (transaction of transactions; track transaction.date; let isLast = $last) {
+                                    @for (transaction of paginatedTransactions; track transaction.date; let isLast = $last) {
                                         <tr 
                                             [routerLink]="['/stock', transaction.symbol]" routerLinkActive="router-link-active"
                                             class="cursor-pointer bg-surface-alt dark:bg-surface-dark-alt hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-600 text-on-surface dark:text-on-surface-dark"
@@ -191,6 +197,12 @@
                                             </td>
                                         </tr>
                                     }
+
+                                    <tr>
+                                        <td colspan="5">
+                                            <app-table-nav-bar [data]="transactions" (dataUpdated)="onTransactionDataUpdated($event)"></app-table-nav-bar>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         }
@@ -246,7 +258,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-outline dark:divide-outline-dark bg-transparent">
-                                    @for (transaction of congressTrades; track $index; let isLast = $last) {
+                                    @for (transaction of paginatedTrades; track $index; let isLast = $last) {
                                         <tr 
                                             [routerLink]="['/stock', transaction.symbol]" routerLinkActive="router-link-active"
                                             class="cursor-pointer bg-surface-alt dark:bg-surface-dark-alt hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-600 text-on-surface dark:text-on-surface-dark"
@@ -284,6 +296,12 @@
                                             </td>
                                         </tr>
                                     }
+
+                                    <tr>
+                                        <td colspan="5">
+                                            <app-table-nav-bar [data]="congressTrades" (dataUpdated)="onCongressDataUpdated($event)"></app-table-nav-bar>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         }

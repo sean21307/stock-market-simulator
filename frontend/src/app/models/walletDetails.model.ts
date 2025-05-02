@@ -14,5 +14,7 @@ interface WalletValue{
 export interface WalletDetails {
     wallet: Wallet,
     shares: Share[],
+    etf: Share[],
+    other: Share[],
     wallet_values_overtime: WalletValue[]
 }
