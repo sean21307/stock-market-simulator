@@ -27,6 +27,7 @@ class Share(models.Model):
     symbol = models.CharField(max_length=50)
     quantity = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    category = models.CharField(max_length=50, null=True)
 
 
 class Purchase(models.Model):

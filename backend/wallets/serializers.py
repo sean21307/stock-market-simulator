@@ -14,7 +14,7 @@ class ShareSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Share
-        fields = ['symbol','quantity']
+        fields = ['symbol','quantity', 'category']
 
 class PurchaseSerializer(serializers.ModelSerializer):
     class Meta:

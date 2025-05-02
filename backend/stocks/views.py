@@ -41,7 +41,7 @@ def get_congress_trades(request):
 
 @api_view(['GET'])
 def get_stock_from_search(request, query):
-    return Response(fmpsdk.search_ticker(apikey=apikey, query=query, limit=5, exchange="NASDAQ"))
+    return Response(fmpsdk.search_ticker(apikey=apikey, query=query, limit=5))
 
 @api_view(['GET'])
 def get_stock_details_with_1y_EOD_data(request, symbol):
