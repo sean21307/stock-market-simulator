@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status
 from rest_framework.decorators import permission_classes, api_view
@@ -12,18 +13,12 @@ from .serializers import ForumPostSerializer, ForumCommentSerializer
 def get_forum_posts(request):
     posts = ForumPost.objects.all().order_by('-created_at')
     serializer = ForumPostSerializer(posts, many=True)
-    
-    return Response(serializer.data, status=status.HTTP_200_OK)
-
-@permission_classes([IsAuthenticated])
-@api_view(['GET'])
-def get_single_post(request, post_id):
-    try:
-        post = ForumPost.objects.get(id=post_id)
-        serializer = ForumPostSerializer(post)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    except ObjectDoesNotExist:
-        return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
+    forum_posts = serializer.data
+    for post in forum_posts:
+        user_id = post['user']
+        username = User.objects.get(id=user_id).username
+        post['user'] = username
+    return Response(forum_posts, status=status.HTTP_200_OK)
 
 @permission_classes([IsAuthenticated])
 @api_view(['POST'])
@@ -96,6 +91,11 @@ def get_post_comments(request, post_id):
         post = ForumPost.objects.get(id=post_id)
         comments = post.comments.all().order_by('created_at')
         serializer = ForumCommentSerializer(comments, many=True)
+        forum_comments = serializer.data
+        for comment in forum_comments:
+            user_id = comment['user']
+            username = User.objects.get(id=user_id).username
+            comment['user'] = username
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ObjectDoesNotExist:
         return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)

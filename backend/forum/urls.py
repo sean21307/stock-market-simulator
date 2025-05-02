@@ -6,7 +6,6 @@ urlpatterns = [
     # Post operations
     path('posts/', views.get_forum_posts, name="forum-posts"),
     path('posts/create/', views.create_forum_post, name="create-forum-post"),
-    path('posts/<int:post_id>/', views.get_single_post, name="get-single-post"),
     path('posts/<int:post_id>/update/', views.update_forum_post, name="update-forum-post"),
     path('posts/<int:post_id>/delete/', views.delete_forum_post, name="delete-forum-post"),
     path('posts/<int:post_id>/upvote/', views.upvote_post, name="upvote-post"),
