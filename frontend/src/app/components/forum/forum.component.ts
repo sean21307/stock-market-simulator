@@ -26,6 +26,7 @@ export class ForumComponent implements OnInit {
   currentUser: { username: string } | null = null;
   selectedPost: ForumPost | null = null;
   editingPost: any = null;
+  currentUsername: string | null = null;
 
   constructor(
     private datePipe: DatePipe,
@@ -50,6 +51,8 @@ export class ForumComponent implements OnInit {
         this.loadPosts();
       }
     });
+
+    this.currentUsername = localStorage.getItem('username');
   }
 
   get totalPostPages(): number {
