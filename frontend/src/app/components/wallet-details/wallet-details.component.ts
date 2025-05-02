@@ -123,10 +123,17 @@ export class WalletDetailsComponent implements OnInit {
         next: (wallet: WalletDetails) => {
           this.walletDetails = wallet;
           this.sharesDict = this.walletService.getSharesCountDictionary(this.walletDetails.shares)
-
+          
           let symbolList = Object.keys(this.sharesDict);
           this.stockService.getStockInfoFromSymbolList(symbolList).subscribe({
             next: (info: Record<string, PartialStock>) => {
+              const etfSymbols = new Set(wallet.etf.map(etf => etf.symbol));
+              for (const symbol in info) {
+                if (etfSymbols.has(symbol)) {
+                  info[symbol].isEtf = true;
+                }
+              }
+
               this.stockDict = info;
 
               for (let symbol of Object.keys(this.stockDict)) {

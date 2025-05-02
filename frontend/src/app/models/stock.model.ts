@@ -16,6 +16,7 @@ interface StockInfo {
 }
 
 export interface PartialStock {
+    isEtf: boolean;
     name: string,
     price: number,
     changesPercentage: number,
