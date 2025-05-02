@@ -141,6 +141,26 @@
         </div>
       </div>
       <button
+  (click)="openEditPostModal(post); $event.stopPropagation()"
+  class="absolute top-2 right-10 text-black dark:text-white"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        class="w-6 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+        />
+      </svg>
+    </button>
+
+      <button
       (click)="deletePost(post.id); $event.stopPropagation()"
       class="absolute top-2 right-2 text-black dark:text-white"
     >
@@ -281,4 +301,61 @@
       </div>
     </div>
   }
+  <!-- Edit Post Modal -->
+  @if (editingPost) {
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="bg-surface dark:bg-surface-dark rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
+        <h3 class="text-lg font-semibold mb-4 text-on-surface-strong dark:text-on-surface-dark-strong">Edit Post</h3>
+
+        <!-- Close button -->
+        <button
+          (click)="closeEditPostModal()"
+          class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        <!-- Edit form -->
+        <div class="space-y-4">
+          <div>
+            <label for="edit-post-title" class="block text-sm font-medium text-on-surface-strong dark:text-on-surface-dark-strong mb-1">Title</label>
+            <input
+              type="text"
+              id="edit-post-title"
+              [(ngModel)]="editingPost.title"
+              class="w-full bg-surface dark:bg-surface-dark rounded-lg p-2 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark text-on-surface dark:text-on-surface-dark"
+              placeholder="Post title"
+            >
+          </div>
+          <div>
+            <label for="edit-post-content" class="block text-sm font-medium text-on-surface-strong dark:text-on-surface-dark-strong mb-1">Content</label>
+            <textarea
+              id="edit-post-content"
+              [(ngModel)]="editingPost.content"
+              class="w-full bg-surface dark:bg-surface-dark rounded-lg p-2 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark text-on-surface dark:text-on-surface-dark"
+              rows="6"
+              placeholder="Edit your post content"
+            ></textarea>
+          </div>
+          <div class="flex justify-end gap-2">
+            <button
+              (click)="closeEditPostModal()"
+              class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-on-surface-strong dark:text-on-surface-dark-strong hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              (click)="saveEditedPost()"
+              [disabled]="!editingPost.title.trim() || !editingPost.content.trim()"
+              class="bg-primary dark:bg-primary-dark text-on-primary dark:text-on-primary-dark px-4 py-2 rounded-lg hover:bg-primary-hover dark:hover:bg-primary-dark-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Save Changes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+}
 </div>

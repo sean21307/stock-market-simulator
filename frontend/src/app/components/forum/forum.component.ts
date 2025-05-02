@@ -25,6 +25,7 @@ export class ForumComponent implements OnInit {
   POST_PAGE_SIZE = 10;
   currentUser: { username: string } | null = null;
   selectedPost: ForumPost | null = null;
+  editingPost: any = null;
 
   constructor(
     private datePipe: DatePipe,
@@ -108,7 +109,7 @@ export class ForumComponent implements OnInit {
       error: (err) => console.error('Failed to load comments', err)
     });
   }
-}
+  }
 
 
   deletePost(postId: number): void {
@@ -179,7 +180,7 @@ export class ForumComponent implements OnInit {
       comment.upvotes = originalUpvotes;
     }
   });
-}
+  }
 
   submitPost(): void {
     if (!this.newPost.title.trim() || !this.newPost.content.trim()) {
@@ -202,9 +203,6 @@ export class ForumComponent implements OnInit {
     return this.datePipe.transform(dateString, 'medium');
   }
 
-
-
-
   onCreatePost(): void {
     this.showPostForm = true;
   }
@@ -214,5 +212,33 @@ export class ForumComponent implements OnInit {
     this.newPost = { title: '', content: '' };
   }
 
+  openEditPostModal(post: any) {
+  // Create a deep copy of the post to edit
+  this.editingPost = JSON.parse(JSON.stringify(post));
+}
+
+closeEditPostModal() {
+  this.editingPost = null;
+}
+
+saveEditedPost() {
+  if (this.editingPost) {
+    // Call your service to update the post
+    this.forumService.updatePost(this.editingPost.id, this.editingPost).subscribe({
+      next: (updatedPost) => {
+        // Update the post in the local array
+        const index = this.forumPosts.findIndex(p => p.id === updatedPost.id);
+        if (index !== -1) {
+          this.forumPosts[index] = updatedPost;
+        }
+        this.closeEditPostModal();
+      },
+      error: (err) => {
+        console.error('Error updating post:', err);
+        // Handle error (show toast/message)
+      }
+    });
+  }
+}
 
 }
