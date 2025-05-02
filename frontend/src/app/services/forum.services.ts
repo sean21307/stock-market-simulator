@@ -50,5 +50,5 @@ export class ForumService {
     const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
     return this.http.patch<void>(`${this.apiUrl}posts/${postId}/comments/${commentId}/upvote/`, {}, { headers });
   }
-  
+
 }
