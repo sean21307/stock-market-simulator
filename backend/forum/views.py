@@ -36,7 +36,7 @@ def create_forum_post(request):
         )
         
         post_data = ForumPostSerializer(post).data
-        post_data['username'] = request.user.username  
+        post_data['user'] = request.user.username
 
         return Response(post_data, status=status.HTTP_201_CREATED)
 
@@ -115,7 +115,10 @@ def create_comment(request, post_id):
             user=request.user,
             post=post
         )
-        return Response(ForumCommentSerializer(comment).data, status=status.HTTP_201_CREATED)
+        username = request.user.username
+        response_obj = ForumCommentSerializer(comment).data
+        response_obj['user'] = username
+        return Response(response_obj, status=status.HTTP_201_CREATED)
     except ObjectDoesNotExist:
         return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
