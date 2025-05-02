@@ -25,7 +25,7 @@ export const routes: Routes = [
     { path: 'wallet/new', component: WalletFormComponent },
     { path: 'wallet/:name', component: WalletDetailsComponent },
     { path: 'news', component: NewsComponent },
-    { path: 'forum', component: ForumComponent }
+    { path: 'forum', component: ForumComponent },
     { path: 'tips', component: TipsComponent },
     { path: 'leaderboard', component: LeaderboardComponent },
 
