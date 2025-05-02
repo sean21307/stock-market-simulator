@@ -279,6 +279,28 @@
                         <div class="flex items-center gap-2 mb-1">
                           <span class="font-medium text-on-surface-strong dark:text-on-surface-dark-strong">{{ comment.user }}</span>
                           <span class="text-xs text-gray-500 dark:text-gray-400">{{ formatDate(comment.created_at) }}</span>
+                          @if (currentUsername === comment.user) {
+                            <button
+                              (click)="deleteComment(selectedPost.id, comment.id); $event.stopPropagation()"
+                              class="ml-auto text-gray-400 hover:text-error dark:hover:text-error-dark transition-colors"
+                              title="Delete comment"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M19 7H5M10 11v6m4-6v6M6 7h12l-1.5 12H7.5L6 7z"
+                                />
+                              </svg>
+                            </button>
+                          }
                         </div>
                         <p class="text-on-surface dark:text-on-surface-dark">{{ comment.content }}</p>
                         <div class="flex items-center gap-3 mt-2">

@@ -41,6 +41,11 @@ export class ForumService {
     return this.http.patch<void>(`${this.apiUrl}posts/${postId}/upvote/`, {}, { headers });
   }
 
+    updatePost(postId: number, post: { title: string; content: string }): Observable<ForumPost> {
+    const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
+    return this.http.put<ForumPost>(`${this.apiUrl}posts/${postId}/update/`, post, { headers });
+  }
+
   // ====================== Comment Operations ======================
 
   getComments(postId: number): Observable<ForumComment[]> {
@@ -58,14 +63,14 @@ export class ForumService {
     return this.http.patch<ForumComment>(`${this.apiUrl}posts/${postId}/comments/${commentId}/upvote/`, {}, { headers });
   }
 
-  updatePost(postId: number, post: { title: string; content: string }): Observable<ForumPost> {
-    const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
-    return this.http.put<ForumPost>(`${this.apiUrl}posts/${postId}/update/`, post, { headers });
-  }
-
   updateComment(postId: number, commentId: number, content: string): Observable<ForumComment> {
   const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
     return this.http.put<ForumComment>(
       `${this.apiUrl}posts/${postId}/comments/${commentId}/update/`, { content }, { headers });
   }
+
+  deleteComment(postId: number, commentId: number): Observable<any> {
+  const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
+  return this.http.delete(`${this.apiUrl}posts/${postId}/comments/${commentId}/delete/`, { headers });
+}
 }

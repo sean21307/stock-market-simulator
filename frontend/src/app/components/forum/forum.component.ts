@@ -218,27 +218,54 @@ export class ForumComponent implements OnInit {
   openEditPostModal(post: any) {
   // Create a deep copy of the post to edit
   this.editingPost = JSON.parse(JSON.stringify(post));
-}
+  }
 
-closeEditPostModal() {
-  this.editingPost = null;
-}
+  closeEditPostModal() {
+    this.editingPost = null;
+  }
 
-saveEditedPost() {
-  if (this.editingPost) {
-    // Call your service to update the post
-    this.forumService.updatePost(this.editingPost.id, this.editingPost).subscribe({
-      next: (updatedPost) => {
-        // Update the post in the local array
-        const index = this.forumPosts.findIndex(p => p.id === updatedPost.id);
-        if (index !== -1) {
-          this.forumPosts[index] = updatedPost;
+  saveEditedPost() {
+    if (this.editingPost) {
+      // Call your service to update the post
+      this.forumService.updatePost(this.editingPost.id, this.editingPost).subscribe({
+        next: (updatedPost) => {
+          // Update the post in the local array
+          const index = this.forumPosts.findIndex(p => p.id === updatedPost.id);
+          if (index !== -1) {
+            this.forumPosts[index] = updatedPost;
+          }
+          this.closeEditPostModal();
+        },
+        error: (err) => {
+          console.error('Error updating post:', err);
+          // Handle error (show toast/message)
         }
-        this.closeEditPostModal();
+      });
+    }
+  }
+
+  deleteComment(postId: number, commentId: number) {
+  if (confirm('Are you sure you want to delete this comment?')) {
+    this.forumService.deleteComment(postId, commentId).subscribe({
+      next: () => {
+        // Remove comment from local state
+        const postIndex = this.forumPosts.findIndex(p => p.id === postId);
+        if (postIndex !== -1) {
+          const commentIndex = this.forumPosts[postIndex].comments?.findIndex(c => c.id === commentId);
+          if (commentIndex !== undefined && commentIndex !== -1) {
+            this.forumPosts[postIndex].comments?.splice(commentIndex, 1);
+          }
+        }
+
+        // Update selectedPost if it's the currently viewed post
+        if (this.selectedPost?.id === postId) {
+          this.selectedPost.comments = this.selectedPost.comments?.filter(c => c.id !== commentId);
+        }
+
       },
       error: (err) => {
-        console.error('Error updating post:', err);
-        // Handle error (show toast/message)
+        console.error('Error deleting comment:', err);
+          // Handle error (show toast/message)
       }
     });
   }
