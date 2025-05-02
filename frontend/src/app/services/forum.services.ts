@@ -53,9 +53,9 @@ export class ForumService {
     return this.http.post<ForumComment>(`${this.apiUrl}posts/${postId}/comments/create/`, { content }, { headers });
   }
 
-  upvoteComment(postId: number, commentId: number): Observable<void> {
+  upvoteComment(postId: number, commentId: number): Observable<ForumComment> {
     const headers = { 'Authorization': `Bearer ${this.authService.getToken()}` };
-    return this.http.patch<void>(`${this.apiUrl}posts/${postId}/comments/${commentId}/upvote/`, {}, { headers });
-  }
+    return this.http.patch<ForumComment>(`${this.apiUrl}posts/${postId}/comments/${commentId}/upvote/`, {}, { headers });
+}
 
 }

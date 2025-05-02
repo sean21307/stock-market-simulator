@@ -94,22 +94,26 @@ export class ForumComponent implements OnInit {
   }
 
   openPostModal(post: ForumPost): void {
-    this.selectedPost = post;
-    if (!this.selectedPost.comments) {
-      this.forumService.getComments(post.id).subscribe({
-        next: (comments) => {
-          if (this.selectedPost) {
-            this.selectedPost.comments = comments;
-          }
-        },
-        error: (err) => console.error('Failed to load comments', err)
-      });
-    }
+  this.selectedPost = post;
+  if (!this.selectedPost.comments) {
+    this.forumService.getComments(post.id).subscribe({
+      next: (comments) => {
+        if (this.selectedPost) {
+          this.selectedPost.comments = comments.map(comment => ({
+            ...comment,
+            postId: post.id
+          }));
+        }
+      },
+      error: (err) => console.error('Failed to load comments', err)
+    });
   }
+}
+
 
   deletePost(postId: number): void {
     if (!confirm('Are you sure you want to delete this post?')) return;
-  
+
     this.forumService.deletePost(postId).subscribe({
       next: () => {
         this.forumPosts = this.forumPosts.filter(post => post.id !== postId);
@@ -158,18 +162,31 @@ export class ForumComponent implements OnInit {
   }
 
   upvoteComment(comment: ForumComment): void {
-    this.forumService.upvoteComment(comment.postId, comment.id).subscribe({
-      next: () => comment.upvotes++,
-      error: (err) => console.error('Failed to upvote comment', err)
-    });
+  if (!comment?.postId) {
+    console.error('Cannot upvote - missing postId in comment:', comment);
+    return;
   }
+
+  const originalUpvotes = comment.upvotes;
+  comment.upvotes++;
+
+  this.forumService.upvoteComment(comment.postId, comment.id).subscribe({
+    next: (updatedComment) => {
+      comment.upvotes = updatedComment.upvotes;
+    },
+    error: (err) => {
+      console.error('Upvote failed:', err);
+      comment.upvotes = originalUpvotes;
+    }
+  });
+}
 
   submitPost(): void {
     if (!this.newPost.title.trim() || !this.newPost.content.trim()) {
       console.warn('Title or content is empty');
       return;
     }
-  
+
     this.forumService.createPost(this.newPost).subscribe({
       next: (post) => {
         console.log('Post created successfully:', post); // Verify the response
@@ -186,7 +203,7 @@ export class ForumComponent implements OnInit {
   }
 
 
-  
+
 
   onCreatePost(): void {
     this.showPostForm = true;
@@ -197,5 +214,5 @@ export class ForumComponent implements OnInit {
     this.newPost = { title: '', content: '' };
   }
 
-  
+
 }

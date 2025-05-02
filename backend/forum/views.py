@@ -154,6 +154,7 @@ def delete_comment(request, post_id, comment_id):
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+
 @permission_classes([IsAuthenticated])
 @api_view(['PATCH'])
 def upvote_comment(request, post_id, comment_id):
@@ -164,7 +165,11 @@ def upvote_comment(request, post_id, comment_id):
         )
         comment.upvotes += 1
         comment.save()
-        return Response({'upvotes': comment.upvotes}, status=status.HTTP_200_OK)
+
+        # Return the full updated comment data
+        serializer = ForumCommentSerializer(comment)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     except ObjectDoesNotExist:
         return Response({'error': 'Comment not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
