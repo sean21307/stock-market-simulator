@@ -26,8 +26,8 @@ export class ProfileComponent implements OnInit {
   deleteWalletName: string | undefined = undefined;
 
   user: { username: string; email: string } | null = null;
-   profileForm!: FormGroup;
-   isEditing: boolean = false;
+  profileForm!: FormGroup;
+  isEditing: boolean = false;
 
   constructor(
     private fb: FormBuilder,
