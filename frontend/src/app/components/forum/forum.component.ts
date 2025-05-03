@@ -17,7 +17,7 @@ import { Router } from '@angular/router';
 export class ForumComponent implements OnInit {
   forumPosts: ForumPost[] = [];
   newCommentContent = '';
-  newPost = { title: '', content: '' };
+  newPost = {title: '', content: ''};
   showPostForm = false;
   isLoading = true;
   error = '';
@@ -27,13 +27,16 @@ export class ForumComponent implements OnInit {
   selectedPost: ForumPost | null = null;
   editingPost: any = null;
   currentUsername: string | null = null;
+  editingComment: ForumComment | null = null;
+  editingCommentContent = '';
 
   constructor(
     private datePipe: DatePipe,
     private forumService: ForumService,
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     if (!this.authService.getToken()) {
@@ -60,7 +63,7 @@ export class ForumComponent implements OnInit {
   }
 
   get postPages(): number[] {
-    return Array.from({ length: this.totalPostPages }, (_, i) => i + 1);
+    return Array.from({length: this.totalPostPages}, (_, i) => i + 1);
   }
 
   incrementPostPage() {
@@ -98,20 +101,20 @@ export class ForumComponent implements OnInit {
   }
 
   openPostModal(post: ForumPost): void {
-  this.selectedPost = post;
-  if (!this.selectedPost.comments) {
-    this.forumService.getComments(post.id).subscribe({
-      next: (comments) => {
-        if (this.selectedPost) {
-          this.selectedPost.comments = comments.map(comment => ({
-            ...comment,
-            postId: post.id
-          }));
-        }
-      },
-      error: (err) => console.error('Failed to load comments', err)
-    });
-  }
+    this.selectedPost = post;
+    if (!this.selectedPost.comments) {
+      this.forumService.getComments(post.id).subscribe({
+        next: (comments) => {
+          if (this.selectedPost) {
+            this.selectedPost.comments = comments.map(comment => ({
+              ...comment,
+              postId: post.id
+            }));
+          }
+        },
+        error: (err) => console.error('Failed to load comments', err)
+      });
+    }
   }
 
 
@@ -145,7 +148,7 @@ export class ForumComponent implements OnInit {
 
         const index = this.forumPosts.findIndex(p => p.id === post.id);
         if (index !== -1) {
-          this.forumPosts[index] = { ...post };
+          this.forumPosts[index] = {...post};
         }
       },
       error: (err) => console.error('Failed to add comment', err)
@@ -166,23 +169,23 @@ export class ForumComponent implements OnInit {
   }
 
   upvoteComment(comment: ForumComment): void {
-  if (!comment?.postId) {
-    console.error('Cannot upvote - missing postId in comment:', comment);
-    return;
-  }
-
-  const originalUpvotes = comment.upvotes;
-  comment.upvotes++;
-
-  this.forumService.upvoteComment(comment.postId, comment.id).subscribe({
-    next: (updatedComment) => {
-      comment.upvotes = updatedComment.upvotes;
-    },
-    error: (err) => {
-      console.error('Upvote failed:', err);
-      comment.upvotes = originalUpvotes;
+    if (!comment?.postId) {
+      console.error('Cannot upvote - missing postId in comment:', comment);
+      return;
     }
-  });
+
+    const originalUpvotes = comment.upvotes;
+    comment.upvotes++;
+
+    this.forumService.upvoteComment(comment.postId, comment.id).subscribe({
+      next: (updatedComment) => {
+        comment.upvotes = updatedComment.upvotes;
+      },
+      error: (err) => {
+        console.error('Upvote failed:', err);
+        comment.upvotes = originalUpvotes;
+      }
+    });
   }
 
   submitPost(): void {
@@ -195,7 +198,7 @@ export class ForumComponent implements OnInit {
       next: (post) => {
         console.log('Post created successfully:', post); // Verify the response
         this.forumPosts.unshift(post);
-        this.newPost = { title: '', content: '' };
+        this.newPost = {title: '', content: ''};
         this.showPostForm = false;
       },
       error: (err) => console.error('Failed to create post', err)
@@ -212,12 +215,12 @@ export class ForumComponent implements OnInit {
 
   cancelPost(): void {
     this.showPostForm = false;
-    this.newPost = { title: '', content: '' };
+    this.newPost = {title: '', content: ''};
   }
 
   openEditPostModal(post: any) {
-  // Create a deep copy of the post to edit
-  this.editingPost = JSON.parse(JSON.stringify(post));
+    // Create a deep copy of the post to edit
+    this.editingPost = JSON.parse(JSON.stringify(post));
   }
 
   closeEditPostModal() {
@@ -245,30 +248,73 @@ export class ForumComponent implements OnInit {
   }
 
   deleteComment(postId: number, commentId: number) {
-  if (confirm('Are you sure you want to delete this comment?')) {
-    this.forumService.deleteComment(postId, commentId).subscribe({
-      next: () => {
-        // Remove comment from local state
-        const postIndex = this.forumPosts.findIndex(p => p.id === postId);
+    if (confirm('Are you sure you want to delete this comment?')) {
+      this.forumService.deleteComment(postId, commentId).subscribe({
+        next: () => {
+          // Remove comment from local state
+          const postIndex = this.forumPosts.findIndex(p => p.id === postId);
+          if (postIndex !== -1) {
+            const commentIndex = this.forumPosts[postIndex].comments?.findIndex(c => c.id === commentId);
+            if (commentIndex !== undefined && commentIndex !== -1) {
+              this.forumPosts[postIndex].comments?.splice(commentIndex, 1);
+            }
+          }
+
+          // Update selectedPost if it's the currently viewed post
+          if (this.selectedPost?.id === postId) {
+            this.selectedPost.comments = this.selectedPost.comments?.filter(c => c.id !== commentId);
+          }
+
+        },
+        error: (err) => {
+          console.error('Error deleting comment:', err);
+          // Handle error (show toast/message)
+        }
+      });
+    }
+  }
+  openEditCommentModal(comment: ForumComment): void {
+    this.editingComment = { ...comment };
+    this.editingCommentContent = comment.content;
+  }
+
+  closeEditCommentModal(): void {
+    this.editingComment = null;
+    this.editingCommentContent = '';
+  }
+
+  saveEditedComment(): void {
+    if (!this.editingComment || !this.editingCommentContent.trim()) return;
+
+    this.forumService.updateComment(
+      this.editingComment.postId!,
+      this.editingComment.id,
+      this.editingCommentContent
+    ).subscribe({
+      next: (updatedComment) => {
+        // Update the comment in the local state
+        const postIndex = this.forumPosts.findIndex(p => p.id === updatedComment.postId);
         if (postIndex !== -1) {
-          const commentIndex = this.forumPosts[postIndex].comments?.findIndex(c => c.id === commentId);
-          if (commentIndex !== undefined && commentIndex !== -1) {
-            this.forumPosts[postIndex].comments?.splice(commentIndex, 1);
+          const commentIndex = this.forumPosts[postIndex].comments?.findIndex(c => c.id === updatedComment.id);
+          if (commentIndex !== undefined && commentIndex !== -1 && this.forumPosts[postIndex].comments) {
+            this.forumPosts[postIndex].comments![commentIndex] = updatedComment;
           }
         }
 
         // Update selectedPost if it's the currently viewed post
-        if (this.selectedPost?.id === postId) {
-          this.selectedPost.comments = this.selectedPost.comments?.filter(c => c.id !== commentId);
+        if (this.selectedPost?.id === updatedComment.postId) {
+          const commentIndex = this.selectedPost.comments?.findIndex(c => c.id === updatedComment.id);
+          if (commentIndex !== undefined && commentIndex !== -1 && this.selectedPost.comments) {
+            this.selectedPost.comments[commentIndex] = updatedComment;
+          }
         }
 
+        this.closeEditCommentModal();
       },
       error: (err) => {
-        console.error('Error deleting comment:', err);
-          // Handle error (show toast/message)
+        console.error('Error updating comment:', err);
+        // Handle error (show toast/message)
       }
     });
   }
-}
-
 }
