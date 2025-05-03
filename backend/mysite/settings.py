@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     'accounts',
     'watchlist',
     'wallets.apps.WalletsConfig',
-
+    'forum.apps.ForumConfig',
 ]
 
 MIDDLEWARE = [
