@@ -28,7 +28,7 @@ Adding stock to watchlists
 
 # 📈 Stock Market Simulator
 
-This project simulates stock market activity using a **React** frontend and a **Python** backend. It's ideal for learning about web development, API integration, and financial technology.
+This project simulates stock market activity using an **Angular (TypeScript)** frontend and a **Django Rest Framework (python)** backend. It's ideal for learning about web development, API integration, and financial technology.
 
 ---
 
@@ -114,7 +114,16 @@ HUGGING_FACE_TOKEN="hf_your_token"  # Hugging Face API Token
 
 ---
 
-### 5. Start the Backend Server
+### 5. Tell Django to Create the Database
+
+Be inside the root backend folder with virtual environment activated:
+
+```bash
+python manage.py migrate
+```
+
+---
+### 6. Start the Backend Server
 
 Be inside the root backend folder with virtual environment activated:
 
