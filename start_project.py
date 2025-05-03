@@ -4,7 +4,7 @@ import os
 project_root = os.getcwd()
 backend_path = os.path.join(project_root, "backend")
 frontend_path = os.path.join(project_root, "frontend")
-venv_activate = os.path.join(backend_path, "stock_market_venv`", "Scripts", "activate.bat")  # Using backticks as per your requirement
+venv_activate = os.path.join(backend_path, "venv", "Scripts", "activate.bat")  # Using backticks as per your requirement
 manage_py = os.path.join(backend_path, "manage.py")
 
 print(f"Project Root: {project_root}")
