@@ -1,0 +1,451 @@
+<div class="container mx-auto px-4 py-6 bg-surface dark:bg-surface-dark">
+  <!-- Header with Create Post button -->
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold text-on-surface-strong dark:text-on-surface-dark-strong">💬 Community Forum</h2>
+    <button
+      (click)="onCreatePost()"
+      class="bg-primary dark:bg-primary-dark text-on-primary dark:text-on-primary-dark px-4 py-2 rounded-lg hover:bg-primary-hover dark:hover:bg-primary-dark-hover transition-colors"
+    >
+      + Create Post
+    </button>
+  </div>
+
+  <!-- Loading state -->
+  @if (isLoading) {
+    <div class="text-center py-10">
+      <p class="text-gray-500 dark:text-gray-400">Loading posts...</p>
+    </div>
+  }
+
+  <!-- Error state -->
+  @if (error) {
+    <div class="text-center py-10 text-error dark:text-error-dark">
+      {{ error }}
+    </div>
+  }
+
+  <!-- Post creation form -->
+  @if (showPostForm) {
+    <div class="bg-surface-light dark:bg-neutral-800 shadow-md rounded-lg overflow-hidden mb-6 p-4">
+      <h3 class="text-lg font-semibold mb-4 text-on-surface-strong dark:text-on-surface-dark-strong">Create New Post</h3>
+      <div class="space-y-4">
+        <div>
+          <label for="post-title" class="block text-sm font-medium text-on-surface-strong dark:text-on-surface-dark-strong mb-1">Title</label>
+          <input
+            type="text"
+            id="post-title"
+            [(ngModel)]="newPost.title"
+            class="w-full bg-surface dark:bg-surface-dark rounded-lg p-2 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark text-on-surface dark:text-on-surface-dark"
+            placeholder="Post title"
+          >
+        </div>
+        <div>
+          <label for="post-content" class="block text-sm font-medium text-on-surface-strong dark:text-on-surface-dark-strong mb-1">Content</label>
+          <textarea
+            id="post-content"
+            [(ngModel)]="newPost.content"
+            class="w-full bg-surface dark:bg-surface-dark rounded-lg p-2 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark text-on-surface dark:text-on-surface-dark"
+            rows="4"
+            placeholder="What's on your mind?"
+          ></textarea>
+        </div>
+        <div class="flex justify-end gap-2">
+          <button
+            (click)="cancelPost()"
+            class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-on-surface-strong dark:text-on-surface-dark-strong hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            (click)="submitPost()"
+            [disabled]="!newPost.title.trim() || !newPost.content.trim()"
+            class="bg-primary dark:bg-primary-dark text-on-primary dark:text-on-primary-dark px-4 py-2 rounded-lg hover:bg-primary-hover dark:hover:bg-primary-dark-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Post
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Empty state -->
+  @if (!isLoading && !error && forumPosts.length === 0) {
+    <div class="text-center py-10">
+      <p class="text-gray-500 dark:text-gray-400">No posts yet. Be the first to start a discussion!</p>
+    </div>
+  }
+
+  <!-- Posts list -->
+  @if (!isLoading && forumPosts.length > 0) {
+    <div class="space-y-4">
+      <!-- Pagination controls -->
+      @if (totalPostPages > 1) {
+        <div class="flex justify-between items-center mb-4">
+          <button
+            (click)="decrementPostPage()"
+            [disabled]="currentPostPage === 1"
+            class="px-3 py-1 rounded border border-gray-300 dark:border-gray-600 text-on-surface-strong dark:text-on-surface-dark-strong disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <div class="flex gap-1">
+            @for (page of postPages; track page) {
+              <button
+                (click)="setPostPage(page)"
+                [class.text-on-primary]="page === currentPostPage"
+                [class.dark:text-on-primary-dark]="page === currentPostPage"
+                class="w-8 h-8 rounded flex items-center justify-center text-on-surface-strong dark:text-on-surface-dark-strong"
+              >
+                {{ page }}
+              </button>
+            }
+          </div>
+          <button
+            (click)="incrementPostPage()"
+            [disabled]="currentPostPage === totalPostPages"
+            class="px-3 py-1 rounded border border-gray-300 dark:border-gray-600 text-on-surface-strong dark:text-on-surface-dark-strong disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      }
+
+<!-- Posts list -->
+<div class="grid gap-4">
+  @for (post of paginatedPosts; track post.id) {
+    <div
+      (click)="openPostModal(post)"
+      class="bg-surface-light dark:bg-neutral-800 shadow-md rounded-lg overflow-hidden p-4 cursor-pointer hover:shadow-lg transition-shadow relative"
+    >
+      <div class="flex items-center gap-2 mb-2">
+        <div class="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+          <span class="text-sm text-on-surface-strong dark:text-on-surface-dark-strong">{{ "POST OWNER IMG"}}</span>
+        </div>
+        <span class="text-sm font-medium text-on-surface-strong dark:text-on-surface-dark-strong">{{ post.user }}</span>
+        <span class="text-xs text-gray-500 dark:text-gray-400">• {{ formatDate(post.created_at) }}</span>
+      </div>
+      <h3 class="text-lg font-semibold mb-2 text-on-surface-strong dark:text-on-surface-dark-strong">{{ post.title }}</h3>
+      <p class="text-on-surface dark:text-on-surface-dark line-clamp-2">{{ post.content }}</p>
+      <div class="flex items-center gap-4 mt-3 pt-2 border-t border-gray-200 dark:border-gray-700">
+        <div class="flex items-center gap-1 text-on-surface dark:text-on-surface-dark">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+          </svg>
+          <span>{{ post.upvotes }}</span>
+        </div>
+        <div class="flex items-center gap-1 text-on-surface dark:text-on-surface-dark">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+          <span>{{ post.comments?.length || 0 }} comments</span>
+        </div>
+      </div>
+      @if (currentUsername === post.user) {
+      <button
+      (click)="openEditPostModal(post); $event.stopPropagation()"
+      class="absolute top-2 right-10 text-black dark:text-white"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+            />
+          </svg>
+        </button>
+
+      <button
+      (click)="deletePost(post.id); $event.stopPropagation()"
+      class="absolute top-2 right-2 text-black dark:text-white"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        class="w-6 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M19 7H5M10 11v6m4-6v6M6 7h12l-1.5 12H7.5L6 7z"
+        />
+      </svg>
+    </button>
+      }
+    </div>
+  }
+</div>
+    </div>
+  }
+
+  <!-- Post Modal -->
+  @if (selectedPost) {
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" (click)="closePostModal()">
+      <div class="bg-surface dark:bg-surface-dark rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
+        <div class="p-6">
+          <!-- Close button -->
+          <button
+            (click)="closePostModal()"
+            class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          <!-- Post content -->
+          <div class="mb-6">
+            <div class="flex items-center gap-2 mb-4">
+              <div class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                <span class="text-sm text-on-surface-strong dark:text-on-surface-dark-strong">{{ "POST OWNER IMG" }}</span>
+              </div>
+              <div>
+                <div class="font-medium text-on-surface-strong dark:text-on-surface-dark-strong">{{ selectedPost.user }}</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400">{{ formatDate(selectedPost.created_at) }}</div>
+              </div>
+            </div>
+            <h2 class="text-xl font-bold mb-3 text-on-surface-strong dark:text-on-surface-dark-strong">{{ selectedPost.title }}</h2>
+            <p class="text-on-surface dark:text-on-surface-dark whitespace-pre-line">{{ selectedPost.content }}</p>
+            <div class="flex items-center gap-4 mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
+              <button
+                (click)="upvotePost(selectedPost!)"
+                class="flex items-center gap-1 text-on-surface dark:text-on-surface-dark hover:text-primary dark:hover:text-primary-dark"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                </svg>
+                <span>{{ selectedPost.upvotes }}</span>
+              </button>
+              <div class="flex items-center gap-1 text-on-surface dark:text-on-surface-dark">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                <span>{{ selectedPost.comments?.length || 0 }} comments</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comment form -->
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-3 text-on-surface-strong dark:text-on-surface-dark-strong">Add a comment</h3>
+            <div class="flex gap-3">
+              <div class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                <span class="text-sm text-on-surface-strong dark:text-on-surface-dark-strong">{{ "IMG for Current User" }}</span>
+              </div>
+              <div class="flex-1">
+                <textarea
+                  [(ngModel)]="newCommentContent"
+                  class="w-full bg-surface-light dark:bg-neutral-800 rounded-lg p-3 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark text-on-surface dark:text-on-surface-dark"
+                  rows="3"
+                  placeholder="Write your comment..."
+                ></textarea>
+                <div class="flex justify-end mt-2">
+                  <button
+                    (click)="addComment(selectedPost!)"
+                    [disabled]="!newCommentContent.trim()"
+                    class="bg-primary dark:bg-primary-dark text-on-primary dark:text-on-primary-dark px-4 py-2 rounded-lg hover:bg-primary-hover dark:hover:bg-primary-dark-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Post Comment
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comments section -->
+          <div>
+            <h3 class="text-lg font-semibold mb-3 text-on-surface-strong dark:text-on-surface-dark-strong">Comments</h3>
+            @if (!selectedPost.comments || selectedPost.comments.length === 0) {
+              <p class="text-center text-gray-500 dark:text-gray-400 py-4">No comments yet</p>
+            }
+            @if (selectedPost.comments && selectedPost.comments.length > 0) {
+              <div class="space-y-4">
+                @for (comment of selectedPost.comments; track comment.id) {
+                  <div class="flex gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                      <span class="text-sm text-on-surface-strong dark:text-on-surface-dark-strong">{{ "COMMENT OWNER IMG" }}</span>
+                    </div>
+                    <div class="flex-1">
+                      <div class="bg-surface-light dark:bg-neutral-800 rounded-lg p-4">
+                        <div class="flex items-center gap-2 mb-1">
+                          <span class="font-medium text-on-surface-strong dark:text-on-surface-dark-strong">{{ comment.user }}</span>
+                          <span class="text-xs text-gray-500 dark:text-gray-400">{{ formatDate(comment.created_at) }}</span>
+                          @if (currentUsername === comment.user) {
+                            <button
+                              (click)="openEditCommentModal(comment); $event.stopPropagation()"
+                              class="ml-2 text-gray-400 hover:text-primary dark:hover:text-primary-dark transition-colors"
+                              title="Edit comment"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                />
+                              </svg>
+                            </button>
+                            <button
+                              (click)="deleteComment(selectedPost.id, comment.id); $event.stopPropagation()"
+                              class="ml-auto text-gray-400 hover:text-error dark:hover:text-error-dark transition-colors"
+                              title="Delete comment"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M19 7H5M10 11v6m4-6v6M6 7h12l-1.5 12H7.5L6 7z"
+                                />
+                              </svg>
+                            </button>
+                          }
+                        </div>
+                        <p class="text-on-surface dark:text-on-surface-dark">{{ comment.content }}</p>
+                        <div class="flex items-center gap-3 mt-2">
+                          <button
+                            (click)="upvoteComment(comment)"
+                            class="text-sm text-on-surface dark:text-on-surface-dark hover:text-primary dark:hover:text-primary-dark flex items-center gap-1"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                            </svg>
+                            <span>Upvote ({{ comment.upvotes }})</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+  <!-- Edit Post Modal -->
+  @if (editingPost) {
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="bg-surface dark:bg-surface-dark rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
+        <h3 class="text-lg font-semibold mb-4 text-on-surface-strong dark:text-on-surface-dark-strong">Edit Post</h3>
+
+        <!-- Close button -->
+        <button
+          (click)="closeEditPostModal()"
+          class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        <!-- Edit form -->
+        <div class="space-y-4">
+          <div>
+            <label for="edit-post-title" class="block text-sm font-medium text-on-surface-strong dark:text-on-surface-dark-strong mb-1">Title</label>
+            <input
+              type="text"
+              id="edit-post-title"
+              [(ngModel)]="editingPost.title"
+              class="w-full bg-surface dark:bg-surface-dark rounded-lg p-2 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark text-on-surface dark:text-on-surface-dark"
+              placeholder="Post title"
+            >
+          </div>
+          <div>
+            <label for="edit-post-content" class="block text-sm font-medium text-on-surface-strong dark:text-on-surface-dark-strong mb-1">Content</label>
+            <textarea
+              id="edit-post-content"
+              [(ngModel)]="editingPost.content"
+              class="w-full bg-surface dark:bg-surface-dark rounded-lg p-2 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark text-on-surface dark:text-on-surface-dark"
+              rows="6"
+              placeholder="Edit your post content"
+            ></textarea>
+          </div>
+          <div class="flex justify-end gap-2">
+            <button
+              (click)="closeEditPostModal()"
+              class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-on-surface-strong dark:text-on-surface-dark-strong hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              (click)="saveEditedPost()"
+              [disabled]="!editingPost.title.trim() || !editingPost.content.trim()"
+              class="bg-primary dark:bg-primary-dark text-on-primary dark:text-on-primary-dark px-4 py-2 rounded-lg hover:bg-primary-hover dark:hover:bg-primary-dark-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Save Changes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+  <!-- Edit Comment Modal -->
+  @if (editingComment) {
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="bg-surface dark:bg-surface-dark rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
+        <h3 class="text-lg font-semibold mb-4 text-on-surface-strong dark:text-on-surface-dark-strong">Edit Comment</h3>
+
+        <!-- Close button -->
+        <button
+          (click)="closeEditCommentModal()"
+          class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        <!-- Edit form -->
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-on-surface-strong dark:text-on-surface-dark-strong mb-1">Comment</label>
+            <textarea
+              [(ngModel)]="editingCommentContent"
+              class="w-full bg-surface dark:bg-surface-dark rounded-lg p-2 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark text-on-surface dark:text-on-surface-dark"
+              rows="4"
+              placeholder="Edit your comment"
+            ></textarea>
+          </div>
+          <div class="flex justify-end gap-2">
+            <button
+              (click)="closeEditCommentModal()"
+              class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-on-surface-strong dark:text-on-surface-dark-strong hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              (click)="saveEditedComment()"
+              [disabled]="!editingCommentContent.trim()"
+              class="bg-primary dark:bg-primary-dark text-on-primary dark:text-on-primary-dark px-4 py-2 rounded-lg hover:bg-primary-hover dark:hover:bg-primary-dark-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Save Changes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
