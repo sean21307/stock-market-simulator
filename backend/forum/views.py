@@ -52,7 +52,10 @@ def update_forum_post(request, post_id):
         post.title = request.data.get('title', post.title)
         post.content = request.data.get('content', post.content)
         post.save()
-        return Response(ForumPostSerializer(post).data, status=status.HTTP_200_OK)
+
+        put_data = ForumPostSerializer(post).data
+        put_data['user'] = request.user.username
+        return Response(put_data, status=status.HTTP_200_OK)
     except ObjectDoesNotExist:
         return Response({'error': 'Post not found or not owned by user'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
@@ -135,7 +138,10 @@ def update_comment(request, post_id, comment_id):
         )
         comment.content = request.data.get('content', comment.content)
         comment.save()
-        return Response(ForumCommentSerializer(comment).data, status=status.HTTP_200_OK)
+
+        put_data = ForumCommentSerializer(comment).data
+        put_data['user'] = request.user.username
+        return Response(put_data, status=status.HTTP_200_OK)
     except ObjectDoesNotExist:
         return Response({'error': 'Comment not found or not owned by user'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
