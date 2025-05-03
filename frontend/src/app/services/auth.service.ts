@@ -30,6 +30,25 @@ export class AuthService {
     return null;
   }
 
+  getProfileImage(username: string): boolean {
+    function imageExists(url: string, callback: { (exists: boolean): void; (arg0: boolean): void; }) {
+      var img = new Image();
+      img.onload = function() { callback(true); };
+      img.onerror = function() { callback(false); };
+      img.src = url;
+    }
+
+    imageExists(username, function(exists: boolean) {
+      if (exists) {
+        return true;
+      }
+
+      return false;
+    });
+
+    return false;
+  }
+
   getUserProfile(): Observable<any> {
     return this.http.get(`${this.apiUrl}profile/`, {
       headers: {
@@ -38,7 +57,7 @@ export class AuthService {
     });
   }
 
-    updateUserProfile(updatedData: any): Observable<any> {
+  updateUserProfile(updatedData: any): Observable<any> {
     return this.http.put(`${this.apiUrl}profile/update`, updatedData, {
       headers: {
         Authorization: `Bearer ${this.getToken()}`
